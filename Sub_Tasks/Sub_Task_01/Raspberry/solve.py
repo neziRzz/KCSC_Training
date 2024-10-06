@@ -1,0 +1,22 @@
+flag = [0]*19
+flag[0] = ord("C")
+flag[1] = ord("T")
+flag[2] = ord("F")
+flag[3] = ord("l")
+flag[4] = ord("e")
+flag[5] = ord("a")
+flag[6] = ord("r")
+flag[7] = ord("n")
+flag[8] = ord("{")
+flag[-1] = ord("}")
+flag[9] = ord("+")
+flag[10] = 0x8D ^ 0xCB
+flag[11] = ord("r")
+flag[12] = ord("u")
+flag[13] = int(0x89D/0x15)
+flag[14] = (5*0x15+11)
+flag[15] = int(98/2)
+flag[16] = 0x32
+flag[17] = int(816 / 16)
+for i in range(len(flag)):
+    print(chr(flag[i]),end="")

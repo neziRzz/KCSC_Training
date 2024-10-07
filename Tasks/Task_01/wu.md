@@ -5,7 +5,7 @@
 # Basic Assembly
 ## Sections
 - Một chương trình được code bằng assembly có thể được chia ra làm 3 sections
-  + .data section: Được sử dụng để khai báo và khởi tạo vùng nhớ các biến hoặc các hằng số đã được định nghĩa sẵn
+  + .data section: Được sử dụng để khai báo và khởi tạo vùng nhớ các biến hoặc các hằng số đã được định nghĩa sẵn, size của section này là cố định
   + .text section: Chứa phần code của chương trình
   + .bss section: Dùng để khai báo biến
 ## Comments
@@ -37,11 +37,23 @@
 
 - Cụ thể hơn về các memory segments thì model phân mảnh vùng nhớ (segmented memory model) sẽ có trách nhiệm chia nhỏ các vùng nhớ hệ thống thành các vùng riêng biệt và chúng được referenced bằng các con trỏ ở trong các thanh ghi segments (segment registers). Mỗi segment sẽ chứa những loại data khác nhau. Cụ thể như sau:
 ```
-- Data segment: Bao gồm 2 sections là **.data** và **.bss**
+- Data segment: Bao gồm 2 sections là .data và .bss, section .data được dùng để khai báo vùng nhớ và vị trí của các data được sử dụng trong chương trình. Size của section này là cố định xuyên suốt trong chương trình. .bss section cũng là một vùng nhớ tĩnh chứa các buffer cho các data được khai báo sau của chương trình. Các buffer này được zero-filled.
+- Code segment: Được định nghĩa bởi .text section. Segment này chứa các đoạn code (instructions) sẽ được thực thi trong chương trinh. Size của segment này cố định.
+- Stack: Segment này chứa các giá trị truyền vào các hàm hay thủ tục ở trong chương trình
 ```
+## Registers
+- Thanh ghi (Registers) là các vùng nhớ đặc biệt ở trong CPU.
+- Có 8 thanh ghi đa chức năng, thì trong đó ta có thể truy cập vào 4 thanh ghi EAX, EBX, ECX, EDX thông qua biến thể 16 hoặc 8 bits của chúng. Ví dụ với thanh ghi EAX, thì AX sẽ là 16 bits dầu của thanh ghi này, AL sẽ lấy 8 bits thấp nhất và AH sẽ lấy 8 bits tiếp theo. Các thanh ghi khác trong số 4 thanh ghi vừa nêu trên đều được truy cập tương tự. Tuy các thanh ghi này có thể được sử dụng cho nhiều mục đích khác nhau, nhưng chúng thường được sử dụng cho một mục đích cụ thể
 
+![image](https://github.com/user-attachments/assets/eefdae86-fa2c-4131-abbe-88e3fa953414)
 
+- Có 6 thanh ghi segment. Chúng định nghĩa các segments trong memory
 
+![image](https://github.com/user-attachments/assets/3ad1e6c0-689d-4aad-ae6b-6d3933b167f8)
+
+- Và cuối cùng là 2 thanh ghi 32-bit sau
+
+  ![image](https://github.com/user-attachments/assets/a58d1deb-2fb8-4d98-9c75-c4753d05da3b)
 
 
 

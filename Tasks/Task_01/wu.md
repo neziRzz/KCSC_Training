@@ -184,7 +184,10 @@ equal_label:
 ![image](https://github.com/user-attachments/assets/faaa5774-5f84-47fd-b84e-eb6fcaf339f7)
 
 - Ta có thể thấy rằng chương trình sẽ được chia ra làm 3 sections
-  + Assembler directives: Chứa các thông tin để khởi tạo assembler như là syntax, memory models(Win32 chỉ hỗ trợ flat model), calling conventions, header files,....
+  + Assembler directives: Chứa các thông tin để khởi tạo assembler như là syntax, memory models, calling conventions, header files,.... Trong đó:
+  	+ `.386` ám chỉ instructions set mà chương trình dùng sẽ là `80386`
+   	+ `.model flat` ám chỉ memory model mà chương trình sẽ sử dụng (chỉ có flat model là được hỗ trợ đối với các chương trình Win32)
+    	+`(.model)stdcall` ám chỉ calling convention mà hàm sử dụng, trong trường hợp này là `stdcall` với các parameters được passed từ phải qua trái (trong stack thì push các arguments vào theo thứ tự như trên)  
   + Data Segment: Khởi tạo và cấp phát vùng nhớ cho các biến do người code định nghĩa
   + Code Segment: Như tên gọi, đây là segment chứa code assembly của chương trình
 ## Cách triển khai hàm

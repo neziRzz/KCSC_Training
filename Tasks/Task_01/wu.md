@@ -85,7 +85,7 @@
 
  Syntax:
  ```asm
-cmp des, src
+cmp dest, src
  ```
 
  Example:

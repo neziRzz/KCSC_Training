@@ -187,3 +187,41 @@ equal_label:
   + Assembler directives: Chứa các thông tin để khởi tạo assembler như là syntax, memory models(Win32 chỉ hỗ trợ flat model), calling conventions, header files,....
   + Data Segment: Khởi tạo và cấp phát vùng nhớ cho các biến do người code định nghĩa
   + Code Segment: Như tên gọi, đây là segment chứa code assembly của chương trình
+## Cách triển khai hàm
+- Cách triển khai 1 hàm trong NASM (giả sử ta có 1 chương trình in ra string `test`)
+```asm
+.386 
+.model flat, stdcall 
+option casemap:none 
+include \masm32\include\masm32rt.inc
+.data
+    msg db "test", 0
+.code 
+start: 
+    push offset msg
+    call StdOut
+    call ExitProcess
+end start
+```
+  + Tạo lable cho hàm với syntax `ur_func_name:`
+  + Kết thúc hàm với syntax `end ur_func_name`
+  + Đảm bảo cả hàm phải nằm trong Code Segment
+## Một số các syntax đặc biệt
+### Push and Pop
+- Push và Pop là các câu lệnh giúp ta có thể xử lí stack. Push sẽ lấy một value và đẩy nó lên đầu stack, Pop sẽ tiến hành lấy value ở đỉnh stack ra khỏi stack và lưu nó vào một toán hạng nào đó. Từ đó ta có thể thấy được stack hoạt động theo cơ chế LIFO (Last In First Out)
+### Invoke
+-  Hàm `Invoke` là 1 hàm chỉ có ở MASM, ta có thể dùng chúng để gọi các hàm mà không cần push các parameters trước đó, qua đó giúp tiết kiệm được thời gian
+
+  Example:
+ (dùng `Invoke`)
+```asm
+invoke SendMessage, [hWnd], WM_CLOSE, 0, 0
+```
+(không dùng `Invoke`)
+```asm
+ push 0 
+ push 0 
+ push WM_CLOSE 
+ push [hWnd] 
+ call [SendMessage]
+```

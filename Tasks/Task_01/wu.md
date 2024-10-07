@@ -42,7 +42,8 @@
 - Stack: Segment này chứa các giá trị truyền vào các hàm hay thủ tục ở trong chương trình
 ```
 ## Registers
-- Thanh ghi (Registers) là các vùng nhớ đặc biệt ở trong CPU.
+- Thanh ghi (Registers) là các vùng nhớ đặc biệt ở trong CPU
+ 
 - Có 8 thanh ghi đa chức năng, thì trong đó ta có thể truy cập vào 4 thanh ghi EAX, EBX, ECX, EDX thông qua biến thể 16 hoặc 8 bits của chúng. Ví dụ với thanh ghi EAX, thì AX sẽ là 16 bits dầu của thanh ghi này, AL sẽ lấy 8 bits thấp nhất và AH sẽ lấy 8 bits tiếp theo. Các thanh ghi khác trong số 4 thanh ghi vừa nêu trên đều được truy cập tương tự. Tuy các thanh ghi này có thể được sử dụng cho nhiều mục đích khác nhau, nhưng chúng thường được sử dụng cho một mục đích cụ thể
 
 ![image](https://github.com/user-attachments/assets/eefdae86-fa2c-4131-abbe-88e3fa953414)
@@ -53,11 +54,123 @@
 
 - Và cuối cùng là 2 thanh ghi 32-bit sau
 
-  ![image](https://github.com/user-attachments/assets/a58d1deb-2fb8-4d98-9c75-c4753d05da3b)
+![image](https://github.com/user-attachments/assets/a58d1deb-2fb8-4d98-9c75-c4753d05da3b)
 
+## Basic Instructions
++ `cmp op1, op2`: Thực hiện so sánh 2 toán hạng `op1` và `op2`, sau đó set các flags CF, OF, SF, ZF, AF, và PF tương ứng. Câu lệnh này thường được sử dụng để xử lí các điều kiện
 
++ `add op1, op2`: Thực hiện cộng 2 toán hạng `op1` và `op2` với kết quả của phép cộng được lưu vào `op1` và set các flags  OF, SF, ZF, AF, CF, và PF tương ứng
+ 
++ `sub op1, op2`: Thực hiện trừ 2 toán hạng `op1` và `op2` với kết quả của phép trừ được lưu vào `op1` và set các flags  OF, SF, ZF, AF, CF, và PF tương ứng
 
++ `mul op1, op2`: Thực hiện nhân không dấu(unsigned) 2 toán hạng `op1` và `op2` với kết quả của phép nhân được lưu vào `op1` và set các flags OF và CF tương ứng. Một điều cần lưu ý với instruction này là tùy thuộc vào data type (BYTE, WORD or DOUBLEWORD) thì kết quả sẽ được lưu vào các toán hạng theo ảnh sau (với x64 thì tương tự, chỉ thêm cặp register RDX:RAX)
+     
+     ![image](https://github.com/user-attachments/assets/28e24a7d-e69d-47da-93c0-cb0b1983eca3)
+     
++ `imul op1, op2(, op3)`:Thực hiện nhân có dấu (signed) 1, 2 hoặc 3 toán hạng `op1`, `op2` và `op3` với kết quả của phép nhân được lưu vào `op1` và set các flags OF và CF tương ứng. Dưới đây là các trường hợp cụ thể cho từng toán hạng và số lượng các toán hạng được sử dụng trong instruction)
+     ![image](https://github.com/user-attachments/assets/21c24e86-c29a-4dbf-9a39-4b41a455b7ba)
+     
++ `div op1`: Thực hiện chia không dấu (unsigned) AX, DX:AX, EDX:EAX,... cho toán hạng `op1`, với kết quả và phần dư được lưu theo ảnh bên dưới (LƯU Ý: Trước khi sử dụng instruction này thì phải gọi trước đó instruction `xor edx, edx` để tránh integer overflow)
 
++ `idiv op1`: Thực hiện chia có dấu (unsigned) AX, DX:AX, EDX:EAX,... cho toán hạng `op1`, với kết quả và phần dư được lưu theo ảnh bên dưới (LƯU Ý: Trước khi sử dụng instruction này thì phải gọi trước đó instruction 1 trong 3 instruction `cwd`, `cdq` or `cqo` <tùy vào data type> để tránh integer overflow [References](https://www.felixcloutier.com/x86/cwd:cdq:cqo)
+    
+    ![image](https://github.com/user-attachments/assets/7a89aad1-55d6-4c3e-9d1b-de5abf6600bb)
+## Conditions
+- Trong assembly, câu điều kiện (Conditional jumps) sẽ được chia ra làm 2 loại
+  + Jump không điều kiện (Unconditional jumps): Được thực hiện bởi câu lệnh `jmp`, loại này thường sẽ chuyển luồng hoạt động của chương trình sang 1 địa chỉ không giống với luồng trước hoặc có thể được dùng để lặp lại một luồng hoạt động nào đó (Luôn được thực thi)
+  + Jump có điều kiện (Conditional jumps): Được thực hiện bởi các câu lệnh có format j<điều kiện>. Tùy vào điều kiện là gì thì sẽ chuyển luồng chương trình sang một luồng khác (Chỉ thực thi khi thỏa mãn điều kiện)
 
+- Dưới đây là các câu lệnh sử dụng để xử lí điều kiện
+  + `CMP` Instruction: Câu lệnh này so sánh 2 toán hạng, thường xuyên được sử dụng để xử lí các. Căn bản thì instruction này sẽ thực hiện trừ 2 toán hạng với nhau để kiểm tra xem chúng có bằng nhau hay không. Được dùng kèm theo với các jump instructions có điều kiện để branch
 
+ Syntax:
+ ```asm
+cmp des, src
+ ```
 
+ Example:
+```asm
+cmp eax, 5 ;compare eax with 5
+jz equal  ; jump to equal lable if eax = 5
+.
+.
+.
+equal: ...
+```
+ + Jump không điều kiện (Unconditional jump): Được thực hiện bởi câu lệnh `jmp`, loại này thường sẽ chuyển luồng hoạt động của chương trình sang 1 địa chỉ không giống với luồng trước hoặc có thể được dùng để lặp lại một luồng hoạt động nào đó (Luôn được thực thi)
+
+Syntax:
+```asm
+jmp label
+```
+Example:
+```asm
+mov ecx, 0 ;init ecx
+mov eax, 1 ;init eax
+mov edx, 1 ;init edx
+label:
+add cx, 1 ;add 1 into cx
+add ax, 2 ;add 2 into ax
+add dx, 3 ;add 3 into dx
+jmp label ;Unconditional jump into label
+```
++ Jump có điều kiện (Conditional jump): Jump có điều kiện (Conditional jumps): Được thực hiện bởi các câu lệnh có format j<điều kiện>. Tùy vào điều kiện là gì thì sẽ chuyển luồng chương trình sang một luồng khác (Chỉ thực thi khi thỏa mãn điều kiện). Dưới đây là các câu lệnh jump có điều kiện (signed data)
+
+![image](https://github.com/user-attachments/assets/b3b5cd9b-9816-4b2a-b073-f75adbb3393a)
+
+(unsigned data)
+![image](https://github.com/user-attachments/assets/e6b73c12-2928-41e9-b8b7-a3c2dc3a9e7c)
+
+(dựa theo các eflags)
+![image](https://github.com/user-attachments/assets/0bf69e60-2b7b-4d9c-a22e-17313505f0ec)
+
+Example:
+```asm
+cmp al, bl
+je equal
+cmp al, cl
+je equal
+cmp ah, ch
+je equal
+non_equal:...
+equal:...
+```
+## Label
+- Labels là tên cho các địa chỉ đã hoặc sẽ được khởi tạo trong vùng nhớ. Thường sẽ tượng chưng cho các địa điểm trong memory mà chưa được xác định hay chỉ có thể biết được khi mà chương trình được load vào memory để thực thi.
+
+- Có 2 loại label chính:
+  + Label được sử dụng để reference cho các memory locations mà ở đó chứa data
+  + Label được sử dụng để reference cho các memory locations mà ở đó chương trình sẽ chuyển luồng thực thi (jmp/branch)
+
+Syntax:
+```asm
+label_name:
+```
+Example:
+(Data)
+```asm
+section	.text
+   global _start     ;must be declared for linker (ld)
+	
+_start:	            ;tells linker entry point
+   mov	edx,len     ;message length
+   mov	ecx,msg     ;message to write
+  .
+  .
+  .
+  .
+section	.data
+msg db 'Example', 0xa  ;string to be printed
+len equ $ - msg     ;length of the string
+
+```
+(jmp/branch)
+```asm
+cmp ax, 1
+jz equal_label
+.
+.
+.
+equal_label:
+```
+# MASM basic

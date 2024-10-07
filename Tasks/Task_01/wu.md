@@ -184,12 +184,12 @@ equal_label:
 ![image](https://github.com/user-attachments/assets/faaa5774-5f84-47fd-b84e-eb6fcaf339f7)
 
 - Ta có thể thấy rằng chương trình sẽ được chia ra làm 3 sections
-  + Assembler directives: Chứa các thông tin để khởi tạo assembler như là syntax, memory models, calling conventions, header files,.... Trong đó:
+  + Assembler directives: Các syntax như `.386`, `.data`, `.code`,... là các Assembler directives. Chứa các thông tin để khởi tạo assembler như là syntax, memory models, calling conventions, header files,....
   	+ `.386` ám chỉ instructions set mà chương trình dùng sẽ là `80386`
    	+ `.model flat` ám chỉ memory model mà chương trình sẽ sử dụng (chỉ có flat model là được hỗ trợ đối với các chương trình Win32)
-    	+`(.model)stdcall` ám chỉ calling convention mà hàm sử dụng, trong trường hợp này là `stdcall` với các parameters được passed từ phải qua trái (trong stack thì push các arguments vào theo thứ tự như trên)  
-  + Data Segment: Khởi tạo và cấp phát vùng nhớ cho các biến do người code định nghĩa
-  + Code Segment: Như tên gọi, đây là segment chứa code assembly của chương trình
+    	+`(.model)stdcall` ám chỉ calling convention mà hàm sử dụng, trong trường hợp này là `stdcall` với các parameters được passed từ phải qua trái (trong stack thì push các arguments vào theo thứ tự như trên)
+  + Data Segment: Bắt đầu sau syntax `.data`. Khởi tạo và cấp phát vùng nhớ cho các data của chương trình. Các directives khác như là `.data?` hay `.const` đều ám chỉ các data chưa được khởi tạo và các data không đổi 
+  + Code Segment: Bắt đầu sau syntax `.code`. Như tên gọi, đây là segment chứa code assembly của chương trình
 ## Cách triển khai hàm
 - Cách triển khai 1 hàm trong NASM (giả sử ta có 1 chương trình in ra string `test`)
 ```asm
@@ -241,3 +241,16 @@ invoke SendMessage, [hWnd], WM_CLOSE, 0, 0
   	ret
   <tên> endp
   ```
+### Variables (Biến)
+- Các biến được cấp phát bộ nhớ trong memory và cho phép chúng ta lưu trữ dữ liệu. Chúng rất hữu ích khi ta không có đủ thanh ghi. Có 2 loại biến là biến cục bộ (Local Variable) và biến toàn cục (Global Variable). Biến toàn cục nằm ở trong `.data` section nếu như chúng đã được khởi tạo, `.data?` nếu chưa và `.const` nếu là các hằng số
+
+- Syntax
+```asm
+<name> <type> <value, or ? if uninitialized>
+```
+- Biến cục bộ được đặt trong các hàm và được lưu tạm thời trong quá trình hàm chạy
+
+- Syntax
+```asm
+local <name>:<type>
+```

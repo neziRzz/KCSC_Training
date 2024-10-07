@@ -225,3 +225,16 @@ invoke SendMessage, [hWnd], WM_CLOSE, 0, 0
  push [hWnd] 
  call [SendMessage]
 ```
+## Một số các tính năng
+### Macros
+- MASM có một số các macros để giúp cho việc lập trình trở nên dễ dàng hơn, ta đã thấy một trong số những macros của MASM là `Invoke`. Sau đây là một số các macros thường gặp khác, tính năng của chúng đúng như tên gọi
+  + .if, .else, .endif
+  + .while, .break, .endw
+### Functions
+- Giống với các ngôn ngữ bậc cao khác, MASM cho phép chúng ta định nghĩa các hàm để code dễ nhìn hơn. Chúng có syntax như sau
+  ```asm
+  <tên> proc <var1>:<var1 type>, <var2>:<var2 type>,...
+  	<function's code>
+  	ret
+  <tên> endp
+  ```

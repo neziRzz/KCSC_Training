@@ -119,9 +119,11 @@ jmp label ;Unconditional jump into label
 ![image](https://github.com/user-attachments/assets/b3b5cd9b-9816-4b2a-b073-f75adbb3393a)
 
 (unsigned data)
+
 ![image](https://github.com/user-attachments/assets/e6b73c12-2928-41e9-b8b7-a3c2dc3a9e7c)
 
 (dựa theo các eflags)
+
 ![image](https://github.com/user-attachments/assets/0bf69e60-2b7b-4d9c-a22e-17313505f0ec)
 
 Example:

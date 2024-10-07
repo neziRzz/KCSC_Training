@@ -19,7 +19,26 @@
   xor eax, eax ;clear eax
   ```
 ## Syntax
+- Trong assembly, mỗi một câu lệnh khác nhau sẽ chỉ được ghi trên 1 dòng duy nhất. Các câu lệnh được viết theo format như sau
+```asm
+[label]   mnemonic   [operands]   [;comment]
+```
+- Những vùng được ghi trong dấu ngoặc vuông là tùy chọn. Một câu lệnh sẽ gồm 2 thành phần chính, phần đầu sẽ là tên của instruction (mnemonic) cần được thực thi và các toán hạng (operands)
+  Examples
+  ```asm
+  xor eax, eax ;clear eax
 
+  add ah, 4 ;add 4 into AH register
+
+  mov cx, 10 ;Transfer 10 into CX register
+  ```
+## Memory Segments
+- Như đã đề cập ở trên về 3 sections của một chương trình được viết bằng assembly, thì 3 sections này cũng được coi là các memory segments
+
+- Cụ thể hơn về các memory segments thì model phân mảnh vùng nhớ (segmented memory model) sẽ có trách nhiệm chia nhỏ các vùng nhớ hệ thống thành các vùng riêng biệt và chúng được referenced bằng các con trỏ ở trong các thanh ghi segments (segment registers). Mỗi segment sẽ chứa những loại data khác nhau. Cụ thể như sau:
+```
+- Data segment: Bao gồm 2 sections là **.data** và **.bss**
+```
 
 
 

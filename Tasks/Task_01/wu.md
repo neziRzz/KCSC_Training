@@ -252,3 +252,60 @@ invoke SendMessage, [hWnd], WM_CLOSE, 0, 0
 ```asm
 local <name>:<type>
 ```
+# Conclusion
+- Đây là những kiến thức mà mình tổng hợp được về ASM nói chung và MASM nói riêng, bên dưới là code asm của mình thực hiện nhận input là 2 số nguyên và tính tổng 2 số đó nhằm cho mục đích tham khảo
+
+```asm
+.386
+.model flat, stdcall
+option casemap : none
+include \masm32\include\windows.inc
+include \masm32\include\kernel32.inc
+includelib \masm32\lib\kernel32.lib
+include \masm32\include\user32.inc
+includelib \masm32\lib\user32.lib
+includelib \masm32\lib\msvcrt.lib
+
+printf proto C 
+scanf proto C
+.data
+    num_form db "%d",0
+    sum_form db "%d",0
+    str_form db "%s",0
+    ms1 db "Enter ur first num:",0Ah,0
+    ms2 db "Enter ur second num:",0Ah,0
+    ms3 db "Sum result:%d",0
+    num1 DWORD ?
+    num2 DWORD ?
+.code
+start:
+    push OFFSET ms1 			;push argument(s) to stack
+    call printf ;call printf
+    add esp, 4   			;clean argument(s) from stack
+    push OFFSET num1  			;push argument(s) to stack
+    push OFFSET num_form
+    call scanf 				;call scanf
+    
+    add esp, 8 				;clean argument(s) from stack
+    push OFFSET ms2
+    call printf				;call printf
+    push OFFSET num2			;push argument(s) to stack
+    push OFFSET num_form		
+    
+    call scanf				;call scanf
+    add esp, 8				;clean stack
+    mov eax, num2			
+    mov ecx, num1
+    add eax, ecx
+    
+    push eax			;push argument(s) to stack
+    push OFFSET ms3		
+    call printf			;call printf
+    add esp, 8			;clean argument(s) stack
+    xor eax, eax		;clear eax
+    
+    push 0			;push exitcode
+    call ExitProcess		;exit		
+end start
+
+```

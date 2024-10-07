@@ -280,7 +280,7 @@ scanf proto C
 .code
 start:
     push OFFSET ms1 			;push argument(s) to stack
-    call printf ;call printf
+    call printf 			;call printf
     add esp, 4   			;clean argument(s) from stack
     push OFFSET num1  			;push argument(s) to stack
     push OFFSET num_form
@@ -293,19 +293,19 @@ start:
     push OFFSET num_form		
     
     call scanf				;call scanf
-    add esp, 8				;clean stack
+    add esp, 8				;clean argument(s) stack
     mov eax, num2			
     mov ecx, num1
     add eax, ecx
     
-    push eax			;push argument(s) to stack
+    push eax				;push argument(s) to stack
     push OFFSET ms3		
-    call printf			;call printf
-    add esp, 8			;clean argument(s) stack
-    xor eax, eax		;clear eax
+    call printf				;call printf
+    add esp, 8				;clean argument(s) stack
+    xor eax, eax			;clear eax
     
-    push 0			;push exitcode
-    call ExitProcess		;exit		
+    push 0				;push exitcode
+    call ExitProcess			;exit		
 end start
 
 ```

@@ -156,13 +156,13 @@ section	.text
 	
 _start:	            ;tells linker entry point
    mov	edx,len     ;message length
-   mov	ecx,msg     ;message to write
+   mov	ecx,msg     ;message to write, 
   .
   .
   .
   .
 section	.data
-msg db 'Example', 0xa  ;string to be printed
+msg: db 'Example', 0xa  ;string to be printed
 len equ $ - msg     ;length of the string
 
 ```
@@ -176,3 +176,14 @@ jz equal_label
 equal_label:
 ```
 # MASM basic
+## About MASM
+- Một chút về tiểu sử của MASM (Microsoft Macro Assembler). Là một `x86 assembler` sử dụng syntax `Intel` cho 2 hệ điều hành `MS-DOS` và `Microsoft Windows`. Có 2 phiên bản chính là hệ `16-bits` và `32-bits`, và một phiên bản khác cho các architecture thuộc hệ `64-bits` là `ML64`
+## Cấu trúc chương trình 
+- Một chương trình được code bằng MASM sẽ có cấu trúc như sau
+
+![image](https://github.com/user-attachments/assets/faaa5774-5f84-47fd-b84e-eb6fcaf339f7)
+
+- Ta có thể thấy rằng chương trình sẽ được chia ra làm 3 sections
+  + Assembler directives: Chứa các thông tin để khởi tạo assembler như là syntax, memory models(Win32 chỉ hỗ trợ flat model), calling conventions, header files,....
+  + Data Segment: Khởi tạo và cấp phát vùng nhớ cho các biến do người code định nghĩa
+  + Code Segment: Như tên gọi, đây là segment chứa code assembly của chương trình

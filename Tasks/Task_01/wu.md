@@ -56,3 +56,34 @@ end start
 - Trong assembly, câu điều kiện (Conditional jumps) sẽ được chia ra làm 2 loại
   + Jump không điều kiện (Unconditional jumps): Được thực hiện bởi câu lệnh `jmp`, loại này thường sẽ chuyển luồng hoạt động của chương trình sang 1 địa chỉ không giống với luồng trước hoặc có thể được dùng để lặp lại một luồng hoạt động nào đó (Luôn được thực thi)
   + Jump có điều kiện (Conditional jumps): Được thực hiện bởi các câu lệnh có format j<điều kiện>. Tùy vào điều kiện là gì thì sẽ chuyển luồng chương trình sang một luồng khác (Chỉ thực thi khi thỏa mãn điều kiện)
+-----------------------------------------------------------------------------------------------------------------------------------------
+- Vòng lặp trong assembly
+  + Như đã đề cập ở trên, ta có thể implement vòng lặp trong assembly bằng cách sử dụng câu lệnh `jmp` (hoặc các câu lệnh có format j<điều kiện>), bên dưới là một đoạn code asm để mô phỏng lại quá trình
+  ```asm
+        xor cx,cx   ; cx-register is the counter, set to 0
+  loop1 nop         ; Whatever you wanna do goes here, should not change cx
+        inc cx      ; Increment
+        cmp cx,3    ; Compare cx to the limit
+        jle loop1   ; Loop while less or equal
+  ```
+  + Đoạn code này khi dịch lại sang C sẽ có cấu trúc như sau
+  ```C
+  for(int x = 0; x<=3; x++)
+  {
+    //things to do go here
+  }
+  ```
+  + Ta cũng có thể sử dụng câu lệnh `loop` để thực thi vòng lặp (**LƯU Ý:** Câu lệnh `loop` mặc định register ECX sẽ là bộ đếm), dưới đây sẽ là đoạn code mô phỏng lại quá trình bằng assembly
+  ```asm
+          mov cx,4    ; 4 iterations
+  loop1   nop         ; Whatever you wanna do goes here, should not change cx
+          loop loop1  ; loop instruction decrements cx and jumps to label if not 0
+  ```
+  + Đoạn code bằng C mô phỏng lại quá trình
+  ```C
+    for(int x = 0; x<=4; x++)
+  {
+    //things to do go here
+  }
+  ```
+    

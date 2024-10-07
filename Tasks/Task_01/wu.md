@@ -13,7 +13,7 @@
   + Data Segment: Khởi tạo và cấp phát vùng nhớ cho các biến do người code định nghĩa
   + Code Segment: Như tên gọi, đây là segment chứa code assembly của chương trình
 -----------------------------------------------------------------------------------------------------------------------------------------
-- Cách triển khai 1 hàm trong NASM )(giả sử ta có 1 chương trình in ra string `test`)
+- Cách triển khai 1 hàm trong NASM (giả sử ta có 1 chương trình in ra string `test`)
 ```asm
 .386 
 .model flat, stdcall 

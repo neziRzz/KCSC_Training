@@ -29,7 +29,6 @@ include \masm32\include\masm32rt.inc
 start: 
     push offset msg
     call StdOut
-
     call ExitProcess
 end start
 ```
@@ -45,15 +44,15 @@ end start
      
      ![image](https://github.com/user-attachments/assets/28e24a7d-e69d-47da-93c0-cb0b1983eca3)
 
-   + `imul op1, op2(, op3)`:Thực hiện nhân có dấu (signed)1, 2 hoặc 3 toán hạng `op1`, `op2` và `op3` với kết quả của phép nhân được lưu vào `op1` và set các flags OF và CF tương ứng. Dưới đây là các trường hợp cụ thể cho từng toán hạng và số lượng các toán hạng được sử dụng trong instruction
+   + `imul op1, op2(, op3)`:Thực hiện nhân có dấu (signed) 1, 2 hoặc 3 toán hạng `op1`, `op2` và `op3` với kết quả của phép nhân được lưu vào `op1` và set các flags OF và CF tương ứng. Dưới đây là các trường hợp cụ thể cho từng toán hạng và số lượng các toán hạng được sử dụng trong instruction)
 
      ![image](https://github.com/user-attachments/assets/21c24e86-c29a-4dbf-9a39-4b41a455b7ba)
 
   + `div op1`: Thực hiện chia không dấu (unsigned) AX, DX:AX, EDX:EAX,... cho toán hạng `op1`, với kết quả và phần dư được lưu theo ảnh bên dưới (LƯU Ý: Trước khi sử dụng instruction này thì phải gọi trước đó instruction `xor edx, edx` để tránh integer overflow)
-  + `idiv op1`: Thực hiện chia có dấu (unsigned) AX, DX:AX, EDX:EAX,... cho toán hạng `op1`, với kết quả và phần dư được lưu theo ảnh bên dưới (LƯU Ý: Trước khi sử dụng instruction này thì phải gọi trước đó instruction 1 trong 3 instruction `cwd`, `cdq` or `cqo` (tùy vào datatype) để tránh integer overflow [References](https://www.felixcloutier.com/x86/cwd:cdq:cqo)
+  + `idiv op1`: Thực hiện chia có dấu (unsigned) AX, DX:AX, EDX:EAX,... cho toán hạng `op1`, với kết quả và phần dư được lưu theo ảnh bên dưới (LƯU Ý: Trước khi sử dụng instruction này thì phải gọi trước đó instruction 1 trong 3 instruction `cwd`, `cdq` or `cqo` <tùy vào data type> để tránh integer overflow [References](https://www.felixcloutier.com/x86/cwd:cdq:cqo)
 
     ![image](https://github.com/user-attachments/assets/7a89aad1-55d6-4c3e-9d1b-de5abf6600bb)
 -----------------------------------------------------------------------------------------------------------------------------------------
 - Trong assembly, câu điều kiện (Conditional jumps) sẽ được chia ra làm 2 loại
-  + Jump không điều kiện (Unconditional jumps): Được thực hiện bởi câu lệnh `jmp`, loại này thường sẽ chuyển luồng hoạt động của chương trình sang 1 địa chỉ không giống với luồng trước hoặc có thể được dùng để lặp lại một luồng hoạt động nào đó
-  + Jump có điều kiện (Conditional jumps): Được thực hiện bởi các câu lệnh có format j(điều kiện). Tùy vào điều kiện là gì thì sẽ chuyển luồng chương trình sang một luồng khác.
+  + Jump không điều kiện (Unconditional jumps): Được thực hiện bởi câu lệnh `jmp`, loại này thường sẽ chuyển luồng hoạt động của chương trình sang 1 địa chỉ không giống với luồng trước hoặc có thể được dùng để lặp lại một luồng hoạt động nào đó (Luôn được thực thi)
+  + Jump có điều kiện (Conditional jumps): Được thực hiện bởi các câu lệnh có format j<điều kiện>. Tùy vào điều kiện là gì thì sẽ chuyển luồng chương trình sang một luồng khác (Chỉ thực thi khi thỏa mãn điều kiện)

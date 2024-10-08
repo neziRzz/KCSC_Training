@@ -43,6 +43,7 @@ fib endp
 start:
     push OFFSET ms1
     call printf
+
     add esp, 4
     push OFFSET num
     push OFFSET int_format
@@ -51,13 +52,15 @@ start:
     add esp, 8
     mov esi, num
     cmp esi, 2
-    jl final    
+    jl final  
+
     lea ecx, [esi-2]
     call fib
 
     lea ecx, [esi-1]
     mov edx, eax
     call fib
+
     lea esi, [eax+edx]
 final:
     push esi

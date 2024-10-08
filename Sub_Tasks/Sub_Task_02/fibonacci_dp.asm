@@ -1,4 +1,4 @@
-;Architecture: x86
+; Architecture: x86
 .386
 .model flat, stdcall                                  ; NOTE: This program is in x86, output can't be bigger than 0xFFFFFFFF
 option casemap : none

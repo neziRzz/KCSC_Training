@@ -59,8 +59,6 @@ clean_up:
     jmp print_num
     
 
-    
-    
 check_if_1:
     cmp esi, 1
     jnz check_if_2

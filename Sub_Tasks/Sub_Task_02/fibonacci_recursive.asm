@@ -1,6 +1,7 @@
-.386
-.model flat, stdcall
-option casemap : none
+; Architecture: x86
+.386                                                ;NOTE: Since this is recursive-based, this may take a very long time to execute with 
+.model flat, stdcall                                ; large n, also this program can only handle 32-bits integers as output, any bigger than that
+option casemap : none                               ; will cause overflow
 include \masm32\include\windows.inc
 include \masm32\include\kernel32.inc
 includelib \masm32\lib\kernel32.lib

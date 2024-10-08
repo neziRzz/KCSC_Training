@@ -1,6 +1,6 @@
 ;Architecture: x86
 .386
-.model flat, stdcall  
+.model flat, stdcall                                  ; NOTE: This program is in x86, output can't be bigger than 0xFFFFFFFF
 option casemap : none
 include \masm32\include\windows.inc
 include \masm32\include\kernel32.inc

@@ -1,6 +1,7 @@
+; Architecture: x86
 .386
 .model flat, stdcall
-option casemap : none
+option casemap : none                
 include \masm32\include\windows.inc
 include \masm32\include\kernel32.inc
 include \masm32\include\user32.inc
@@ -55,7 +56,7 @@ init_tbox_sbox:
     jnz init_tbox_sbox
     
     xor edi, edi
-KSA:
+KSA: ;init KSA
     mov dl, [edi+s_box]
     movzx eax, [edi+t_box]
     add ebx, eax
@@ -81,7 +82,7 @@ swap:
     jle print_cyphertext
     
     xor ebx, ebx
-smthin:
+smthin: ;indices_handling
     inc ebx
     and ebx, 800000FFh
     jns next_label
@@ -89,7 +90,7 @@ smthin:
     dec ebx
     or ebx, 0FFFFFF00h
     inc ebx
-next_label:    
+next_label: ;indices_handling   
     mov cl, [ebx+s_box]
     movzx eax, cl
     add edi, eax

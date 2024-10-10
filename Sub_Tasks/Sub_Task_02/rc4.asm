@@ -70,7 +70,7 @@ KSA:
 swap:
     mov al, [ebx+s_box]
     mov [ebx+s_box], dl
-    mov [ebx+s_box], al
+    mov [edi+s_box], al
     inc edi
     cmp edi, 100h
     jl KSA

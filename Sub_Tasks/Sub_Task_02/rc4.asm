@@ -19,7 +19,7 @@ scanf proto C, :VARARG
     promptKey       db "Enter key(no_spaces_allowed): ", 0
     promptPlaintext db 0Ah,"Enter plaintext(no_spaces_allowed): ", 0
     encryptedPrompt db "Encrypted Data: ", 0
-    cypher_format db "%0X2 ",0
+    cypher_format db "%02X ",0
     key byte 256 dup(0)
     plaintext byte 256 dup(0)
     key_len DWORD ?
@@ -99,13 +99,33 @@ next_label:
     dec edi
     or  edi, 0FFFFFF00h
     inc edi
+    
 encrypt_routine:
-    nop
-    jmp print_cyphertext
-
+    mov al, [edi+s_box]
+    mov [edi+s_box], cl
+    mov [ebx+s_box], al
+    movzx ecx, [edi+s_box]
+    movzx eax, al
+    add ecx, eax
+    movzx eax, cl
+    movzx eax, [eax+s_box]
+    xor al, [edx+plaintext]
+    mov [edx+t_box], al
+    inc edx
+    cmp edx, esi
+    jl  smthin
+    
 print_cyphertext:
     invoke printf, OFFSET encryptedPrompt
-    jmp exit    
+    xor edi, edi
+
+iterate_cyphertext:
+    movzx eax, [edi+t_box]
+    invoke printf, OFFSET cypher_format, eax
+    inc edi
+    cmp edi, esi
+    jl iterate_cyphertext
+    jmp exit
 exit:
     invoke ExitProcess, 0
     end start

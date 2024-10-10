@@ -101,7 +101,7 @@ next_label: ;indices_handling
     or  edi, 0FFFFFF00h
     inc edi
     
-encrypt_routine:
+encrypt_routine: ; PRNG
     mov al, [edi+s_box]
     mov [edi+s_box], cl
     mov [ebx+s_box], al

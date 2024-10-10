@@ -75,7 +75,7 @@ iterate_output:
     mov esi, [edi]
     push edi
     mov edi, [edi+4]
-    call free
+    call free   ; call manually here cause edi is effected
     add esp, 4
     movzx eax, expected_output[esi]
     invoke printf, OFFSET output_format, eax

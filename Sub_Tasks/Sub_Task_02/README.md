@@ -7,4 +7,5 @@
 
 
 # RC4
+.
 # Base10 to any base

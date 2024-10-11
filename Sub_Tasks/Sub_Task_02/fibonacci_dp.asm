@@ -12,8 +12,8 @@ includelib \masm32\lib\advapi32.lib
 
 .686 ; for cmovg instruction
 
-printf proto C, :VARARG
-scanf proto C, :VARARG
+printf proto C :VARARG
+scanf proto C :VARARG
 malloc proto C  :VARARG
 free proto C    :VARARG
 .data

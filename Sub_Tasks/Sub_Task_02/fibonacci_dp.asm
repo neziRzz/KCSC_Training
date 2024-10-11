@@ -1,3 +1,4 @@
+; Architecture: x86
 .386
 .model flat, stdcall
 option casemap : none
@@ -12,8 +13,8 @@ includelib \masm32\lib\advapi32.lib
 
 .686 ; for cmovg instruction
 
-printf proto C :VARARG
-scanf proto C :VARARG
+printf proto C, :VARARG
+scanf proto C, :VARARG
 malloc proto C  :VARARG
 free proto C    :VARARG
 .data
@@ -46,15 +47,15 @@ cmp_eax_1:
     cmp eax, 1
     jnz init_fib
     
-    invoke printf, "0\n"
+    invoke printf, "1\n"
     jmp exit
 init_fib:
-    invoke malloc, 0F4240h
+    invoke malloc, 0FFFFFh
     mov mem_block_addr, eax
-    invoke malloc, 0F4240h
+    invoke malloc, 0FFFFFh
     mov edi, eax
     mov mem_block_addr2, edi
-    invoke malloc, 0F4240h
+    invoke malloc, 0FFFFFh
     mov ecx, mem_block_addr
     mov ebx, eax
     mov eax, 30h

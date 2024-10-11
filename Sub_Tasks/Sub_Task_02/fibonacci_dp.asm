@@ -1,4 +1,3 @@
-; Architecture: x86
 .386
 .model flat, stdcall
 option casemap : none
@@ -20,6 +19,7 @@ free proto C    :VARARG
 .data
     ms1 db "Enter your nth Fibonacci number:",0Ah,0
     ms2 db "Your nth Fibonacci number is:%s",0
+    ms3 db "Your nth Fibonacci number is:%d",0
     int_format db "%d",0
     nth_term DWORD ?
     temp_nth_term DWORD ?
@@ -212,8 +212,13 @@ print_result:
 start:
     invoke printf, OFFSET ms1
     invoke scanf, OFFSET int_format, OFFSET nth_term
+    cmp nth_term, 1
+    jz print_1st_term
     mov ecx, nth_term
     call fib
+print_1st_term:
+    invoke printf, OFFSET ms3, 1
+    jmp exit
 exit:
     invoke ExitProcess, 0
 end start

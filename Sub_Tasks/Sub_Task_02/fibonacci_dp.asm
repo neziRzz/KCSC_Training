@@ -20,7 +20,7 @@ free proto C    :VARARG
 .data
     ms1 db "Enter your nth Fibonacci number:",0Ah,0
     ms2 db "Your nth Fibonacci number is:%s",0
-    ms3 db "Your nth Fibonacci number is:%d",0
+    
     int_format db "%d",0
     nth_term DWORD ?
     temp_nth_term DWORD ?
@@ -30,147 +30,87 @@ free proto C    :VARARG
     temp_var_4 DWORD ?
     temp_var_5 DWORD ?
     mem_block_addr DWORD ?
-    mem_block_addr2 DWORD ?
-    mem_block_addr3 DWORD ?
+    temp_var_6 DWORD ?
+    temp_var_7 DWORD ?
     term_counter DWORD ?
     
 .code
-fib:
+add_2_big_num proc
+    push ebx
     mov eax, ecx
-    mov temp_nth_term, eax
-    test eax, eax
-    jnz cmp_eax_1
-    
-    invoke printf, "0\n"
-    jmp exit 
-cmp_eax_1:
-    cmp eax, 1
-    jnz init_fib
-    
-    invoke printf, "1\n"
-    jmp exit
-init_fib:
-    invoke malloc, 0FFFFFh
-    mov mem_block_addr, eax
-    invoke malloc, 0FFFFFh
-    mov edi, eax
-    mov mem_block_addr2, edi
-    invoke malloc, 0FFFFFh
-    mov ecx, mem_block_addr
-    mov ebx, eax
-    mov eax, 30h
-    mov mem_block_addr3, ebx
-    mov [ecx], ax
-    mov eax, 31h
-    mov [edi], ax
-    mov eax, nth_term
-    cmp eax, 2
-    jl print_result
-    
-    dec eax
-    mov term_counter, eax
-lea_label:
-    lea edx, [ecx+1]
-get_len:
-    
-    mov al, [ecx]
-    inc ecx
-    test al, al
-    jnz get_len
-    
-    mov esi, edi
-    sub ecx, edx
-    lea edx, [esi+1]
-get_len2:
+    mov temp_var_5, edx
+    push esi
+    mov esi, eax
+    mov temp_var_6, eax
+    push edi
+    lea ecx, [esi+1]
+get_len3:
     mov al, [esi]
     inc esi
     test al, al
-    jnz get_len2
+    jnz get_len3
     
-    mov ebx, mem_block_addr2
-    sub esi, edx
-    mov edx, mem_block_addr
-    cmp ecx, esi
-    mov eax, esi
-    cmovg eax, ecx
-    dec ebx
-    mov temp_var_1, eax
-    dec edx
-    xor eax, eax
-    xor edi, edi
-    add ebx, esi
-    mov temp_var_2, eax
-    mov temp_var_3, eax
-    add edx, ecx
-init_temp_var:
-    mov temp_var_4, edx
-    mov temp_var_5, ebx
-    cmp edi, temp_var_1
-    jl cmp_edi_ecx
-    
-    test eax, eax
-    jz branch1
-cmp_edi_ecx:
-    cmp edi,ecx
-    jge clear_edx
-    
-    movsx edx, byte ptr [edx]
-    sub edx, 30h
-    jmp cmp_edi_esi
-clear_edx:
-    xor edx, edx
-    jmp cmp_edi_esi
-    
-cmp_edi_esi:
-    cmp edi, esi
-    jge clear_eax
-    
-    movsx eax, byte ptr [ebx]    
-    sub eax, 30h
-    jmp finger_math
-clear_eax:
-    xor eax, eax
-    jmp finger_math
-finger_math:
-    lea ebx, [eax+edx]
-    inc temp_var_3
-    add ebx, temp_var_2
-    mov eax, 66666667h
-    imul ebx
-    sar edx, 2
-    mov eax, edx
-    shr eax, 1Fh
-    add eax, edx
-    mov dl, al
-    mov temp_var_2, eax
-    shl al, 2
-    add dl, al
-    mov eax, mem_block_addr3
-    add dl, dl
-    sub bl, dl
-    mov edx, temp_var_4
-    add bl, 30h
-    dec edx
-    mov [eax+edi], bl
+    mov edi, edx
+    sub esi, ecx
+    lea ecx, [edi+1]
+get_len4:
+    mov al, [edi]
     inc edi
-    mov ebx, temp_var_5
-    mov eax, temp_var_2
-    dec ebx
-    jmp init_temp_var
-branch1:
-    mov ecx, temp_var_3
+    test al, al
+    jnz get_len4
+
+    sub edi, ecx
+    cmp esi, edi
+    mov eax, edi
+    cmovg eax, esi
+    mov temp_var_2, eax
+    add eax, 2
+    invoke malloc, eax
+    mov ecx, temp_var_5
+    dec ecx
+    mov temp_var_4, eax
+    add ecx, edi
+    xor edx, edx
+    mov temp_var_5, ecx
+    xor ebx, ebx
+    mov ecx, temp_var_6
+    xor eax, eax
+    dec ecx
+    add ecx, esi
+    mov temp_var_6, ecx
+    mov ecx, temp_var_4
+label1:
+    mov temp_var_3, eax
+    mov temp_var_7, ebx
+    cmp eax, temp_var_2
+    jl cmp_eax_esi
+    
+    test edx, edx
+    jz label2
+    
+    cmp eax, esi
+    jge clear_ecx
+label2:
+    mov eax, ebx
     xor esi, esi
-    mov ebx, mem_block_addr3
-    mov eax, ecx
     cdq
     sub eax, edx
     mov edi, eax
     sar edi, 1
     test edi, edi
-    jle finger_math2
+    jle return1
     
+    mov ebx, temp_var_4
     lea edx, [ebx-1]
-    add edx, ecx
+    add edx, temp_var_7
+    jmp iterate
+return1:
+    pop edi
+    pop esi
+    mov byte ptr [ebx+ecx], 0
+    mov eax, ecx
+    pop ebx
+    ret
 iterate:
     mov al, [edx]
     lea edx, [edx-1]
@@ -180,46 +120,150 @@ iterate:
     mov [edx+1], cl
     cmp esi, edi
     jl iterate
+
+    mov eax, temp_var_7
+    pop edi
+    pop esi
+    mov byte ptr [eax+ebx], 0
+    mov eax, ebx
+    pop ebx
+    ret
     
-    mov ecx, temp_var_3
-finger_math2:
-    sub term_counter, 1
-    mov edi, ebx
-    mov eax, mem_block_addr
-    mov byte ptr [ecx+ebx], 0
-    mov ebx, eax
-    mov ecx, mem_block_addr2
-    mov mem_block_addr, ecx
-    mov mem_block_addr2, edi
-    mov mem_block_addr3, ebx
-    jnz lea_label
-   
-print_result:
-    push edi
-    push OFFSET ms2
-    call printf
-    add esp, 4
-    push mem_block_addr
-    call free
-    add esp, 4
-    push edi
-    call free
-    add esp,4
-    push ebx
-    call free
-    add esp, 4
-    jmp exit  
+cmp_eax_esi:
+    cmp eax, esi
+    jge clear_ecx
     
+    mov ecx, temp_var_6
+    movsx ecx, byte ptr [ecx]
+    sub ecx, 30h
+    jmp cmp_eax_edi
+    
+clear_ecx:
+    xor ecx, ecx
+    jmp cmp_eax_edi
+cmp_eax_edi:
+    cmp eax, edi
+    jge clear_eax
+    
+    mov eax, temp_var_5
+    movsx eax, byte ptr [eax]
+    sub eax, 30h 
+    jmp finger_math
+clear_eax:
+    xor eax, eax
+    jmp finger_math
+finger_math:
+    lea ebx, [eax+ecx]
+    dec temp_var_6
+    add ebx, edx
+    mov eax, 66666667h
+    imul ebx
+    sar edx, 2
+    mov ecx, edx
+    shr ecx, 1Fh
+    add ecx, edx
+    mov al, cl
+    mov temp_var_1, ecx
+    mov edx, temp_var_1
+    shl al, 2
+    add cl, al
+    mov eax, temp_var_3
+    add cl, cl
+    sub bl, cl
+    mov ecx, temp_var_4
+    add bl, 30h 
+    mov [eax+ecx], bl
+    inc eax
+    mov ebx, temp_var_7
+    inc ebx
+    dec temp_var_5
+    jmp label1
+
+add_2_big_num endp
+fib proc
+    push esi
+    mov esi, ecx
+    test esi, esi
+    jnz cmp_term_to_1
+
+    invoke malloc, 2
+    mov ecx, 30h
+    mov [eax], cx
+    pop esi
+    ret
+cmp_term_to_1:
+    cmp esi, 1
+    jnz init_fib
+    
+    invoke malloc, 2
+    mov ecx, 31h 
+    mov [eax], cx
+    pop esi
+    ret
+init_fib:
+    invoke malloc, 0FFFFFh
+    mov ebx, eax    
+    invoke malloc, 0FFFFFh 
+    mov edi, eax
+    invoke malloc, 0FFFFFh
+    mov mem_block_addr, eax
+    mov eax, 30h
+    mov [ebx], ax
+    mov eax, 31h ; '1'
+    mov [edi], ax
+    cmp esi, 2
+    jl if_term_is_2
+    
+    dec esi
+    mov temp_nth_term, esi
+fib_loop:
+    mov edx, edi
+    mov ecx, ebx
+    call add_2_big_num
+    push ebx             
+    mov  esi, eax
+    call free
+    add  esp, 4
+    mov  ebx, edi
+    sub  temp_nth_term, 1
+    mov  edi, esi
+    jnz  fib_loop
+if_term_is_2:
+    mov ecx, edi
+    lea edx, [ecx+1]
+get_len:
+    mov al, [ecx]
+    inc ecx
+    test al, al
+    jnz get_len
+    
+    sub ecx, edx
+    lea eax, [ecx+1]
+    invoke malloc, eax
+    mov esi, eax
+    mov temp_nth_term, eax
+    mov edx, edi
+    sub esi, edi
+get_len2:
+    mov  cl, [edx]
+    lea  edx, [edx+1]
+    mov  [edx+esi-1], cl
+    test cl, cl
+    jnz get_len2            
+    invoke free, ebx            
+    invoke free, edi
+    invoke free, mem_block_addr
+    mov eax, temp_nth_term
+    pop esi
+    ret
+fib endp   
 start:
     invoke printf, OFFSET ms1
     invoke scanf, OFFSET int_format, OFFSET nth_term
-    cmp nth_term, 1
-    jz print_1st_term
     mov ecx, nth_term
     call fib
-print_1st_term:
-    invoke printf, OFFSET ms3, 1
-    jmp exit
+    mov esi, eax
+    invoke printf, OFFSET ms2, esi
 exit:
     invoke ExitProcess, 0
 end start

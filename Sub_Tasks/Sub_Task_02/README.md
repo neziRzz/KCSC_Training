@@ -12,3 +12,4 @@
 - Bài này đơn thuần chỉ là code lại thuật toán RC4 bằng asm
 
 # Base10 to any base
+- Ý tưởng bài này sẽ là xây dựng stack bằng danh sách liên kết, với mỗi node của stack được malloc 8 byte (4 byte địa chỉ 4 byte data) or 16 byte (8 byte địa chỉ 8 byte data). Để đổi một số hệ 10 sang các hệ khác, ta chỉ cần lấy số hệ 10 đó chia cho hệ cần đổi cho đến khi không chia được nữa. Các phần dư của các phép tính đó khi lấy từ dưới lên sẽ là kết quả cần tìm, Ví dụ đổi số 11 sang hệ 2: 11/2 = 5 mod 1, 5/2 = 2 mod 1, 2/2 = 1 mod 0, 1/2 = 1 mod 1 -> 1011 (lấy dư từ cuối lên), với những hệ lớn hơn 10 thì ta gán cho các giá trị dư là từ A->F (10->15)

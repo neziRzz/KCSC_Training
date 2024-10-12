@@ -27,4 +27,21 @@ push ebx
 mov ebx, 5
 call function
 ```
-- Đặc biệt cẩn thận với những gì được push hay pop ra khỏi stack, bởi stack chứa rất nhiều những thông tin của các biến, địa chỉ trả về,....
+- Đặc biệt cẩn thận với những gì được push hay pop ra khỏi stack, bởi stack chứa rất nhiều những thông tin của các biến, địa chỉ return của các hàm,.... Một trong những practice sẽ là push những gì vào rồi thì phải pop hết chúng ra khi ra khỏi hàm và **theo thứ tự ngược lại**, ví dụ
+```asm
+function proc
+  push ebp
+  mov ebp, esp
+  push esi
+  push edx
+  push ebx
+.
+.
+.
+.
+  pop ebx
+  pop edx
+  pop esi
+  pop ebp
+  ret
+```

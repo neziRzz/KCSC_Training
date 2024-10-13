@@ -54,14 +54,14 @@ alloc_mem:
 
     invoke printf, OFFSET stack_overflowPrompt
     jmp base_convert
-base_convert2:
+get_remainder:
     mov eax, esi
     mov [ecx+4], edi
     cdq
     mov edi, ecx
     idiv ebx
     mov [ecx], edx
-base_convert:
+get_quotient:
     mov eax, esi
     cdq
     idiv ebx

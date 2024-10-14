@@ -1,4 +1,3 @@
-; Architecture: x86
 .386
 .model flat, stdcall
 option casemap : none
@@ -27,17 +26,7 @@ free proto C :VARARG
     base10_num DWORD ?
     desired_base DWORD ?
 .code
-start:
-    invoke printf, OFFSET base10Prompt
-    invoke scanf, OFFSET int_format, OFFSET base10_num
-    invoke printf, OFFSET other_basePrompt
-    invoke scanf, OFFSET int_format, OFFSET desired_base
-    mov ecx, desired_base
-    lea eax, [ecx-2]
-    cmp eax, 0Eh
-    ja handling_invalid_base
-    
-    invoke printf, OFFSET result, desired_base
+base_conversion proc; esi = base number, ebx = desired base
     mov esi, base10_num
     mov ebx, desired_base
     xor edi, edi
@@ -46,22 +35,22 @@ start:
     jmp exit
 if_less:
     jle exit
-alloc_mem:
+alloc_mem: ; malloc node and push into stack
     invoke malloc, 8
     mov ecx,eax
     test ecx, ecx
-    jnz base_convert2
+    jnz get_remainder
 
     invoke printf, OFFSET stack_overflowPrompt
-    jmp base_convert
-get_remainder:
+    jmp get_quotient
+get_remainder: ; get remainder from edx and push into stack
     mov eax, esi
     mov [ecx+4], edi
     cdq
     mov edi, ecx
     idiv ebx
     mov [ecx], edx
-get_quotient:
+get_quotient: ; get quotient from eax and iterate until reaches 0
     mov eax, esi
     cdq
     idiv ebx
@@ -71,23 +60,37 @@ get_quotient:
     
     test edi, edi
     jz exit
-iterate_output:
+pop_and_print: ; pop from stack and print result
     mov esi, [edi]
     push edi
     mov edi, [edi+4]
-    call free   ; call manually here cause edi is effected
+    call free
     add esp, 4
     movzx eax, expected_output[esi]
     invoke printf, OFFSET output_format, eax
     test edi, edi
-    jnz iterate_output
+    jnz pop_and_print
     jmp exit
    
-handling_invalid_base:
-    invoke printf, OFFSET invalid_base
-    jmp exit    
-    
 
+base_conversion endp 
+
+start:
+    invoke printf, OFFSET base10Prompt
+    invoke scanf, OFFSET int_format, OFFSET base10_num
+    invoke printf, OFFSET other_basePrompt
+    invoke scanf, OFFSET int_format, OFFSET desired_base
+    mov ecx, desired_base
+    lea eax, [ecx-2]
+    cmp eax, 0Eh
+    ja handling_invalid_base
+    call base_conversion
+    invoke printf, OFFSET result, desired_base
+  
+handling_invalid_base: ; for handling non base10 and conversion outside of base (2-16)
+    invoke printf, OFFSET invalid_base
+    jmp exit
+   
 exit:
     invoke ExitProcess, 0
-    end start
+end start

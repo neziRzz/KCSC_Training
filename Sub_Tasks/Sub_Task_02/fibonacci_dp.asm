@@ -74,20 +74,20 @@ add_loop:
     dec ebx
     
     cmp edx, 0
-    jl one_left1
+    jl iterate_digits
     
     cmp ebx, 0
-    jl one_left2
+    jl iterate_num2
     
     jmp add_loop
     
-one_left1:
+iterate_digits: ; check if any digits left to be processed
     cmp ebx, 0
     jl last_step
-one_left1_loop:
+iterate_digits_loop:; add each
 
     add al, byte ptr [edi+ebx]
-    sub al, '0'
+    sub al, '0' ;
     
     movzx ax, al
     push ecx
@@ -102,12 +102,12 @@ one_left1_loop:
     
     cmp ebx, 0
     jl last_step
-    jmp one_left1_loop
+    jmp iterate_digits_loop
     
-one_left2:
+iterate_num2:
     cmp edx, 0
     jl last_step
-one_left2_loop:
+iterate_num2_loop:
 
     add al, byte ptr [esi+edx]
     sub al, '0'
@@ -126,14 +126,14 @@ one_left2_loop:
     cmp edx, 0
     jl last_step
     
-    jmp one_left2_loop
+    jmp iterate_num2_loop
 
 last_step:
-    cmp al, 0
+    cmp al, 0 ; find null terminator
     je final
     
-    add al, '0'
-    mov byte ptr [ecx], al
+    add al, '0' ;itoa
+    mov byte ptr [ecx], al ; move to fib
     inc ecx
 final:
     mov byte ptr [ecx], 0
@@ -161,7 +161,7 @@ copy proc
     
     xor edx, edx
     
-copy_loop:
+copy_loop: ; copy fib3 to fib2, fib2 to fib1 for each iteration
     mov cl, byte ptr [ebx+edx]
     mov byte ptr [eax+edx], cl
     
@@ -180,45 +180,7 @@ final:
 
 copy endp
 
-
-; Convert string to integer (src: git)
-atoi proc
-    push ebx
-    push ecx
-    push edx
-    push esi
-    mov esi, eax
-    mov eax, 0
-    mov ecx, 0
-
-mul_loop:
-    xor ebx, ebx
-    mov bl, byte ptr [esi+ecx]
-    
-    cmp bl, 48
-    jl finish
-
-    cmp bl, 57
-    jg finish
-
-    sub bl, 48
-    mov edx, 10
-    mul edx
-    add eax, ebx
-    inc ecx
-    jmp mul_loop
-finish:
-    pop esi
-    pop edx
-    pop ecx
-    pop ebx
-    ret
-
-atoi endp
-
-
-; Reverse string to get most significant digit first
-reverse proc
+reverse proc ; reverse string to get most significant digit first
     push edx
     push ecx
     push ebx
@@ -291,12 +253,12 @@ start:
     mov eax, term_int
     mov count, eax
     cmp count, 0
-    je print_num1   ; If N == 0, print num1 ("0")
+    je print_num1   ; 
 
     cmp count, 1
-    je print_num2   ; If N == 1, print num2 ("1")
+    je print_num2   
 
-    ; for N >= 2, start Fibonacci calculation
+  
 fib_loop:
     ; add num1 and num2, result goes into num3
     mov eax, offset num1

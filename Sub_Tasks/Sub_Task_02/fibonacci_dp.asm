@@ -24,7 +24,7 @@ scanf proto C, :VARARG
 .data?
     num1 db 0FFFFh dup (?)        ; Holds Fib(n-2) (change this to increase or decrease num capacity)
     num2 db 0FFFFh dup (?)        ; Holds Fib(n-1) (change this to increase or decrease num capacity)
-    num3 db 0FFFFh dup (?)        ; Holds the current Fibonacci term (Fib(n) 0-9999)
+    num3 db 0FFFFh dup (?)        ; Holds the current Fibonacci term Fib(n)
     term_str db 4 dup (?)        ; Input for N
     term_int dd ?                ; Integer value of N
     count dd ?                ; Counter for current Fibonacci iteration

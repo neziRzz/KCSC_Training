@@ -22,74 +22,112 @@ free proto C :VARARG
     invalid_base db 0Ah,"Invalid base",0
     result db 0Ah,"Your base%d number is:",0
     stack_overflowPrompt db 0Ah,"Stack overflow!",0Ah,0
+    stack_underflowPrompt db 0Ah,"Stack underflow!",0Ah,0
     output_format db "%c",0
     base10_num DWORD ?
     desired_base DWORD ?
 .code
 base_conversion proc; esi = base number, ebx = desired base
+    push ecx
     mov esi, base10_num
-    mov ebx, desired_base
-    xor edi, edi
+    mov edi, desired_base
+    xor ecx, ecx
+    mov [ebp-4], ecx
     test esi, esi
     jnz if_less
-    jmp exit
-if_less:
-    jle exit
-alloc_mem: ; malloc node and push into stack
-    invoke malloc, 8
-    mov ecx,eax
-    test ecx, ecx
-    jnz get_remainder
 
-    invoke printf, OFFSET stack_overflowPrompt
-    jmp get_quotient
-get_remainder: ; get remainder from edx and push into stack
+if_less:
+    jle return
+base_convert: ; divide until base10 num reaches 0, remainders pushed into stack  
     mov eax, esi
-    mov [ecx+4], edi
+    lea ecx, [ebp-4]
     cdq
-    mov edi, ecx
-    idiv ebx
-    mov [ecx], edx
-get_quotient: ; get quotient from eax and iterate until reaches 0
-    mov eax, esi
-    cdq
-    idiv ebx
-    mov esi, eax
+    idiv edi
+    mov esi, eax ; save result for next division
+    call push_
     test esi, esi
-    jg alloc_mem
+    jg base_convert
     
-    test edi, edi
-    jz exit
-pop_and_print: ; pop from stack and print result
-    mov esi, [edi]
-    push edi
-    mov edi, [edi+4]
-    call free
-    add esp, 4
-    movzx eax, expected_output[esi]
+    mov ecx, [ebp-4]
+pop_and_print: ; 
+    lea ecx, [ebp-4]
+    call pop_
+    movsx eax, expected_output[eax] ; remainders range from 0-15 (0-F)
     invoke printf, OFFSET output_format, eax
-    test edi, edi
+    mov ecx, [ebp-4]
+    test ecx, ecx
     jnz pop_and_print
-    jmp exit
-   
+return:
+    pop ecx
+    ret   
 base_conversion endp 
 
+push_ proc ; push to stack
+    push eax
+    push ebx
+    push esi
+    push edi
+    
+    mov ebx, edx ; remainder
+    mov edi, ecx
+    invoke malloc, 8 (x86: 4 byte data, 4 address, for x64 malloc twice the inital value)
+    mov esi, eax
+    test esi, esi
+    jnz push_to_stack
+    
+    invoke printf, OFFSET stack_overflowPrompt
+    pop edi
+    pop esi
+    pop ebx
+    pop eax
+    ret
+push_to_stack:
+    mov eax, [edi]
+    mov [edi], esi
+    pop edi
+    mov [esi], ebx
+    mov [esi+4], eax
+    pop esi
+    pop ebx
+    pop eax
+    ret
+push_ endp
+
+pop_ proc ; pop from stack
+    mov edx, ecx
+    mov eax, [edx]
+    test eax, eax
+    jnz pop_from_stack
+    
+    invoke printf, OFFSET stack_underflowPrompt
+    ret
+pop_from_stack:
+    mov ecx, [eax+4]
+    push esi
+    mov esi, [eax]
+    push eax
+    mov [edx], ecx
+    call free
+    add esp, 4
+    mov eax, esi
+    pop esi
+    ret
+pop_ endp
+    
 start:
     invoke printf, OFFSET base10Prompt
     invoke scanf, OFFSET int_format, OFFSET base10_num
     invoke printf, OFFSET other_basePrompt
     invoke scanf, OFFSET int_format, OFFSET desired_base
     mov ecx, desired_base
-    lea eax, [ecx-2]
-    cmp eax, 0Eh
+    lea eax, [ecx-2] 
+    cmp eax, 0Eh ; check whether base outside of range
     ja handling_invalid_base
-    call base_conversion
     invoke printf, OFFSET result, desired_base
-  
-handling_invalid_base: ; for handling non base10 and conversion outside of base (2-16)
-    invoke printf, OFFSET invalid_base
-    jmp exit
-   
+    call base_conversion   
 exit:
     invoke ExitProcess, 0
+handling_invalid_base: ; for handling non base10 and conversion outside of base (2-16)
+    invoke printf, OFFSET invalid_base
+    jmp exit    
 end start

@@ -20,18 +20,16 @@ scanf proto C, :VARARG
     format db "nth Fibonacci num is:%s", 0
     format_for_special_case db "nth Fibonacci num is:%s", 0
     input_format db "%d", 0
-    
-.data?
     num1 db 0FFFFh dup (?)        ; Holds Fib(n-2) (change this to increase or decrease num capacity)
     num2 db 0FFFFh dup (?)        ; Holds Fib(n-1) (change this to increase or decrease num capacity)
     num3 db 0FFFFh dup (?)        ; Holds the current Fibonacci term Fib(n)
     term_str db 4 dup (?)        ; Input for N
     term_int dd ?                ; Integer value of N
-    count dd ?                ; Counter for current Fibonacci iteration
+    count dd ?                ; Counter for current Fibonacci iteration    
+
 
 
 .code
-
 
 fib proc
 
@@ -174,11 +172,9 @@ final:
     call reverse
     pop ebx
     pop eax
-    
-    ret
+     ret
 
 add_nums endp
-
 
 
 copy proc ; copy string from ebx (src) to eax (dest)
@@ -186,7 +182,6 @@ copy proc ; copy string from ebx (src) to eax (dest)
     push ebx
     push ecx
     push edx
-    
     xor edx, edx
     
 copy_loop: ; copy fib3 to fib2, fib2 to fib1 for each iteration
@@ -203,9 +198,7 @@ final:
     pop ecx
     pop ebx
     pop eax
-    
     ret
-
 copy endp
 
 reverse proc ; reverse string to get most significant digit first

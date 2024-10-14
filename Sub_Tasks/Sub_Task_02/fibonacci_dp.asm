@@ -1,4 +1,3 @@
-; Architecture: x86
 .386
 .model flat, stdcall
 option casemap : none
@@ -11,259 +10,341 @@ includelib \masm32\lib\user32.lib
 includelib \masm32\lib\msvcrt.lib
 includelib \masm32\lib\advapi32.lib
 
-.686 ; for cmovg instruction
-
 printf proto C, :VARARG
 scanf proto C, :VARARG
-malloc proto C  :VARARG
-free proto C    :VARARG
+
+
 .data
-    ms1 db "Enter your nth Fibonacci number:",0Ah,0
-    ms2 db "Your nth Fibonacci number is:%s",0
+    lf db 10, 0
+    prompt db "Enter n: ", 0Ah,0
+    format db "nth Fibonacci num is:%s", 0
+    format_for_special_case db "nth Fibonacci num is:%s", 0
+    input_format db "%d", 0
     
-    int_format db "%d",0
-    nth_term DWORD ?
-    temp_nth_term DWORD ?
-    temp_var_1 DWORD ?
-    temp_var_2 DWORD ?
-    temp_var_3 DWORD ?
-    temp_var_4 DWORD ?
-    temp_var_5 DWORD ?
-    mem_block_addr DWORD ?
-    temp_var_6 DWORD ?
-    temp_var_7 DWORD ?
-    term_counter DWORD ?
-    
+.data?
+    num1 db 0FFFFh dup (?)        ; Holds Fib(n-2) (change this to increase num capacity)
+    num2 db 0FFFFh dup (?)        ; Holds Fib(n-1) (change this to increase num capacity)
+    num3 db 0FFFFh dup (?)        ; Holds the current Fibonacci term (Fib(n) 0-9999)
+    term_str db 4 dup (?)        ; Input for N
+    term_int dd ?                ; Integer value of N
+    count dd ?                ; Counter for current Fibonacci iteration
+
+
 .code
-add_2_big_num proc
+
+; add 2 large numbers and move the sum to num3
+add_nums proc
+    push eax
     push ebx
-    mov eax, ecx
-    mov temp_var_5, edx
+    push ecx
+    push edx
     push esi
-    mov esi, eax
-    mov temp_var_6, eax
     push edi
-    lea ecx, [esi+1]
-get_len3:
-    mov al, [esi]
-    inc esi
-    test al, al
-    jnz get_len3
     
-    mov edi, edx
-    sub esi, ecx
-    lea ecx, [edi+1]
-get_len4:
-    mov al, [edi]
-    inc edi
-    test al, al
-    jnz get_len4
-
-    sub edi, ecx
-    cmp esi, edi
-    mov eax, edi
-    cmovg eax, esi
-    mov temp_var_2, eax
-    add eax, 2
-    invoke malloc, eax
-    mov ecx, temp_var_5
-    dec ecx
-    mov temp_var_4, eax
-    add ecx, edi
-    xor edx, edx
-    mov temp_var_5, ecx
-    xor ebx, ebx
-    mov ecx, temp_var_6
-    xor eax, eax
-    dec ecx
-    add ecx, esi
-    mov temp_var_6, ecx
-    mov ecx, temp_var_4
-label1:
-    mov temp_var_3, eax
-    mov temp_var_7, ebx
-    cmp eax, temp_var_2
-    jl cmp_eax_esi
+    mov esi, eax
+    mov edi, ebx
     
-    test edx, edx
-    jz label2
-    
-    cmp eax, esi
-    jge clear_ecx
-label2:
+    call strlen
+    mov edx, eax
+    sub edx, 1
     mov eax, ebx
-    xor esi, esi
-    cdq
-    sub eax, edx
-    mov edi, eax
-    sar edi, 1
-    test edi, edi
-    jle return1
+    call strlen
+    mov ebx, eax
+    sub ebx, 1
     
-    mov ebx, temp_var_4
-    lea edx, [ebx-1]
-    add edx, temp_var_7
-    jmp iterate
-return1:
-    pop edi
-    pop esi
-    mov byte ptr [ebx+ecx], 0
-    mov eax, ecx
-    pop ebx
-    ret
-iterate:
-    mov al, [edx]
-    lea edx, [edx-1]
-    mov cl, [ebx+esi]
-    mov [ebx+esi], al
-    inc esi
-    mov [edx+1], cl
-    cmp esi, edi
-    jl iterate
+    xor ax, ax
 
-    mov eax, temp_var_7
-    pop edi
-    pop esi
-    mov byte ptr [eax+ebx], 0
-    mov eax, ebx
-    pop ebx
-    ret
-    
-cmp_eax_esi:
-    cmp eax, esi
-    jge clear_ecx
-    
-    mov ecx, temp_var_6
-    movsx ecx, byte ptr [ecx]
-    sub ecx, 30h
-    jmp cmp_eax_edi
-    
-clear_ecx:
-    xor ecx, ecx
-    jmp cmp_eax_edi
-cmp_eax_edi:
-    cmp eax, edi
-    jge clear_eax
-    
-    mov eax, temp_var_5
-    movsx eax, byte ptr [eax]
-    sub eax, 30h 
-    jmp finger_math
-clear_eax:
-    xor eax, eax
-    jmp finger_math
-finger_math:
-    lea ebx, [eax+ecx]
-    dec temp_var_6
-    add ebx, edx
-    mov eax, 66666667h
-    imul ebx
-    sar edx, 2
-    mov ecx, edx
-    shr ecx, 1Fh
-    add ecx, edx
-    mov al, cl
-    mov temp_var_1, ecx
-    mov edx, temp_var_1
-    shl al, 2
-    add cl, al
-    mov eax, temp_var_3
-    add cl, cl
-    sub bl, cl
-    mov ecx, temp_var_4
-    add bl, 30h 
-    mov [eax+ecx], bl
-    inc eax
-    mov ebx, temp_var_7
-    inc ebx
-    dec temp_var_5
-    jmp label1
+add_loop:
 
-add_2_big_num endp
-fib proc
-    push esi
-    mov esi, ecx
-    test esi, esi
-    jnz cmp_term_to_1
+    add al, byte ptr [esi+edx]
+    add al, byte ptr [edi+ebx]
+    sub al, '0'
+    sub al, '0'
 
-    invoke malloc, 2
-    mov ecx, 30h
-    mov [eax], cx
-    pop esi
-    ret
-cmp_term_to_1:
-    cmp esi, 1
-    jnz init_fib
+    movzx ax, al
+    push ecx
+    mov cl, 10
+    div cl
+    pop ecx
     
-    invoke malloc, 2
-    mov ecx, 31h 
-    mov [eax], cx
-    pop esi
-    ret
-init_fib:
-    invoke malloc, 0FFFFFh
-    mov ebx, eax    
-    invoke malloc, 0FFFFFh 
-    mov edi, eax
-    invoke malloc, 0FFFFFh
-    mov mem_block_addr, eax
-    mov eax, 30h
-    mov [ebx], ax
-    mov eax, 31h ; '1'
-    mov [edi], ax
-    cmp esi, 2
-    jl if_term_is_2
-    
-    dec esi
-    mov temp_nth_term, esi
-fib_loop:
-    mov edx, edi
-    mov ecx, ebx
-    call add_2_big_num
-    push ebx             
-    mov  esi, eax
-    call free
-    add  esp, 4
-    mov  ebx, edi
-    sub  temp_nth_term, 1
-    mov  edi, esi
-    jnz  fib_loop
-if_term_is_2:
-    mov ecx, edi
-    lea edx, [ecx+1]
-get_len:
-    mov al, [ecx]
+    add ah, '0'
+    mov byte ptr [ecx], ah
     inc ecx
-    test al, al
-    jnz get_len
+    dec edx
+    dec ebx
     
-    sub ecx, edx
-    lea eax, [ecx+1]
-    invoke malloc, eax
-    mov esi, eax
-    mov temp_nth_term, eax
-    mov edx, edi
-    sub esi, edi
-get_len2:
-    mov  cl, [edx]
-    lea  edx, [edx+1]
-    mov  [edx+esi-1], cl
-    test cl, cl
-    jnz get_len2            
-    invoke free, ebx            
-    invoke free, edi
-    invoke free, mem_block_addr
-    mov eax, temp_nth_term
+    cmp edx, 0
+    jl one_left1
+    
+    cmp ebx, 0
+    jl one_left2
+    
+    jmp add_loop
+    
+one_left1:
+    cmp ebx, 0
+    jl last_step
+one_left1_loop:
+
+    add al, byte ptr [edi+ebx]
+    sub al, '0'
+    
+    movzx ax, al
+    push ecx
+    mov cl, 10
+    div cl
+    pop ecx
+    
+    add ah, '0'
+    mov byte ptr [ecx], ah
+    inc ecx
+    dec ebx
+    
+    cmp ebx, 0
+    jl last_step
+    jmp one_left1_loop
+    
+one_left2:
+    cmp edx, 0
+    jl last_step
+one_left2_loop:
+
+    add al, byte ptr [esi+edx]
+    sub al, '0'
+    
+    movzx ax, al
+    push ecx
+    mov cl, 10
+    div cl
+    pop ecx
+    
+    add ah, '0'
+    mov byte ptr [ecx], ah
+    inc ecx
+    dec edx
+    
+    cmp edx, 0
+    jl last_step
+    
+    jmp one_left2_loop
+
+last_step:
+    cmp al, 0
+    je final
+    
+    add al, '0'
+    mov byte ptr [ecx], al
+    inc ecx
+final:
+    mov byte ptr [ecx], 0
+    
+    pop edi
     pop esi
+    pop edx
+    pop ecx
+    mov eax, ecx
+    call reverse
+    pop ebx
+    pop eax
+    
     ret
-fib endp   
-start:
-    invoke printf, OFFSET ms1
-    invoke scanf, OFFSET int_format, OFFSET nth_term
-    mov ecx, nth_term
-    call fib
+
+add_nums endp
+
+
+; copy string from ebx (src) to eax (dest)
+copy proc
+    push eax
+    push ebx
+    push ecx
+    push edx
+    
+    xor edx, edx
+    
+copy_loop:
+    mov cl, byte ptr [ebx+edx]
+    mov byte ptr [eax+edx], cl
+    
+    cmp cl, 0
+    je final
+    inc edx
+    jmp copy_loop
+    
+final:
+    pop edx
+    pop ecx
+    pop ebx
+    pop eax
+    
+    ret
+
+copy endp
+
+
+; Convert string to integer (src: git)
+atoi proc
+    push ebx
+    push ecx
+    push edx
+    push esi
     mov esi, eax
-    invoke printf, OFFSET ms2, esi
-exit:
-    invoke ExitProcess, 0
+    mov eax, 0
+    mov ecx, 0
+
+mul_loop:
+    xor ebx, ebx
+    mov bl, byte ptr [esi+ecx]
+    
+    cmp bl, 48
+    jl finish
+
+    cmp bl, 57
+    jg finish
+
+    sub bl, 48
+    mov edx, 10
+    mul edx
+    add eax, ebx
+    inc ecx
+    jmp mul_loop
+finish:
+    pop esi
+    pop edx
+    pop ecx
+    pop ebx
+    ret
+
+atoi endp
+
+
+; Reverse string to get most significant digit first
+reverse proc
+    push edx
+    push ecx
+    push ebx
+    push eax
+
+    push eax
+    mov ebx, eax
+    call strlen
+
+    add ebx, eax
+    sub ebx, 1
+    pop eax
+
+swap_loop:
+    mov cl, byte ptr [eax]
+    mov dl, byte ptr [ebx]
+    mov byte ptr [eax], dl
+    mov byte ptr [ebx], cl
+
+    inc eax
+    dec ebx
+    cmp eax, ebx
+    jl swap_loop
+
+    pop eax
+    pop ebx
+    pop ecx
+    pop edx
+    ret
+
+reverse endp
+
+
+; get len of string
+strlen proc
+    push ebx
+    mov ebx, eax
+
+next_char:
+    cmp byte ptr [eax], 0
+    je finish
+    inc eax
+    jmp next_char
+
+finish:
+    sub eax, ebx
+    pop ebx
+    ret
+
+strlen endp  
+
+
+start:
+
+    push offset prompt
+    call printf
+
+
+    push offset term_int
+    push offset input_format
+    call scanf
+
+    ; initial fib sequence: num1 = "0", num2 = "1"
+    mov byte ptr [num1], '0'
+    mov byte ptr [num1+1], 0
+    mov byte ptr [num2], '1'
+    mov byte ptr [num2+1], 0
+    
+    ; handling base cases
+    mov eax, term_int
+    mov count, eax
+    cmp count, 0
+    je print_num1   ; If N == 0, print num1 ("0")
+
+    cmp count, 1
+    je print_num2   ; If N == 1, print num2 ("1")
+
+    ; for N >= 2, start Fibonacci calculation
+fib_loop:
+    ; add num1 and num2, result goes into num3
+    mov eax, offset num1
+    mov ebx, offset num2
+    mov ecx, offset num3
+    call add_nums
+    
+    ; copy num2 to num1
+    mov eax, offset num1
+    mov ebx, offset num2
+    call copy
+    
+    ; copy num3 to num2
+    mov eax, offset num2
+    mov ebx, offset num3
+    call copy
+    
+    ; decrement count and check if it's the Nth Fibonacci number
+    dec count
+    cmp count, 1
+    je print_num3   ; If N == count, print num3
+    
+    jmp fib_loop
+
+print_num1:
+    ; Print num1 ("0")
+    push offset num1
+    push offset format_for_special_case
+    call printf
+    jmp done
+
+print_num2:
+    ; Print num2 ("1")
+    push offset num2
+    push offset format_for_special_case
+    call printf
+    jmp done
+
+print_num3:
+    ; Print num3 (Nth Fibonacci term)
+    push offset num3
+    push offset format_for_special_case
+    call printf
+    jmp done
+
+done:
+    ; Exit the program
+    push 0
+    call ExitProcess
+
 end start

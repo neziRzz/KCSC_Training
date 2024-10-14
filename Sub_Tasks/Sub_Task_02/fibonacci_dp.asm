@@ -32,8 +32,36 @@ scanf proto C, :VARARG
 
 .code
 
-; add 2 large numbers and move the sum to num3, convert each digits to int, do additions then convert back to ascii
-add_nums proc
+
+fib proc
+
+fib_loop: ; add num1 and num2, result goes into num3
+    
+    mov eax, offset num1
+    mov ebx, offset num2
+    mov ecx, offset num3
+    call add_nums
+    
+    ; copy num2 to num1
+    mov eax, offset num1
+    mov ebx, offset num2
+    call copy
+    
+    ; copy num3 to num2
+    mov eax, offset num2
+    mov ebx, offset num3
+    call copy
+    
+
+    dec count
+    cmp count, 1
+    jz exit_func
+    jmp fib_loop
+exit_func:
+    ret
+fib endp
+
+add_nums proc ; add 2 large numbers and move the sum to num3, convert each digits to int, do additions then convert back to ascii
     push eax
     push ebx
     push ecx
@@ -146,6 +174,7 @@ final:
     call reverse
     pop ebx
     pop eax
+    
     ret
 
 add_nums endp
@@ -174,11 +203,12 @@ final:
     pop ecx
     pop ebx
     pop eax
+    
     ret
 
 copy endp
 
-reverse proc ; reverse string from 2 ends 
+reverse proc ; reverse string to get most significant digit first
     push edx
     push ecx
     push ebx
@@ -254,33 +284,21 @@ start:
     je print_num1   ; 
 
     cmp count, 1
-    je print_num2   
-
-  
-fib_loop:
-    ; add num1 and num2, result goes into num3
-    mov eax, offset num1
-    mov ebx, offset num2
-    mov ecx, offset num3
-    call add_nums
+    je print_num2
     
-    ; copy num2 to num1
-    mov eax, offset num1
-    mov ebx, offset num2
-    call copy
-    
-    ; copy num3 to num2
-    mov eax, offset num2
-    mov ebx, offset num3
-    call copy
-    
-
-    dec count
-    cmp count, 1
-    je print_num3   
-    
-    jmp fib_loop
-
+    call fib  
+print_num3:
+    ; Print num3 (Nth Fibonacci term)
+    push offset num3
+    push offset format_for_special_case
+    call printf
+    jmp done
+print_num2:
+    ; Print num2 ("1")
+    push offset num2
+    push offset format_for_special_case
+    call printf
+    jmp done    
 print_num1:
     ; Print num1 ("0")
     push offset num1
@@ -288,22 +306,8 @@ print_num1:
     call printf
     jmp done
 
-print_num2:
-    ; Print num2 ("1")
-    push offset num2
-    push offset format_for_special_case
-    call printf
-    jmp done
-
-print_num3:
-    ; Print num3 (Nth Fibonacci term)
-    push offset num3
-    push offset format_for_special_case
-    call printf
-    jmp done
-
 done:
-  
+    ; Exit the program
     push 0
     call ExitProcess
 

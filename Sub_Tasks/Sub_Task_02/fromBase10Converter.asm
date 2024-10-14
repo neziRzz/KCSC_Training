@@ -70,7 +70,7 @@ push_ proc ; push to stack
     
     mov ebx, edx ; remainder
     mov edi, ecx
-    invoke malloc, 8 (x86: 4 byte data, 4 address, for x64 malloc twice the inital value)
+    invoke malloc, 8 ;(x86: 4 byte data, 4 address, for x64 malloc twice the initial value)
     mov esi, eax
     test esi, esi
     jnz push_to_stack

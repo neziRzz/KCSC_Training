@@ -20,13 +20,13 @@ scanf proto C
 fib proc
     push edi
     mov edi, ecx
-    cmp edi, 2
+    cmp edi, 2 ; check if n <= 2
     jge recur
 
     mov eax, edi
     pop edi
     ret
-recur:
+recur: ; recursive call until n <=2
     push esi
     lea ecx, [edi-2]
     call fib 

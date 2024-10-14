@@ -28,69 +28,69 @@ free proto C :VARARG
     desired_base DWORD ?
 .code
 base_conversion proc; esi = base number, ebx = desired base
-    push ecx
-    mov esi, base10_num
-    mov edi, desired_base
-    xor ecx, ecx
-    mov [ebp-4], ecx
-    test esi, esi
-    jnz if_less
-
-if_less:
-    jle return
-base_convert: ; divide until base10 num reaches 0, remainders pushed into stack  
-    mov eax, esi
-    lea ecx, [ebp-4]
-    cdq
-    idiv edi
-    mov esi, eax ; save result for next division
-    call push_
-    test esi, esi
-    jg base_convert
+        push ecx
+        mov esi, base10_num
+        mov edi, desired_base
+        xor ecx, ecx
+        mov [ebp-4], ecx
+        test esi, esi
+        jnz if_less
     
-    mov ecx, [ebp-4]
-pop_and_print: ; 
-    lea ecx, [ebp-4]
-    call pop_
-    movsx eax, expected_output[eax] ; remainders range from 0-15 (0-F)
-    invoke printf, OFFSET output_format, eax
-    mov ecx, [ebp-4]
-    test ecx, ecx
-    jnz pop_and_print
-return:
-    pop ecx ; restore initial registers state
-    ret   
+    if_less:
+        jle return
+    base_convert: ; divide until base10 num reaches 0, remainders pushed into stack  
+        mov eax, esi
+        lea ecx, [ebp-4]
+        cdq
+        idiv edi
+        mov esi, eax ; save result for next division
+        call push_
+        test esi, esi
+        jg base_convert
+        
+        mov ecx, [ebp-4]
+    pop_and_print: ; 
+        lea ecx, [ebp-4]
+        call pop_
+        movsx eax, expected_output[eax] ; remainders range from 0-15 (0-F)
+        invoke printf, OFFSET output_format, eax
+        mov ecx, [ebp-4]
+        test ecx, ecx
+        jnz pop_and_print
+    return:
+        pop ecx ; restore initial registers state
+        ret   
 base_conversion endp 
 
-push_ proc ; push to stack
-    push eax
-    push ebx
-    push esi
-    push edi
-    
-    mov ebx, edx ; remainder
-    mov edi, ecx
-    invoke malloc, 8 ;(x86: 4 byte data, 4 address, for x64 malloc twice the initial value)
-    mov esi, eax
-    test esi, esi
-    jnz push_to_stack
-    
-    invoke printf, OFFSET stack_overflowPrompt
-    pop edi ; restore initial registers state
-    pop esi
-    pop ebx
-    pop eax
-    ret
-push_to_stack:
-    mov eax, [edi]
-    mov [edi], esi
-    pop edi
-    mov [esi], ebx
-    mov [esi+4], eax
-    pop esi ; restore initial registers state
-    pop ebx
-    pop eax
-    ret
+    push_ proc ; push to stack
+        push eax
+        push ebx
+        push esi
+        push edi
+        
+        mov ebx, edx ; remainder
+        mov edi, ecx
+        invoke malloc, 8 ;(x86: 4 byte data, 4 address, for x64 malloc twice the initial value)
+        mov esi, eax
+        test esi, esi
+        jnz push_to_stack
+        
+        invoke printf, OFFSET stack_overflowPrompt
+        pop edi ; restore initial registers state
+        pop esi
+        pop ebx
+        pop eax
+        ret
+    push_to_stack:
+        mov eax, [edi]
+        mov [edi], esi
+        pop edi
+        mov [esi], ebx
+        mov [esi+4], eax
+        pop esi ; restore initial registers state
+        pop ebx
+        pop eax
+        ret
 push_ endp
 
 pop_ proc ; pop from stack
@@ -101,17 +101,17 @@ pop_ proc ; pop from stack
     
     invoke printf, OFFSET stack_underflowPrompt
     ret
-pop_from_stack:
-    mov ecx, [eax+4]
-    push esi
-    mov esi, [eax]
-    push eax
-    mov [edx], ecx
-    call free
-    add esp, 4
-    mov eax, esi
-    pop esi
-    ret
+        pop_from_stack:
+            mov ecx, [eax+4]
+            push esi
+            mov esi, [eax]
+            push eax
+            mov [edx], ecx
+            call free
+            add esp, 4
+            mov eax, esi
+            pop esi
+            ret
 pop_ endp
     
 start:

@@ -18,27 +18,27 @@ scanf proto C
     num DWORD ?
 .code
 fib proc
-    push edi
-    mov edi, ecx
-    cmp edi, 2 ; check if n <= 2
-    jge recur
-
-    mov eax, edi
-    pop edi
-    ret
-recur: ; recursive call until n <=2
-    push esi
-    lea ecx, [edi-2]
-    call fib 
-
-    lea ecx, [edi-1]
-    mov esi, eax
-    call fib
-
-    add eax, esi
-    pop esi
-    pop edi
-    ret
+        push edi
+        mov edi, ecx
+        cmp edi, 2 ; check if n <= 2
+        jge recur
+    
+        mov eax, edi
+        pop edi
+        ret
+    recur: ; recursive call until n <=2
+        push esi
+        lea ecx, [edi-2]
+        call fib 
+    
+        lea ecx, [edi-1]
+        mov esi, eax
+        call fib
+    
+        add eax, esi
+        pop esi
+        pop edi
+        ret
 fib endp
 start:
     push OFFSET ms1

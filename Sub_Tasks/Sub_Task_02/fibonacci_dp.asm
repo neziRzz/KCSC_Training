@@ -146,7 +146,6 @@ final:
     call reverse
     pop ebx
     pop eax
-    
     ret
 
 add_nums endp
@@ -175,7 +174,6 @@ final:
     pop ecx
     pop ebx
     pop eax
-    
     ret
 
 copy endp
@@ -305,7 +303,7 @@ print_num3:
     jmp done
 
 done:
-    ; Exit the program
+  
     push 0
     call ExitProcess
 

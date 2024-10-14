@@ -22,8 +22,8 @@ scanf proto C, :VARARG
     input_format db "%d", 0
     
 .data?
-    num1 db 0FFFFh dup (?)        ; Holds Fib(n-2) (change this to increase num capacity)
-    num2 db 0FFFFh dup (?)        ; Holds Fib(n-1) (change this to increase num capacity)
+    num1 db 0FFFFh dup (?)        ; Holds Fib(n-2) (change this to increase or decrease num capacity)
+    num2 db 0FFFFh dup (?)        ; Holds Fib(n-1) (change this to increase or decrease num capacity)
     num3 db 0FFFFh dup (?)        ; Holds the current Fibonacci term (Fib(n) 0-9999)
     term_str db 4 dup (?)        ; Input for N
     term_int dd ?                ; Integer value of N
@@ -32,7 +32,7 @@ scanf proto C, :VARARG
 
 .code
 
-; add 2 large numbers and move the sum to num3
+; add 2 large numbers and move the sum to num3, convert each digits to int, do additions then convert back to ascii
 add_nums proc
     push eax
     push ebx
@@ -58,8 +58,8 @@ add_loop:
 
     add al, byte ptr [esi+edx]
     add al, byte ptr [edi+ebx]
-    sub al, '0'
-    sub al, '0'
+    sub al, '0' ; atoi
+    sub al, '0' ; atoi
 
     movzx ax, al
     push ecx
@@ -67,27 +67,27 @@ add_loop:
     div cl
     pop ecx
     
-    add ah, '0'
+    add ah, '0' ; itoa
     mov byte ptr [ecx], ah
     inc ecx
     dec edx
     dec ebx
     
     cmp edx, 0
-    jl iterate_digits
+    jl iterate_num1
     
     cmp ebx, 0
     jl iterate_num2
     
     jmp add_loop
     
-iterate_digits: ; check if any digits left to be processed
-    cmp ebx, 0
+iterate_num1: ; check if any digits left to be processed (num1)
+    cmp ebx, 0 ; null terminator
     jl last_step
-iterate_digits_loop:; add each
+iterate_num1_loop:; 
 
     add al, byte ptr [edi+ebx]
-    sub al, '0' ;
+    sub al, '0' ;atoi
     
     movzx ax, al
     push ecx
@@ -95,22 +95,22 @@ iterate_digits_loop:; add each
     div cl
     pop ecx
     
-    add ah, '0'
+    add ah, '0' ;itoa
     mov byte ptr [ecx], ah
     inc ecx
     dec ebx
     
     cmp ebx, 0
     jl last_step
-    jmp iterate_digits_loop
+    jmp iterate_num1_loop
     
-iterate_num2:
-    cmp edx, 0
+iterate_num2: ;check if any digits left to be processed (num2)
+    cmp edx, 0 ; null terminator
     jl last_step
 iterate_num2_loop:
 
     add al, byte ptr [esi+edx]
-    sub al, '0'
+    sub al, '0' ; atoi
     
     movzx ax, al
     push ecx
@@ -118,7 +118,7 @@ iterate_num2_loop:
     div cl
     pop ecx
     
-    add ah, '0'
+    add ah, '0' ; itoa
     mov byte ptr [ecx], ah
     inc ecx
     dec edx
@@ -152,8 +152,8 @@ final:
 add_nums endp
 
 
-; copy string from ebx (src) to eax (dest)
-copy proc
+
+copy proc ; copy string from ebx (src) to eax (dest)
     push eax
     push ebx
     push ecx
@@ -194,7 +194,7 @@ reverse proc ; reverse string to get most significant digit first
     sub ebx, 1
     pop eax
 
-swap_loop:
+swap_loop: ; change place last byte and first byte
     mov cl, byte ptr [eax]
     mov dl, byte ptr [ebx]
     mov byte ptr [eax], dl
@@ -214,8 +214,8 @@ swap_loop:
 reverse endp
 
 
-; get len of string
-strlen proc
+
+strlen proc ; get len of string
     push ebx
     mov ebx, eax
 
@@ -276,10 +276,10 @@ fib_loop:
     mov ebx, offset num3
     call copy
     
-    ; decrement count and check if it's the Nth Fibonacci number
+
     dec count
     cmp count, 1
-    je print_num3   ; If N == count, print num3
+    je print_num3   
     
     jmp fib_loop
 

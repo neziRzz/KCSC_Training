@@ -178,7 +178,7 @@ final:
 
 copy endp
 
-reverse proc ; reverse string to get most significant digit first
+reverse proc ; reverse string from 2 ends 
     push edx
     push ecx
     push ebx

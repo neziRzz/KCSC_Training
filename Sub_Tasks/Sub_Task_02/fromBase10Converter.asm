@@ -58,7 +58,7 @@ pop_and_print: ;
     test ecx, ecx
     jnz pop_and_print
 return:
-    pop ecx
+    pop ecx ; restore initial registers state
     ret   
 base_conversion endp 
 
@@ -76,7 +76,7 @@ push_ proc ; push to stack
     jnz push_to_stack
     
     invoke printf, OFFSET stack_overflowPrompt
-    pop edi
+    pop edi ; restore initial registers state
     pop esi
     pop ebx
     pop eax
@@ -87,7 +87,7 @@ push_to_stack:
     pop edi
     mov [esi], ebx
     mov [esi+4], eax
-    pop esi
+    pop esi ; restore initial registers state
     pop ebx
     pop eax
     ret

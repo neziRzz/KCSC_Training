@@ -1,3 +1,4 @@
+; Architecture: x86
 .386
 .model flat, stdcall
 option casemap : none

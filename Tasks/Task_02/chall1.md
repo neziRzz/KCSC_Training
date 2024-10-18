@@ -73,6 +73,7 @@ LABEL_18:
 }
 ```
 - Ta có thể thấy rằng về cơ bản flow của chương trình sẽ như sau
+# Script giải và flag
 ```python
 from z3 import *
 key = "reversing_is_pretty_cool"

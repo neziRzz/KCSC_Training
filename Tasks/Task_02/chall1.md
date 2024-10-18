@@ -147,7 +147,7 @@ int __cdecl sub_1380000(int a1, int a2, int a3)
 ![image](https://github.com/user-attachments/assets/a5075383-5e41-43e0-8626-ca8a2265eda5)
 ![image](https://github.com/user-attachments/assets/66e44e45-0b96-44f0-bdc0-db2454ad86c9)
 
-- Sau khi sửa lại data type đúng thì pseudocode sẽ dễ nhìn hơn (một trong những practice nên học)
+  + Sau khi sửa lại data type đúng thì pseudocode sẽ dễ nhìn hơn (một trong những practice nên học)
 ```C
 int __cdecl sub_1380000(char *a1, char *a2, int a3)
 {
@@ -164,6 +164,9 @@ int __cdecl sub_1380000(char *a1, char *a2, int a3)
   return 0;
 }
 ```
+  + Ta có thể thấy rằng chương trình sẽ thực hiện tính toán các phần tử của `a1` (`flag_content`) và gán chúng vào v5, sau đó sẽ XOR chúng với từng phần tử của `v4` (string `reversing_is_pretty_cool`) và gán vào `a2` (`temp_buffer`), khi hoàn thành thì hàm sẽ return 0
+  + Cuối cùng thì sẽ giải phóng vùng nhớ của hàm `encrypt_flag_content` bằng `VirtualFree` và kiểm tra từng phần tử của `temp_buffer` (`flag_content` đã bị encrypt) với từng phần tử của  `byte_E37CF4`, nếu tất cả đều khớp thì sẽ in ra string `Not uncorrect ^_^`
+  + Vậy để giải được challenge này, ta sẽ sử dụng z3 với các dữ kiện đã được cung cấp trong hàm `encrypt_flag_content` (pseudocode khá đẹp nên ta có thể copy pase thẳng vào trong script)
 # Script and flag
 ```python
 from z3 import *

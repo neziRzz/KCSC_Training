@@ -111,7 +111,11 @@ LABEL_18:
 
 ----------------------------------------------------------------------------------------------------------------------------------------
   + Nếu không thỏa mãn 1 trong 3 điều kiện trên thì sẽ in ra string `Not correct @_@` và thoát, ngược lại chương trình tiếp tục thực thi như sau
-    + Tiến hành cấp phát vùng nhớ cho hàm `encrypt_flag_content` bằng `VirtualAlloc` 
+    + Tiến hành cấp phát vùng nhớ cho hàm `encrypt_flag_content` bằng `VirtualAlloc` ([references](https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualalloc)) trong đó có 3 arguments ta cần phải chú ý
+      + `0xA4` - Đây sẽ là size vùng nhớ sẽ được cấp phát
+      + `MEM COMMIT` - Cấp phát memory page cho vùng nhớ được chỉ định, đồng thời đảm bảo rằng trước khi được truy cập vào thì vùng nhớ được cấp phát sẽ chỉ chứa các byte 0
+      + `PAGE_EXECUTE_READWRITE` - Khai báo quyền cho vùng nhớ này sẽ là có thể thực thi, đọc và ghi
+    
 # Script and flag
 ```python
 from z3 import *

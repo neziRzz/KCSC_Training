@@ -78,8 +78,39 @@ LABEL_18:
   + Tiến hành bỏ newline character có trong buffer input (input[j_strlen(input) - 1] == 0xA với 0xA = "\n")
   + Kiểm tra đồng thời 3 điều kiện sau
     + Độ dài của input (sau khi bỏ newline character) là 30 hay không
-    + Giá trị return của hàm `j_cmp_header_and_last_then_get_content(input))` có bằng 0 hay không (sẽ phân tích kĩ hơn hàm này sau)
+    + Giá trị return của hàm `j_cmp_header_and_last_then_get_content(input)` có khác 0 hay không (sẽ phân tích kĩ hơn hàm này sau)
     + Độ dài của `flag_content` là 24 hay không ( giá trị cụ thể của `flag_content` sẽ do `j_cmp_header_and_last_then_get_content(input))` quyết định)
+    + Hàm `j_cmp_header_and_last_then_get_content()`
+```C
+    char *__cdecl sub_411890(char *Str)
+{
+  char *Destination; // [esp+D0h] [ebp-2Ch]
+  char *v3; // [esp+E8h] [ebp-14h]
+  char *Source; // [esp+F4h] [ebp-8h]
+  char *Sourcea; // [esp+F4h] [ebp-8h]
+
+  __CheckForDebuggerJustMyCode(&unk_41C017);
+  Source = j_strstr(Str, "KCSC{");
+  if ( Source )
+  {
+    Sourcea = &Source[j_strlen("KCSC{")];
+    v3 = j_strchr(Sourcea, '}');
+    if ( v3 )
+    {
+      Destination = (char *)malloc(v3 - Sourcea + 1);
+      if ( !strncpy_s(Destination, v3 - Sourcea + 1, Sourcea, v3 - Sourcea) )
+        return Destination;
+      free(Destination);
+    }
+  }
+  return 0;
+}
+```
+  + Hàm này sẽ có chức năng là kiểm tra input có bắt đầu bằng `KCSC{` và kết thúc với `}` hay không, nếu có thì sẽ bỏ 2 string vừa kể trên và return string đã bị biến đổi (Ví dụ input có format `KCSC{just_a_made_up_flag}` thì hàm này sẽ trả về string `just_a_made_up_flag`)
+
+----------------------------------------------------------------------------------------------------------------------------------------
+  + Nếu không thỏa mãn 1 trong 3 điều kiện trên thì sẽ in ra string `Not correct @_@` và thoát, ngược lại chương trình tiếp tục thực thi như sau
+    + Tiến hành cấp phát vùng nhớ cho hàm `encrypt_flag_content` bằng `VirtualAlloc` 
 # Script and flag
 ```python
 from z3 import *

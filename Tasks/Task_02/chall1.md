@@ -1,4 +1,4 @@
-# Misc
+![image](https://github.com/user-attachments/assets/9dcace69-ff88-44dd-8acd-b9732afc33a7)# Misc
 - Đề cho 1 file PE32 và 2 dll kèm theo (trong trường hợp máy không chạy được chương trình)
 
 ![image](https://github.com/user-attachments/assets/e2243221-b3f8-496b-9a67-d8fc8a81d046)
@@ -142,12 +142,28 @@ int __cdecl sub_1380000(int a1, int a2, int a3)
   return 0;
 }
 ```
-  + Lí do cho điều này là bởi các parameters cũng như là một số biến trong hàm này không được define đúng loại data type. Như `v4` được define là `_WORD v4[15]` trong khi data type chuẩn phải là `char *v4` (lí do bởi `v4` được gán là string `reversing_is_pretty_cool`), đồng thời 2 parameters `a1` và `a2` phải là `char *` (`encrypt_flag_content(flag_content, temp_buffer, content_length)`), ta có thể sửa lại data type cho các biến này bằng cách click chuột vào chúng rồi nhấn `Y` 
+  + Lí do cho điều này là bởi các parameters cũng như là một số biến trong hàm này không được define đúng loại data type. Như `v4` được define là `_WORD v4[15]` trong khi data type chuẩn phải là `char *v4` (lí do bởi `v4` được gán là string `reversing_is_pretty_cool`), đồng thời 2 parameters `a1` và `a2` phải là `char *` (`encrypt_flag_content(flag_content, temp_buffer, content_length)`), ta có thể sửa lại data type cho các biến này bằng cách click chuột vào chúng rồi nhấn `Y` (làm tương tự với `a1` và `a2`)
 
 ![image](https://github.com/user-attachments/assets/a5075383-5e41-43e0-8626-ca8a2265eda5)
 ![image](https://github.com/user-attachments/assets/66e44e45-0b96-44f0-bdc0-db2454ad86c9)
 
+- Sau khi sửa lại data type đúng thì pseudocode sẽ dễ nhìn hơn (một trong những practice nên học)
+```C
+int __cdecl sub_1380000(char *a1, char *a2, int a3)
+{
+  char *v4; // [esp+2h] [ebp-1Eh] BYREF
+  char v5; // [esp+1Bh] [ebp-5h]
+  int i; // [esp+1Ch] [ebp-4h]
 
+  strcpy((char *)&v4, "reversing_is_pretty_cool");
+  for ( i = 0; i < a3; ++i )
+  {
+    v5 = 16 * (a1[i] % 16) + a1[i] / 16;
+    a2[i] = v5 ^ *((_BYTE *)&v4 + i);
+  }
+  return 0;
+}
+```
 # Script and flag
 ```python
 from z3 import *

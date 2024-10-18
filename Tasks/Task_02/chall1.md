@@ -75,8 +75,11 @@ LABEL_18:
 
 - Ta có thể thấy rằng về cơ bản flow của chương trình sẽ như sau
   + Chương trình tiến hành nhận input của user bằng `fgets` (giới hạn số byte tối đa mà buffer có thể chứa là 32 byte)
-  + 
-  
+  + Tiến hành bỏ newline character có trong buffer input (input[j_strlen(input) - 1] == 0xA với 0xA = "\n")
+  + Kiểm tra đồng thời 3 điều kiện sau
+    + Độ dài của input (sau khi bỏ newline character) là 30 hay không
+    + Giá trị return của hàm `j_cmp_header_and_last_then_get_content(input))` có bằng 0 hay không (sẽ phân tích kĩ hơn hàm này sau)
+    + Độ dài của `flag_content` là 24 hay không ( giá trị cụ thể của `flag_content` sẽ do `j_cmp_header_and_last_then_get_content(input))` quyết định)
 # Script and flag
 ```python
 from z3 import *

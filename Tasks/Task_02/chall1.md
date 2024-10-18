@@ -13,7 +13,7 @@ int __cdecl main_0(int argc, const char **argv, const char **envp)
   size_t v8; // [esp+10h] [ebp-13Ch]
   size_t j; // [esp+DCh] [ebp-70h]
   unsigned int i; // [esp+E8h] [ebp-64h]
-  void (__cdecl *check_function)(const char *, char *, size_t); // [esp+F4h] [ebp-58h]
+  void (__cdecl *encrypt_flag_content)(const char *, char *, size_t); // [esp+F4h] [ebp-58h]
   char *temp_buffer; // [esp+10Ch] [ebp-40h]
   const char *flag_content; // [esp+118h] [ebp-34h]
   char input[36]; // [esp+124h] [ebp-28h] BYREF
@@ -25,10 +25,10 @@ int __cdecl main_0(int argc, const char **argv, const char **envp)
   sub_4110D7("Show your skills. What is the flag?\n", v6);
   v3 = _acrt_iob_func(0);
   fgets(input, 32, v3);
-  if ( input[j_strlen(input) - 1] == 10 )
+  if ( input[j_strlen(input) - 1] == 0xA )
   {
     v8 = j_strlen(input) - 1;
-    if ( v8 >= 0x20 )
+    if ( v8 >= 32 )
       j____report_rangecheckfailure();
     input[v8] = 0;
   }
@@ -36,14 +36,14 @@ int __cdecl main_0(int argc, const char **argv, const char **envp)
     && (flag_content = j_cmp_header_and_last_then_get_content(input)) != 0
     && j_strlen(flag_content) == 24 )
   {
-    check_function = (void (__cdecl *)(const char *, char *, size_t))VirtualAlloc(0, 0xA4u, 0x1000u, 0x40u);
-    if ( check_function )
+    encrypt_flag_content = (void (__cdecl *)(const char *, char *, size_t))VirtualAlloc(0, 0xA4u, 0x1000u, 0x40u);
+    if ( encrypt_flag_content )
     {
       for ( i = 0; i < 0xA4; ++i )
-        *((_BYTE *)check_function + i) = encrypted_bytecodes[i] ^ 0x41;
+        *((_BYTE *)encrypt_flag_content + i) = encrypted_bytecodes[i] ^ 0x41;
       content_length = j_strlen(flag_content);
-      check_function(flag_content, temp_buffer, content_length);
-      VirtualFree(check_function, 0xA4u, 0x8000u);
+      encrypt_flag_content(flag_content, temp_buffer, content_length);
+      VirtualFree(encrypt_flag_content, 0xA4u, 0x8000u);
       for ( j = 0; j < j_strlen(flag_content); ++j )
       {
         if ( temp_buffer[j] != byte_417CF4[j] )

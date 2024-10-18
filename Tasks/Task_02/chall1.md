@@ -1,9 +1,9 @@
-# Thông tin cơ bản
+# Misc
 - Đề cho 1 file PE32 và 2 dll kèm theo (trong trường hợp máy không chạy được chương trình)
 
 ![image](https://github.com/user-attachments/assets/e2243221-b3f8-496b-9a67-d8fc8a81d046)
 
-# Phân tích cụ thể
+# Detailed analysis 
 - IDA's Pseudocode
 ```C
 int __cdecl main_0(int argc, const char **argv, const char **envp)
@@ -72,8 +72,12 @@ LABEL_18:
   }
 }
 ```
+
 - Ta có thể thấy rằng về cơ bản flow của chương trình sẽ như sau
-# Script giải và flag
+  + Chương trình tiến hành nhận input của user bằng `fgets` (giới hạn số byte tối đa mà buffer có thể chứa là 32 byte)
+  + 
+  
+# Script and flag
 ```python
 from z3 import *
 key = "reversing_is_pretty_cool"

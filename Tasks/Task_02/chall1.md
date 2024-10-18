@@ -80,7 +80,8 @@ LABEL_18:
     + Độ dài của input (sau khi bỏ newline character) là 30 hay không
     + Giá trị return của hàm `j_cmp_header_and_last_then_get_content(input)` có khác 0 hay không (sẽ phân tích kĩ hơn hàm này sau)
     + Độ dài của `flag_content` là 24 hay không ( giá trị cụ thể của `flag_content` sẽ do `j_cmp_header_and_last_then_get_content(input))` quyết định)
-    + Hàm `j_cmp_header_and_last_then_get_content()`
+----------------------------------------------------------------------------------------------------------------------------------------
++ Hàm `j_cmp_header_and_last_then_get_content()`
 ```C
     char *__cdecl sub_411890(char *Str)
 {

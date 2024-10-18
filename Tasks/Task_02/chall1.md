@@ -90,7 +90,7 @@ if(s.check() == sat):
         last = int(str(s.model()[flag[i]]))
         x += chr(last)
 else:
-    print("Failed")
+print("Failed")
 print("KCSC{",end='')
 print(x,end='')
 print("}")

@@ -115,7 +115,36 @@ LABEL_18:
       + `0xA4` - Đây sẽ là size vùng nhớ sẽ được cấp phát
       + `MEM COMMIT` - Cấp phát memory page cho vùng nhớ được chỉ định, đồng thời đảm bảo rằng trước khi được truy cập vào thì vùng nhớ được cấp phát sẽ chỉ chứa các byte 0
       + `PAGE_EXECUTE_READWRITE` - Khai báo quyền cho vùng nhớ này sẽ là có thể thực thi, đọc và ghi
-    
+      + Trong trường hợp `VirtualAlloc` lỗi thì sẽ in ra string `VirtualAlloc failed` và thoát
+  + Tiếp theo, tiến hành fill các byte 0 của vùng nhớ sau khi được cấp phát (data của hàm `encrypt_flag_content()`) bằng `encrypted_bytecodes[i] ^ 0x41` và gọi hàm `encrypt_flag_content(flag_content, temp_buffer, content_length)` ( **Lưu ý** : Hàm này được khởi tạo trong khi chạy nên ta sẽ phải debug thì mới step được vào trong )
+  + Khi step vào bên trong hàm này, ta có thể thấy rằng IDA không define đây là một hàm ( dĩ nhiên, khi đây không được define là 1 function thì IDA sẽ không thể gen ra pseudocode) 
+
+![image](https://github.com/user-attachments/assets/f0ed2bf8-a4ab-42e2-b40b-a2096b6469c0)
+
+  + Để giải quyết ta chỉ cần nhấn vào instruction đầu tiên rôi ấn `P` trên bàn phím để IDA có thể define được function
+
+![image](https://github.com/user-attachments/assets/7b783607-8478-4d7d-8278-3108fd211d8e)
+
+  + Sau đó nhấn `F5` để gen ra pseudocode như bình thường, nhưng pseudocode được gen ra có vẻ rất khó nhìn
+```C
+int __cdecl sub_1380000(int a1, int a2, int a3)
+{
+  _WORD v4[15]; // [esp+2h] [ebp-1Eh] BYREF
+
+  strcpy((char *)v4, "reversing_is_pretty_cool");
+  *(_DWORD *)&v4[13] = 0;
+  while ( *(int *)&v4[13] < a3 )
+  {
+    HIBYTE(v4[12]) = 16 * (*(char *)(*(_DWORD *)&v4[13] + a1) % 16) + *(char *)(*(_DWORD *)&v4[13] + a1) / 16;
+    *(_BYTE *)(a2 + *(_DWORD *)&v4[13]) = HIBYTE(v4[12]) ^ *((_BYTE *)v4 + *(_DWORD *)&v4[13]);
+    ++*(_DWORD *)&v4[13];
+  }
+  return 0;
+}
+```
+  + Lí do cho điều này là bởi các parameters cũng như là một số biến trong hàm này không được define đúng loại data type. Như `v4` được define là `_WORD v4[15]` trong khi data type chuẩn phải là `char *v4` (lí do bởi `v4` được gán là string `reversing_is_pretty_cool`), đồng thời 2 arguments `a1` và a2
+
+
 # Script and flag
 ```python
 from z3 import *

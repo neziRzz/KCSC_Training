@@ -36,7 +36,11 @@ int __cdecl main_0(int argc, const char **argv, const char **envp)
     && (flag_content = j_cmp_header_and_last_then_get_content(input)) != 0
     && j_strlen(flag_content) == 24 )
   {
-    encrypt_flag_content = (void (__cdecl *)(const char *, char *, size_t))VirtualAlloc(0, 0xA4u, 0x1000u, 0x40u);
+    encrypt_flag_content = (void (__cdecl *)(const char *, char *, size_t))VirtualAlloc(
+                                                                             0,
+                                                                             0xA4u,
+                                                                             MEM_COMMIT,
+                                                                             PAGE_EXECUTE_READWRITE);
     if ( encrypt_flag_content )
     {
       for ( i = 0; i < 0xA4; ++i )

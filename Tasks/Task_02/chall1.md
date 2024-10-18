@@ -3,6 +3,70 @@
 ![image](https://github.com/user-attachments/assets/e2243221-b3f8-496b-9a67-d8fc8a81d046)
 
 - IDA's Pseudocode
+```C
+int __cdecl main_0(int argc, const char **argv, const char **envp)
+{
+  FILE *v3; // eax
+  size_t content_length; // eax
+  char v6; // [esp+0h] [ebp-14Ch]
+  char v7; // [esp+0h] [ebp-14Ch]
+  size_t v8; // [esp+10h] [ebp-13Ch]
+  size_t j; // [esp+DCh] [ebp-70h]
+  unsigned int i; // [esp+E8h] [ebp-64h]
+  void (__cdecl *check_function)(const char *, char *, size_t); // [esp+F4h] [ebp-58h]
+  char *temp_buffer; // [esp+10Ch] [ebp-40h]
+  const char *flag_content; // [esp+118h] [ebp-34h]
+  char input[36]; // [esp+124h] [ebp-28h] BYREF
+
+  __CheckForDebuggerJustMyCode(&unk_41C017);
+  j_memset(input, 0, 0x20u);
+  malloc(0x19u);
+  temp_buffer = (char *)malloc(0x19u);
+  sub_4110D7("Show your skills. What is the flag?\n", v6);
+  v3 = _acrt_iob_func(0);
+  fgets(input, 32, v3);
+  if ( input[j_strlen(input) - 1] == 10 )
+  {
+    v8 = j_strlen(input) - 1;
+    if ( v8 >= 0x20 )
+      j____report_rangecheckfailure();
+    input[v8] = 0;
+  }
+  if ( j_strlen(input) == 30
+    && (flag_content = j_cmp_header_and_last_then_get_content(input)) != 0
+    && j_strlen(flag_content) == 24 )
+  {
+    check_function = (void (__cdecl *)(const char *, char *, size_t))VirtualAlloc(0, 0xA4u, 0x1000u, 0x40u);
+    if ( check_function )
+    {
+      for ( i = 0; i < 0xA4; ++i )
+        *((_BYTE *)check_function + i) = encrypted_bytecodes[i] ^ 0x41;
+      content_length = j_strlen(flag_content);
+      check_function(flag_content, temp_buffer, content_length);
+      VirtualFree(check_function, 0xA4u, 0x8000u);
+      for ( j = 0; j < j_strlen(flag_content); ++j )
+      {
+        if ( temp_buffer[j] != byte_417CF4[j] )
+          goto LABEL_18;
+      }
+      sub_4110D7("Not uncorrect ^_^", v7);
+      return 0;
+    }
+    else
+    {
+      perror("VirtualAlloc failed");
+      return 1;
+    }
+  }
+  else
+  {
+LABEL_18:
+    sub_4110D7("Not correct @_@", v7);
+    return 0;
+  }
+}
+```
+
 ```python
 from z3 import *
 key = "reversing_is_pretty_cool"
@@ -31,3 +95,4 @@ print("KCSC{",end='')
 print(x,end='')
 print("}")
 ```
+**Flag:** `KCSC{correct_flag!submit_now!}`

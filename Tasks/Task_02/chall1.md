@@ -142,7 +142,10 @@ int __cdecl sub_1380000(int a1, int a2, int a3)
   return 0;
 }
 ```
-  + Lí do cho điều này là bởi các parameters cũng như là một số biến trong hàm này không được define đúng loại data type. Như `v4` được define là `_WORD v4[15]` trong khi data type chuẩn phải là `char *v4` (lí do bởi `v4` được gán là string `reversing_is_pretty_cool`), đồng thời 2 arguments `a1` và a2
+  + Lí do cho điều này là bởi các parameters cũng như là một số biến trong hàm này không được define đúng loại data type. Như `v4` được define là `_WORD v4[15]` trong khi data type chuẩn phải là `char *v4` (lí do bởi `v4` được gán là string `reversing_is_pretty_cool`), đồng thời 2 parameters `a1` và `a2` phải là `char *` (`encrypt_flag_content(flag_content, temp_buffer, content_length)`), ta có thể sửa lại data type cho các biến này bằng cách click chuột vào chúng rồi nhấn `Y` 
+
+![image](https://github.com/user-attachments/assets/a5075383-5e41-43e0-8626-ca8a2265eda5)
+![image](https://github.com/user-attachments/assets/66e44e45-0b96-44f0-bdc0-db2454ad86c9)
 
 
 # Script and flag

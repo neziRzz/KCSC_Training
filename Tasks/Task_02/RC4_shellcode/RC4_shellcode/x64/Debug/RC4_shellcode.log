@@ -1,0 +1,4 @@
+﻿  RC4_shellcode.c
+D:\Reversing\Shellcode\RC4\RC4_shellcode\RC4_shellcode\RC4_shellcode.c(60,19): warning C4267: 'initializing': conversion from 'size_t' to 'long', possible loss of data
+D:\Reversing\Shellcode\RC4\RC4_shellcode\RC4_shellcode\RC4_shellcode.c(61,20): warning C4267: 'initializing': conversion from 'size_t' to 'long', possible loss of data
+  RC4_shellcode.vcxproj -> D:\Reversing\Shellcode\RC4\RC4_shellcode\x64\Debug\RC4_shellcode.exe

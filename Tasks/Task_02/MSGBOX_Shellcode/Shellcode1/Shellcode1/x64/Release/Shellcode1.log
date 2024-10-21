@@ -1,7 +1,0 @@
-﻿cl : command line  warning D9002: ignoring unknown option '/arch:IA32'
-  Shellcode1.c
-  Generating code
-  Previous IPDB and IOBJ mismatch, fall back to full compilation.
-  All 4 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
-  Finished generating code
-  Shellcode1.vcxproj -> D:\Reversing\Shellcode\MSGBOX_Shellcode\Shellcode1\x64\Release\Shellcode1.exe

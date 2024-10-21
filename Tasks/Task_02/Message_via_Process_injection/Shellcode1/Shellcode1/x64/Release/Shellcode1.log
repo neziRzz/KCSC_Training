@@ -1,8 +1,0 @@
-﻿  Shellcode1.c
-D:\Reversing\Shellcode\Message_via_Process_injection\Shellcode1\Shellcode1\Shellcode1.c(66,13): warning C4047: '==': 'DWORD' differs in levels of indirection from 'void *'
-  Generating code
-  2 of 5 functions (40.0%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    0 functions had inline decision re-evaluated but remain unchanged
-  Finished generating code
-  Shellcode1.vcxproj -> D:\Reversing\Shellcode\Message_via_Process_injection\Shellcode1\x64\Release\Shellcode1.exe

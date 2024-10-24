@@ -41,4 +41,4 @@ unsigned char shellcode = [fill shellcode here];
   + B2: Copy các bytecodes trong array shellcode vào vùng nhớ vừa được cấp phát
   + B3: Tiến hành gắn cho vùng nhớ trên con trỏ hàm để gọi hàm và sau khi hàm thực thi xong thì giải phóng vùng nhớ với `VirtualFree`
 ## Encountered problems and solutions
-- Khi sử dụng shellcode để thực thi chương trình, một trong những vấn đề tiêu biểu nhất mà ta sẽ gặp phải là làm thế nào để resolve các external functions. Lí do cho điều này là bởi shellcode không được compile bằng chương trình gốc đang chạy nó nên khi shellcode muốn gọi một số functions thì thay 
+- Khi sử dụng shellcode để thực thi chương trình, một trong những vấn đề tiêu biểu nhất mà ta sẽ gặp phải là làm thế nào để resolve các external functions. Lí do cho điều này là bởi shellcode không được compile cùng với chương trình mà nó chạy trên  

@@ -16,4 +16,4 @@ int main() {
 
 ![1](https://github.com/user-attachments/assets/51ea7fb7-38ae-4afc-ba99-8ae5ea55d44f)
 
-- Phần mà mình đã đóng khung đỏ trong hình chính là các opcodes mà chúng ta có thể dùng để tạo ra `Shellcode`, nếu các bạn chưa rõ `Opcodes` là gì thì có thể tham khảo thêm tại [https://en.wikipedia.org/wiki/Opcode#:~:text=In%20computing%2C%20an%20opcode%20(abbreviated,the%20operation%20to%20be%20performed.](Đây)
+- Phần mà mình đã đóng khung đỏ trong hình chính là các opcodes mà chúng ta có thể dùng để tạo ra `Shellcode`, nếu các bạn chưa rõ `Opcodes` là gì thì có thể tham khảo thêm tại [Đây](https://en.wikipedia.org/wiki/Opcode)

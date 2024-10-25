@@ -1,0 +1,8 @@
+﻿  peb_test.c
+D:\Reversing\PEB_Traversing\PEB Traversing\PEB Traversing\peb_test.c(92,23): warning C4018: '<': signed/unsigned mismatch
+  Generating code
+  0 of 2 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  PEB Traversing.vcxproj -> D:\Reversing\PEB_Traversing\PEB Traversing\Release\PEB Traversing.exe

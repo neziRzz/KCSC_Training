@@ -44,4 +44,27 @@ unsigned char shellcode = [fill shellcode here];
 - Khi sử dụng shellcode để thực thi chương trình, một trong những vấn đề tiêu biểu nhất mà ta sẽ gặp phải là làm thế nào để resolve các external functions. Để giải quyết được điều này, ta có thể sử dụng kĩ thuật `PEB Traversal`
 ### PEB Traversal
 #### What is PEB?
-- PEB (Process Environment Block) là một data  
+- Khi mà một process chạy, hệ điều hành (Windows) sẽ cấp phát một Process Enviroment Block (PEB) struct cho process đó. PEB được tạo bởi kernel và nó chứa các vùng chứa những thông tin như các modules được load cùng với process, các parameters, các biến môi trường,... bên dưới là các thành phần trong PEB được tham khảo tại [đây](https://learn.microsoft.com/en-us/windows/win32/api/winternl/ns-winternl-peb)
+```C
+typedef struct _PEB {
+  BYTE                          Reserved1[2];
+  BYTE                          BeingDebugged;
+  BYTE                          Reserved2[1];
+  PVOID                         Reserved3[2];
+  PPEB_LDR_DATA                 Ldr;
+  PRTL_USER_PROCESS_PARAMETERS  ProcessParameters;
+  PVOID                         Reserved4[3];
+  PVOID                         AtlThunkSListPtr;
+  PVOID                         Reserved5;
+  ULONG                         Reserved6;
+  PVOID                         Reserved7;
+  ULONG                         Reserved8;
+  ULONG                         AtlThunkSListPtr32;
+  PVOID                         Reserved9[45];
+  BYTE                          Reserved10[96];
+  PPS_POST_PROCESS_INIT_ROUTINE PostProcessInitRoutine;
+  BYTE                          Reserved11[128];
+  PVOID                         Reserved12[1];
+  ULONG                         SessionId;
+} PEB, *PPEB;
+``` 

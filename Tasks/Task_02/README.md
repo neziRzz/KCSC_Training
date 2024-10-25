@@ -79,7 +79,7 @@ typedef struct _PEB_LDR_DATA {
     LIST_ENTRY InInitializationOrderModuleList;
 } PEB_LDR_DATA, * PPEB_LDR_DATA;
 ```
-- Trong struct trên, một process sẽ dùng `InMemoryOrderModuleList` để enumerate các modules được load. Linked list này chứa các entries cho mỗi module, được mô tả bởi struct `LDR_DATA_TABLE_ENTRY`, struct này cung cấp các thông tin chi tiết của từng module
+- Trong struct trên, một process sẽ dùng `InMemoryOrderModuleList` để enumerate các modules được load. Linked list này chứa các entries cho mỗi module, được mô tả bởi struct `LDR_DATA_TABLE_ENTRY`, struct này cung cấp các thông tin chi tiết của từng module.
 ```C
 typedef struct _LDR_DATA_TABLE_ENTRY {
     LIST_ENTRY InLoadOrderLinks;
@@ -102,3 +102,22 @@ typedef struct _LDR_DATA_TABLE_ENTRY {
     PVOID      PatchInformation;
 } LDR_DATA_TABLE_ENTRY, * PLDR_DATA_TABLE_ENTRY;
 ```
+### Accessing PEB
+- Vậy làm thế nào để ta truy cập vào PEB? 1 trong nhiều cách sẽ là bằng cách sử dụng inlie assembly
+```C
+#include <stdio.h>
+#include <Windows.h>
+
+int main() {
+    PVOID peb;
+
+    __asm {
+        mov eax, fs:[0x30]
+        mov peb, eax
+    }
+
+    printf("PEB Address: %p\n", peb);
+    return 0;
+}
+```
+- Giả sử như trong đoạn code trên sử dụng keyword `__asm` để insert asm instruction trực tiếp. PEB được truy cập thông qua segment register `fs`. `fs` là một segment register được sử dụng trong x32 architecture và nó trỏ tới TEB, trong trường hợp này, `fs:[0x30]` là offset trong TEB chứa con trỏ tới PEB (LƯU Ý : Nếu các bạn có ý định sử dụng inline x64 thì sẽ không khả thi bởi trình compiler C không hỗ trợ. Nên để truy cập PEB trong x64 sẽ phải code bằng asm và sử dụng segment register `gs` với offset là `0x60`)

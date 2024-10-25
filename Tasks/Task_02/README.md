@@ -44,4 +44,4 @@ unsigned char shellcode = [fill shellcode here];
 - Khi sử dụng shellcode để thực thi chương trình, một trong những vấn đề tiêu biểu nhất mà ta sẽ gặp phải là làm thế nào để resolve các external functions. Để giải quyết được điều này, ta có thể sử dụng kĩ thuật `PEB Traversal`
 ### PEB Traversal
 #### What is PEB?
-- 
+- PEB (Process Environment Block) là một data  

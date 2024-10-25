@@ -68,3 +68,37 @@ typedef struct _PEB {
   ULONG                         SessionId;
 } PEB, *PPEB;
 ``` 
+- Trong các thành phần của struct trên, thành phần mà ta cần quan tâm cho kĩ thuật kể trên là `Ldr`, thành phần này chứa con trỏ tới struct `PEB_LDR_DATA`, struct này chứa thông tin về các modules được load cùng với process (EXEs/DLLs), bao gồm cả một double-linked list (danh sách liên kết đôi) `InMemoryOrderModuleList` , linked list này có nhiệm vụ tìm các địa chỉ của các DLLs được load cùng với process đang chạy
+```C
+typedef struct _PEB_LDR_DATA {
+    ULONG Length;
+    BOOLEAN Initialized;
+    HANDLE SsHandle;
+    LIST_ENTRY InLoadOrderModuleList;
+    LIST_ENTRY InMemoryOrderModuleList;
+    LIST_ENTRY InInitializationOrderModuleList;
+} PEB_LDR_DATA, * PPEB_LDR_DATA;
+```
+- Trong struct trên, một process sẽ dùng `InMemoryOrderModuleList` để enumerate các modules được load. Linked list này chứa các entries cho mỗi module, được mô tả bởi struct `LDR_DATA_TABLE_ENTRY`, struct này cung cấp các thông tin chi tiết của từng module
+```C
+typedef struct _LDR_DATA_TABLE_ENTRY {
+    LIST_ENTRY InLoadOrderLinks;
+    LIST_ENTRY InMemoryOrderLinks;
+    LIST_ENTRY InInitializationOrderLinks;
+    PVOID      DllBase;
+    PVOID      EntryPoint;
+    ULONG      SizeOfImage;
+    UNICODE_STRING FullDllName;
+    UNICODE_STRING BaseDllName;
+    ULONG      Flags;
+    USHORT     LoadCount;
+    USHORT     TlsIndex;
+    LIST_ENTRY HashLinks;
+    PVOID      SectionPointer;
+    ULONG      CheckSum;
+    ULONG      TimeDateStamp;
+    PVOID      LoadedImports;
+    PVOID      EntryPointActivationContext;
+    PVOID      PatchInformation;
+} LDR_DATA_TABLE_ENTRY, * PLDR_DATA_TABLE_ENTRY;
+```

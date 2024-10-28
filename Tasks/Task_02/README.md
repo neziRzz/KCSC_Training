@@ -41,7 +41,7 @@ unsigned char shellcode = [fill shellcode here];
   + B2: Copy các bytecodes trong array shellcode vào vùng nhớ vừa được cấp phát
   + B3: Tiến hành gắn cho vùng nhớ trên con trỏ hàm để gọi hàm và sau khi hàm thực thi xong thì giải phóng vùng nhớ với `VirtualFree`
 ## Encountered problems and solutions
-- Khi sử dụng shellcode để thực thi chương trình, một trong những vấn đề tiêu biểu nhất mà ta sẽ gặp phải là làm thế nào để resolve các external functions. Tại sao lại phải resolve các function? Giả sử trong shellcode của chúng ta muốn gọi hàm `printf`
+- Khi sử dụng shellcode để thực thi chương trình, một trong những vấn đề tiêu biểu nhất mà ta sẽ gặp phải là làm thế nào để resolve các external functions. Tại sao lại phải resolve các function? Giả sử trong shellcode của chúng ta muốn gọi hàm `printf` thì lúc shellcode gọi hàm `printf` sẽ không lấy theo địa chỉ của hàm `printf` được defined trong process chạy shellcode mà lấy theo địa chỉ hàm `printf` của shellcode **lúc được compiled**. Để giải quyết vấn đề này, ta có thể sử dụng kĩ thuật `PEB Traversal`
 ### PEB Traversal
 #### What is PEB?
 - Khi mà một process chạy, hệ điều hành (Windows) sẽ cấp phát một Process Enviroment Block (PEB) struct cho process đó. PEB được tạo bởi kernel và nó chứa các vùng chứa những thông tin như các modules được load cùng với process, các parameters, các biến môi trường,... bên dưới là các thành phần trong PEB được tham khảo tại [đây](https://learn.microsoft.com/en-us/windows/win32/api/winternl/ns-winternl-peb)
@@ -307,4 +307,4 @@ int main() {
 
 
 ## Conclusion
-- 
+- Đây là những kiến thức mà mình có thể tổng hợp được về shellcode và một số những kĩ thuật liên quan. Việc sử dụng shellcode để thực thi một số tính năng nhất định sẽ khiến cho việc reverse các sample có sử dụng shellcode trở nên khó khăn hơn. Đồng thời, shellcode thường sử dụng kĩ thuật `PEB Traversing` để resolve các api cũng như là functions, điều này sẽ ngăn cản việc dựa vào các functions có trong import table để đoán được cách mà chương trình hoạt động và ta sẽ phải buộc debug chương trình để hiểu về cách chúng hoạt động

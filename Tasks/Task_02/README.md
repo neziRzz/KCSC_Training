@@ -253,3 +253,6 @@ int main() {
     return 0;
 }
 ```
+- Khi chạy đoạn code trên, ta có thể thấy rằng chương trình chạy thành công
+
+![Screenshot 2024-10-28 122828](https://github.com/user-attachments/assets/12b16fdc-96f6-403c-9805-e6e2bf5c3d2c)

@@ -307,4 +307,4 @@ int main() {
 
 
 ## Conclusion
-- Đây là những kiến thức mà mình có thể tổng hợp được về shellcode và một số những kĩ thuật liên quan. Việc sử dụng shellcode để thực thi một số tính năng nhất định sẽ khiến cho việc reverse các sample có sử dụng shellcode trở nên khó khăn hơn. Đồng thời, shellcode thường sử dụng kĩ thuật `PEB Traversing` để resolve các api cũng như là functions, điều này sẽ ngăn cản việc dựa vào các functions có trong import table để đoán được cách mà chương trình hoạt động và ta sẽ phải buộc debug chương trình để hiểu về cách chúng hoạt động
+- Đây là những kiến thức mà mình có thể tổng hợp được về shellcode và một số những kĩ thuật liên quan. Việc sử dụng shellcode để thực thi một số tính năng nhất định sẽ khiến cho việc reverse các sample có sử dụng shellcode trở nên khó khăn hơn. Đồng thời, shellcode thường sử dụng kĩ thuật `PEB Traversing` để resolve các api cũng như là functions, điều này giúp cho shellcode có thể tự resolve và gọi các api + functions cũng như là sẽ ngăn cản việc dựa vào các functions có trong import table để đoán được cách mà chương trình hoạt động và ta sẽ phải buộc debug chương trình để hiểu về cách chúng hoạt động

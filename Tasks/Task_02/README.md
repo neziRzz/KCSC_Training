@@ -102,7 +102,7 @@ typedef struct _LDR_DATA_TABLE_ENTRY {
     PVOID      PatchInformation;
 } LDR_DATA_TABLE_ENTRY, * PLDR_DATA_TABLE_ENTRY;
 ```
-### Accessing PEB
+#### Accessing PEB
 - Vậy làm thế nào để ta truy cập vào PEB? 1 trong nhiều cách sẽ là bằng cách sử dụng inlie assembly
 ```C
 #include <stdio.h>

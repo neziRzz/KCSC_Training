@@ -121,7 +121,7 @@ int main() {
 }
 ```
 - Giả sử như trong đoạn code trên sử dụng keyword `__asm` để insert asm instruction trực tiếp. PEB được truy cập thông qua segment register `fs`. `fs` là một segment register được sử dụng trong x32 architecture và nó trỏ tới TEB, trong trường hợp này, `fs:[0x30]` là offset trong TEB chứa con trỏ tới PEB (LƯU Ý : Nếu các bạn có ý định sử dụng inline x64 thì sẽ không khả thi bởi trình compiler C không hỗ trợ. Nên để truy cập PEB trong x64 sẽ phải code bằng asm và sử dụng segment register `gs` với offset là `0x60`)
-### Walking through PEB structure
+#### Walking through PEB structure
 
 - Bởi PEB chứa thông tin về các modules được load vào process (`kernel32.dll` và `ntdll.dll`) và được map vào trong process space nên ta có thể sử dụng chúng để resolve dynamically function có trong các DLL đó. Bằng cách này, các chương trình sử dụng kĩ thuật này có thể extract các base addresses của những DLLs (kể trên) và resolve các functions thuộc các DLLs này.
 

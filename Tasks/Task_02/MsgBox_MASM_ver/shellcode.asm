@@ -5,7 +5,7 @@ option casemap : none
 .code
 start:
 
-get_kernel32:
+; Get kernel32.dll base addr
 
     xor ecx, ecx
     mul ecx
@@ -19,7 +19,7 @@ get_kernel32:
     lodsd
     mov ebx, [eax + 010h]
 
-get_address_based_on_name:
+; Get_address_based_on_name:
     mov edx, [ebx+ 03Ch]
     add edx, ebx
     mov edx, [edx + 078h]
@@ -28,7 +28,7 @@ get_address_based_on_name:
     add esi, ebx
     xor ecx, ecx
 
-get_procAddr:
+; Iterate through ordinals
     inc ecx
     lodsd
     add eax, ebx
@@ -39,7 +39,7 @@ get_procAddr:
     cmp DWORD PTR [eax+8], 065726464h
     jnz get_procAddr
 
-get_procAddrFunc:
+; Get GetProcAddress func addr
     mov esi, [edx+024h]
     add esi, ebx
     mov cx, [esi + ecx*2]
@@ -50,7 +50,7 @@ get_procAddrFunc:
     add edx, ebx
     mov ebp, edx
 
-get_LoadLibA:
+; Get LoadLibraryA base addr
     xor ecx, ecx
     push ecx
     push 041797261h
@@ -60,7 +60,7 @@ get_LoadLibA:
     push ebx
     call edx
 
-get_User32:
+; Get user32.dll base addr
     push 061616C6Ch
     sub  word ptr [esp+2], 06161h
     push 0642E3233h
@@ -68,7 +68,7 @@ get_User32:
     push esp
     call eax    
 
-get_MsgBox:
+; Get MsgBox addr
     push 6141786Fh
     sub word ptr [esp+03h], 061h
     push 042656761h
@@ -77,7 +77,7 @@ get_MsgBox:
     push eax
     call ebp
 
-init_MsgBoxA:
+; Initialize and dynamically resolve MsgBox
     add esp, 010h
     xor edx, edx
     xor ecx, ecx
@@ -93,7 +93,8 @@ init_MsgBoxA:
     push ecx
     push edx
     call eax
-exit:
+
+; Dynamically resolve ExitProcess 
     add esp, 010h
     push 061737365h
     sub word ptr [esp+3], 061h

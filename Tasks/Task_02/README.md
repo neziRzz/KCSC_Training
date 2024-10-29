@@ -305,7 +305,7 @@ int main() {
 
 ![image](https://github.com/user-attachments/assets/7fe8549f-1820-4d1d-86af-1c4517447366)
 
-- Thay vì code bằng C thì ta cũng có thể áp dụng hướng làm tương tự và code bằng ASM, bên dưới là source và mình sẽ decompile chương trình đó và lấy bytecodes và đem bytecode vào một loader bằng C để test
+- Thay vì code bằng C thì ta cũng có thể áp dụng hướng làm tương tự và code bằng ASM, bên dưới là source và mình sẽ decompile chương trình đó và lấy bytecodes đem  vào một loader bằng C để test
 ```asm
 .386
 .model flat, stdcall
@@ -337,7 +337,7 @@ start:
     add esi, ebx
     xor ecx, ecx
 
-; Iterate through ordinals
+get_procAddr:
     inc ecx
     lodsd
     add eax, ebx

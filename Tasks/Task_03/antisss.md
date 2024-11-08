@@ -10,8 +10,8 @@ key = "BKSEECCCC!!!"
 for i in range(len(cyphertext)):
     print(chr(cyphertext[i]^ord(key[i%len(key)])),end='')
 ```
-#Anti_2
-##Script and Flag
+# Anti_2
+## Script and Flag
 ```python
 test = [0xE8, 0x49, 0x12, 0x6E, 0x4E, 0x47, 0xD8, 0x7A, 0x1B, 0x2E, 
   0xC5, 0x8A, 0x19, 0x15, 0xD5, 0x3E, 0x0B, 0x08, 0x91, 0xC5, 
@@ -48,8 +48,8 @@ cyphertext=[ 0xBF, 0x7F, 0x60, 0x6B, 0x6E, 0xA1, 0xB4, 0x8B, 0x12, 0x01,
 for i in range(len(cyphertext)):
   print(chr(test[i*4] ^ cyphertext[i]),end='')
 ```
-#Anti_3
-##Script and Flag
+# Anti_3
+## Script and Flag
 
 ```python
 #manually picking out flag from the binary :skull:

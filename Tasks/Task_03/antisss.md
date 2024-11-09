@@ -1,4 +1,16 @@
 # Anti_1
+## Misc
+- Đề cho 1 file PE32
+
+![image](https://github.com/user-attachments/assets/78243b7e-9c8d-4f8f-8f0c-f36a3f10b78f)
+
+## Detailed Analysis
+- Vì flow của bải này khá là lộn xộn, mình xin phép chỉ phân tích những hàm và flow đáng chú ý
+
+![image](https://github.com/user-attachments/assets/25f20d72-76b5-44d3-b741-9998701a8ba1)
+
+
+
 ## Script and Flag
 ```python
 cyphertext = [0x00, 0x00, 0x00, 0x00, 0x06, 0x38, 0x26, 0x77, 0x30, 0x58, 0x7E, 0x42, 0x2A, 0x7F, 0x3F, 0x29, 

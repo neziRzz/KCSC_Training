@@ -56,6 +56,9 @@ char __fastcall sub_401220(const char *a1, int a2, int a3)
 - Kĩ thuật anti debug được sử dụng trong bài này chính là kiểm tra flag `BeingDebugged` trong struct `PEB`, dấu hiệu nhận biết kĩ thuật này được sử dụng là `large fs:30h`, offset `0x30` trong segment register `fs` (0x60 với segment register `gs`) trỏ tới `PEB` và phần tử thứ 2 `eax+2` trong struct này là flag `BeingDebugged`
 - Để bypass được đoạn kiểm tra này, ta có thể sửa flag `ZF` hoặc patch instruction từ `jz` sang `jmp`, khi đó luồng đúng của chương trình sẽ khởi tạo ra cyphertext, ta chỉ cần nhặt chúng ra và viết script
 
+![image](https://github.com/user-attachments/assets/a5801bc6-c16c-427a-a53f-4ca8d85f7615)
+
+
 ## Script and Flag
 ```python
 cyphertext = [0x00, 0x00, 0x00, 0x00, 0x06, 0x38, 0x26, 0x77, 0x30, 0x58, 0x7E, 0x42, 0x2A, 0x7F, 0x3F, 0x29, 

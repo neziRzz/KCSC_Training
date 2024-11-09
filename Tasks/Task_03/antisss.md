@@ -9,6 +9,18 @@
 
 ![image](https://github.com/user-attachments/assets/25f20d72-76b5-44d3-b741-9998701a8ba1)
 
+- Chương trình thực hiện lấy input của user, sau khi debug một hồi thì chương trình sẽ raise execption
+
+![image](https://github.com/user-attachments/assets/150dbb79-9d17-44e4-a80f-677a823cbe9c)
+
+- Tuy nhiên ta vẫn có thể tiếp tục debug bằng cách để cho chương trình tự handle execption này
+
+![image](https://github.com/user-attachments/assets/c856b990-8bf5-4303-93cd-067b64d8c403)
+
+- Tiếp tục debug nhưng đến đây thì chương trình đột nhiên thông báo wrong flag
+
+![image](https://github.com/user-attachments/assets/8e8488be-1275-4b5f-aa47-28431b9478ca)
+![image](https://github.com/user-attachments/assets/1dde63cf-2832-4791-a521-b26c80aab150)
 
 
 ## Script and Flag

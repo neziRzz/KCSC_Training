@@ -29,8 +29,32 @@
 - XREFs để xem string này được gọi từ đâu
 
 ![image](https://github.com/user-attachments/assets/5def4d74-2285-4275-a1e7-5b29fe3fb07d)
+![image](https://github.com/user-attachments/assets/0b74f63e-9a5f-4006-ac63-95314063ebf2)
 
+- Hàm `sub_401220`
+```C
+char __fastcall sub_401220(const char *a1, int a2, int a3)
+{
+  char result; // al
+  signed int v5; // esi
+  int i; // ecx
 
+  v5 = strlen(a1);
+  for ( i = 0; i < a3; ++i )
+  {
+    result = a1[i % v5];
+    *(_BYTE *)(i + a2) ^= result;
+  }
+  return result;
+}
+```
+- Hàm này có nhiệm vụ XOR từng phần từ của input với string `BKSEECCCC!!!`, để kiểm chứng các bạn có thể debug
+- Tiếp tục trace các instruction, sẽ thấy challenge sử dụng một kĩ thuật anti-debug khá quen thuộc
+
+![image](https://github.com/user-attachments/assets/5903fc35-c4e0-4f14-bb7e-247cd3b4f647)
+
+- Kĩ thuật anti debug được sử dụng trong bài này chính là kiểm tra flag `BeingDebugged` trong struct `PEB`, dấu hiệu nhận biết kĩ thuật này được sử dụng là `large fs:30h`, offset `0x30` trong segment register `fs` (0x60 với segment register `gs`) trỏ tới `PEB` và phần tử thứ 2 `eax+2` trong struct này là flag `BeingDebugged`
+- Để bypass được đoạn kiểm tra này, ta có thể sửa flag `ZF` hoặc patch instruction từ `jz` sang `jmp`, khi đó luồng đúng của chương trình sẽ khởi tạo ra cyphertext, ta chỉ cần nhặt chúng ra và viết script
 
 ## Script and Flag
 ```python

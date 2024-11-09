@@ -22,6 +22,15 @@
 ![image](https://github.com/user-attachments/assets/8e8488be-1275-4b5f-aa47-28431b9478ca)
 ![image](https://github.com/user-attachments/assets/1dde63cf-2832-4791-a521-b26c80aab150)
 
+- Đến đây thì mình không có bất cứ 1 ý tưởng về việc input được xử lí như thế nào, nên mình mở cửa sổ string của IDA và tìm thấy một string khá đặc biệt
+
+![image](https://github.com/user-attachments/assets/2942f7fc-10c9-4c40-981d-4fdc4cd06871)
+
+- XREFs để xem string này được gọi từ đâu
+
+![image](https://github.com/user-attachments/assets/5def4d74-2285-4275-a1e7-5b29fe3fb07d)
+
+
 
 ## Script and Flag
 ```python

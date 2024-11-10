@@ -125,6 +125,8 @@ for i in range(len(cyphertext)):
 ![image](https://github.com/user-attachments/assets/1cce1e29-1112-4838-9662-5f970b881a78)
 
 - Sử dụng cửa sổ Xrefs của IDA, mình sẽ trace ngược lại ra message trên được gọi từ đâu
+
+![image](https://github.com/user-attachments/assets/8377f4a8-73b1-4009-97ca-d9253c29f02a)
 ```C
   switch ( (unsigned __int16)wParam )
   {
@@ -148,9 +150,144 @@ for i in range(len(cyphertext)):
       MessageBoxA(0, "oh, no", v5, 0);
       return 0;
 ```
-- Đoạn code này có nhiệm vụ là kiểm tra input của chúng ta, `sub_401B40` sẽ có nhiệm vụ kiểm tra input(mình sẽ phân tích hàm này cụ thể sau) còn 
+- Đoạn code này có nhiệm vụ là kiểm tra input của chúng ta, `sub_401B40` sẽ có nhiệm vụ kiểm tra input(mình sẽ phân tích hàm này cụ thể sau), còn `sub_401000` sẽ có nhiệm vụ decrypt 1 cyphertext có sẵn với input do chúng ta nhập vào là key. Vì mục tiêu chính của bài này là để hiểu được các kĩ thuật anti debug nên mình sẽ chỉ tập chung vào phân tích `sub_401B40`, trước khi đi vào phân tích hàm này, khi check cửa sổ Exports của IDA ta có thể thấy rằng bài này có gọi hàm `TlsCallBack`
 
-![image](https://github.com/user-attachments/assets/8377f4a8-73b1-4009-97ca-d9253c29f02a)
+![image](https://github.com/user-attachments/assets/fcd8e9f5-21f2-4f56-a3fe-a96cfbe7133f)
+
+- Hàm `TlsCallback_0()`
+```C
+char *__stdcall TlsCallback_0(int a1, int a2, int a3)
+{
+  struct _LIST_ENTRY *v3; // eax
+  char *result; // eax
+  void (__stdcall *v5)(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD); // [esp-4h] [ebp-8h] BYREF
+  char *v6; // [esp+0h] [ebp-4h]
+
+  v3 = sub_401DF0((void *)0x7B3FA1C0);
+  v6 = (char *)sub_401F10(v3, 0x5A3BB3B0);
+  v5 = (void (__stdcall *)(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD))v6;
+  ((void (__stdcall *)(int, int, _DWORD, int, _DWORD))v6)(-1, 7, &v5, 4, 0);
+  result = v6;
+  if ( v6 )
+  {
+    result = (char *)&unk_405018 + 10;
+    *((_BYTE *)&unk_405018 + 10) = 116;
+  }
+  return result;
+}
+```
+- Trong hàm này, 2 hàm `sub_401DF0` và `sub_401F10` thực chất là custom implementation của `LoadLibrary` và `GetProcAddress` sử dụng kĩ thuật `API Hashing` để resolve các DLLs và functions dựa trên giá trị hash của chúng, và trong trường hợp này sẽ resolve `ntdll32.dll` và `NtQueryInformationProcess`. Sau đó gọi `NtQueryInformationProcess` với argument thứ 2 là `ProcessDebugPort`(0x7) để check debugger. Các bạn có thể bypass đoạn check này bằng cách chỉnh cờ ZF khi step đến instruction dưới đây
+
+![image](https://github.com/user-attachments/assets/361df950-1fc5-4d9d-abf4-58ca2bfadf11)
+
+- Hàm `sub_401B40` (trước đó mình có chạy debugger nên một số hàm sẽ bị đổi lại tên)
+```C
+char __thiscall sub_AB1B40(const char *this)
+{
+  char v2; // cl
+  int v3; // esi
+  int v4; // ecx
+  char v5; // bl
+  char v6; // cl
+  int v7; // eax
+  char v8; // al
+  int v9; // eax
+  void (__stdcall *v10)(_DWORD); // eax
+  char result; // al
+  char v12; // bl
+  int v13; // eax
+  unsigned __int8 v14; // cl
+  int v15; // eax
+  int v16; // eax
+  void (__stdcall *v17)(_DWORD); // eax
+  void (__stdcall *v18)(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD); // [esp-4h] [ebp-25Ch] BYREF
+  void (__stdcall *v19)(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD); // [esp+10h] [ebp-248h]
+  int v20; // [esp+14h] [ebp-244h]
+  void (__stdcall *v21)(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD); // [esp+18h] [ebp-240h]
+  char v22; // [esp+1Fh] [ebp-239h]
+  char v23[556]; // [esp+20h] [ebp-238h] BYREF
+  int v24; // [esp+24Ch] [ebp-Ch]
+
+  if ( strlen(this) < 0x26 )
+    return 0;
+  sub_AB1FD0(v23, byte_AB501C[(unsigned __int8)byte_AB501C[0] / 0xCu]);
+  v2 = v22;
+  v3 = 0;
+  while ( 2 )
+  {
+    switch ( dword_AB32C8[v3] )
+    {
+      case 1:
+        v4 = dword_AB3360[v3];
+        v5 = this[dword_AB33F8[v3]];
+        v22 = NtCurrentPeb()->NtGlobalFlag & 0x70;
+        v6 = sub_AB2050(v4);
+        v7 = v24;
+        if ( v24 >= 256 )
+          v7 = 0;
+        v24 = v7 + 1;
+        v2 = byte_AB329F[v7 + 1] == (char)(v5 ^ v6);
+        goto LABEL_9;
+      case 2:
+        v8 = sub_AB1600(dword_AB3360[v3]);
+        goto LABEL_8;
+      case 3:
+        v8 = sub_AB16C0(dword_AB3360[v3]);
+        goto LABEL_8;
+      case 4:
+        v8 = sub_AB1760(dword_AB3360[v3]);
+        goto LABEL_8;
+      case 5:
+        v8 = sub_AB1950(dword_AB3360[v3]);
+        goto LABEL_8;
+      case 6:
+        v8 = sub_AB1AA0(dword_AB3360[v3]);
+LABEL_8:
+        v2 = v8;
+        goto LABEL_9;
+      case 7:
+        v20 = dword_AB3360[v3];
+        v12 = this[dword_AB33F8[v3]];
+        v13 = sub_AB1DF0(2067767744);
+        v19 = (void (__stdcall *)(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD))sub_AB1F10(v13, 1513862064);
+        v21 = 0;
+        v18 = v19;
+        v19(-1, 31, &v18, 4, 0);
+        v21 = v18;
+        v14 = sub_AB2050(v20);
+        v15 = v24;
+        if ( v24 >= 256 )
+          v15 = 0;
+        v24 = v15 + 1;
+        if ( byte_AB329F[v15 + 1] != (v14 ^ (unsigned __int8)v12) )
+          goto LABEL_20;
+        v2 = 1;
+        goto LABEL_10;
+      default:
+LABEL_9:
+        if ( !v2 )
+        {
+LABEL_20:
+          v16 = sub_AB1DF0(38312619);
+          v17 = (void (__stdcall *)(_DWORD))sub_AB1F10(v16, 838910877);
+          v17(0);
+          byte_AB55B8 = 0;
+          return 0;
+        }
+LABEL_10:
+        if ( ++v3 < 38 )
+          continue;
+        v9 = sub_AB1DF0(38312619);
+        v10 = (void (__stdcall *)(_DWORD))sub_AB1F10(v9, 838910877);
+        v10(0);
+        byte_AB55B8 = 0;
+        result = 1;
+        break;
+    }
+    return result;
+  }
+}
+```
 
 ## Script and Flag
 ```python

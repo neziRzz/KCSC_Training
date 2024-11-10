@@ -29,4 +29,4 @@ int main() {
 	return 0;
 }
 ```
-- Function `IsDebuggerPresent()` sẽ xác định tiến trình đang chạy có đang bị debug bởi 1 debugger user-mode hay không. Thông thương thì function này sẽ kiểm tra flag `BeingDebugged` trong `PEB` 
+- Function `IsDebuggerPresent()` sẽ xác định tiến trình đang chạy có đang bị debug bởi 1 debugger user-mode hay không. Thông thường thì function này sẽ kiểm tra flag `BeingDebugged` trong `PEB` 

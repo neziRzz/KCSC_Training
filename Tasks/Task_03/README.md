@@ -21,7 +21,7 @@ BOOL debugger_check() {
 }
 int main() {
 	if (debugger_check() == TRUE) {
-		printf("Lmao fuck off!");
+		printf("Cu't");
 	}
 	else {
 		printf("Hello there!");
@@ -29,4 +29,9 @@ int main() {
 	return 0;
 }
 ```
-- Function `IsDebuggerPresent()` sẽ xác định tiến trình đang chạy có đang bị debug bởi 1 debugger user-mode hay không. Thông thường thì function này sẽ kiểm tra flag `BeingDebugged` trong `PEB` 
+- Function `IsDebuggerPresent()` sẽ xác định tiến trình đang chạy có đang bị debug bởi 1 debugger user-mode hay không. Thông thường thì function này sẽ kiểm tra flag `BeingDebugged` trong `PEB`
+
+### NtQueryInformationProcess()
+```C
+
+```

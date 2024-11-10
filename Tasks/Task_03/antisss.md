@@ -149,6 +149,7 @@ for i in range(len(cyphertext)):
       return 0;
 ```
 - Đoạn code này có nhiệm vụ là kiểm tra input của chúng ta, `sub_401B40` sẽ có nhiệm vụ kiểm tra input(mình sẽ phân tích hàm này cụ thể sau) còn 
+
 ![image](https://github.com/user-attachments/assets/8377f4a8-73b1-4009-97ca-d9253c29f02a)
 
 ## Script and Flag

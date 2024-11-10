@@ -291,6 +291,8 @@ LABEL_10:
 - Hàm này sẽ kiểm tra input của chúng ta bằng cách sử dụng một map để access một case bất kì trong các case của switch case trên, mỗi một case sẽ chứa một kĩ thuật anti debug. Sau đây mình sẽ phân tích từng case
   + Case 1
     + Case này sẽ check debug bằng cách kiểm tra flag `NtGlobalFlag` trong `PEB`, nếu chương trình bị debug thì sẽ tiến hành set flag đồng thời phụ thuộc vào flag này thì `sub_AB2050` sẽ gen ra giá trị tương ứng (may thay `sub_AB2050` chỉ có thể gen ra 2 trường hợp giá trị phụ thuộc vào việc chương trình có bị debug hay không nên mình sẽ không phân tích kĩ hàm đó) sau đó input của chúng ta sẽ được XOR với giá trị mà `sub_AB2050` trả về và kiểm tra với phần tử tương ứng tại `byte_AB329F`
+   
+  
   + Case 2:
     + `sub_AB1600`
 ```C
@@ -321,6 +323,8 @@ bool __fastcall sub_AB1600(int a1, char a2, int a3)
 ```
    + Hàm này sẽ resolve `HeapWalk` bằng kĩ thuật `API Hashing` như mình vừa đề cập và sau đó kiểm tra các `Heap Flags` các bạn có thể tìm hiểu kĩ hơn tại [đây](https://anti-debug.checkpoint.com/techniques/debug-flags.html#manual-checks-heap-flags)
 
+
+
   + Case 3:
 ```C
 bool __fastcall sub_AB16C0(int a1, char a2, int a3)
@@ -341,6 +345,8 @@ bool __fastcall sub_AB16C0(int a1, char a2, int a3)
 }
 ```
    + Tương tự case 2 nhưng sẽ là kiểm tra `Force Flags`
+
+
 
   + Case 4
 ```C
@@ -394,6 +400,8 @@ LABEL_8:
 }
 ```
   + Case này sẽ kiểm tra chuỗi `0xABABABAB` có được append trong heap block hay không (check debug), các bạn có thể tìm hiểu thêm về kĩ thuật này tại [đây](https://anti-debug.checkpoint.com/techniques/debug-flags.html#manual-checks-heap-protection)
+
+
 
   + Case 5
 ```C
@@ -454,6 +462,8 @@ LABEL_9:
 ```
    + Case này sẽ resolve `CreateToolhelp32Snapshot`, `Process32First` và `Process32Last` bằng kĩ thuật `API Hashing` mà mình đã đề cập ở trên để kiếm chương trình đang chạy `anti3`, ban đầu mình nghĩ case này sẽ kiểm tra thêm cả parent process của nó rồi kiểm tra với tên các trình debugger với disassembler nữa nhưng có vẻ là không phải (cứ để flow chương trình chạy bình thường tại đây)
 
+
+
   + Case 6
 ```C
 bool __fastcall sub_441AA0(int a1, char a2, int a3)
@@ -490,6 +500,8 @@ LABEL_6:
 ```
    + Case này sử dụng một kĩ thuật khá là `lạ` và bản thân mình thấy rất hay đó chính là resolve `BlockInput` bằng kĩ thuật `API Hashing` mà mình đã đề cập ở trên. `BlockInput` sẽ có nhiệm vụ block mouse cũng như là keyboard input của user (không dùng được chuột với phím thì sao mà debug :v), sau đó kiểm tra giá trị trả về thông qua 2 lần gọi hàm này để check xem hàm có bị tác động thêm vào hay không, từ đó phát hiện debugger. Cái điều mà mình thấy hay nó là ở đây, theo [MSDN](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-blockinput#return-value) nếu như hàm này đã block input thành công thì giá trị trả về sẽ khác 0 và nếu như đã bị block rồi thì giá trị trả về sẽ = 0, nếu như không có debugger attach vào thì giá trị trả về lần lượt của 2 hàm này sẽ là 1 và 0 tương ứng. Nhưng nếu ta patch lại argument của hàm này để cho `BlockInput` không block thì giá trị trả về sẽ đểu là 0 hoặc là đều là 1, và từ đó có nghĩa là chương trình bị debug, nên ta sẽ phải patch đoạn kiểm tra `v7!=v8` sao cho nó luôn đúng
 
+
+
   + Case 7
 ```C
       case 7:
@@ -516,7 +528,9 @@ LABEL_6:
 ```
   + Cách kiểm tra debugger của hàm này giống hàm `TLSCallBack_0` nên mình sẽ không phân tích
 
-- Vậy để viết script giải ta có 2 cách. Cách đầu tiên là chạy lần lượt qua các case và nhặt các giá trị được return bởi `sub_442050` (giá trị trả về của hàm này chỉ có 2 trường hợp phụ thuộc vào việc flag check debugger trong từng case ra sao) và xor với từng phần tử trong `byte_44329F`. Cách thứ hai sẽ là tự build lại hàm `sub_442050`. Vì bài này là để học các kĩ thuật anti debug nên mình sẽ làm theo cách 1
+
+
+- Vậy để viết script giải ta có 2 cách. Cách đầu tiên là chạy lần lượt qua các case và nhặt các giá trị được return bởi `sub_442050` (giá trị trả về của hàm này chỉ có 2 trường hợp phụ thuộc vào việc flag check debugger trong từng case ra sao nếu các bạn bypass chuẩn thì giá trị trả ra sẽ chuẩn) và xor với từng phần tử trong `byte_44329F`. Cách thứ hai sẽ là tự build lại hàm `sub_442050` để tự động hóa script hơn. Vì bài này là để học các kĩ thuật anti debug nên mình sẽ làm theo cách 1
 ## Script and Flag
 ```python
 #manually picking out flag from the binary :skull:

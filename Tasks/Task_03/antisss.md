@@ -71,6 +71,12 @@ for i in range(len(cyphertext)):
     print(chr(cyphertext[i]^ord(key[i%len(key)])),end='')
 ```
 # Anti_2
+## Misc 
+- Đề cho 1 file ELF64
+
+![image](https://github.com/user-attachments/assets/c993a1af-2772-419a-9190-ca47e7027192)
+## Detailed Analysis
+
 ## Script and Flag
 ```python
 test = [0xE8, 0x49, 0x12, 0x6E, 0x4E, 0x47, 0xD8, 0x7A, 0x1B, 0x2E, 
@@ -109,8 +115,43 @@ for i in range(len(cyphertext)):
   print(chr(test[i*4] ^ cyphertext[i]),end='')
 ```
 # Anti_3
-## Script and Flag
+## Misc
+- Đề cho 1 file PE32
 
+![image](https://github.com/user-attachments/assets/6ef65f87-e49c-4f0c-8133-4ecb47024cf0)
+## Detailed Analysis
+- Chương trình bắt ta phải chạy với quyền admin, nhập input rồi kiểm tra, nếu sai thì sẽ hiện lên MsgBox như sau
+
+![image](https://github.com/user-attachments/assets/1cce1e29-1112-4838-9662-5f970b881a78)
+
+- Sử dụng cửa sổ Xrefs của IDA, mình sẽ trace ngược lại ra message trên được gọi từ đâu
+```C
+  switch ( (unsigned __int16)wParam )
+  {
+    case 4u:
+      GetWindowTextA(::hWnd, String, 256);
+      if ( sub_401B40(String) )
+      {
+        sub_401000((BYTE *)String, &pdwDataLen);
+        if ( pdwDataLen >= 0x2E )
+        {
+          BYTE14(v9) = 0;
+          MessageBoxA(0, (LPCSTR)v8, "OK", 0);
+          return 0;
+        }
+        v5 = "Wrong";
+      }
+      else
+      {
+        v5 = "Wrong check fail";
+      }
+      MessageBoxA(0, "oh, no", v5, 0);
+      return 0;
+```
+- Đoạn code này có nhiệm vụ là kiểm tra input của chúng ta, `sub_401B40` sẽ có nhiệm vụ kiểm tra input(mình sẽ phân tích hàm này cụ thể sau) còn 
+![image](https://github.com/user-attachments/assets/8377f4a8-73b1-4009-97ca-d9253c29f02a)
+
+## Script and Flag
 ```python
 #manually picking out flag from the binary :skull:
 flag = ["a"]*38

@@ -397,7 +397,126 @@ LABEL_8:
 
   + Case 5
 ```C
+char __fastcall sub_441950(int a1, unsigned __int8 a2, int a3)
+{
+  struct _LIST_ENTRY *v4; // eax
+  int (__stdcall *v5)(int, _DWORD); // eax
+  int v6; // edi
+  struct _LIST_ENTRY *v8; // eax
+  int (__stdcall *v9)(int, int *); // eax
+  struct _LIST_ENTRY *v10; // eax
+  struct _LIST_ENTRY *v11; // eax
+  void (__stdcall *v12)(int); // ebx
+  char v13; // dl
+  char v14; // al
+  int (__stdcall *v15)(int, int *); // [esp+8h] [ebp-238h]
+  int v17[9]; // [esp+10h] [ebp-230h] BYREF
+  char v18[520]; // [esp+34h] [ebp-20Ch] BYREF
+
+  v4 = sub_441DF0((void *)0x6AE69F02);
+  v5 = (int (__stdcall *)(int, _DWORD))sub_441F10(v4, 0x3E0C478A);
+  v6 = v5(2, 0);
+  if ( v6 == -1 )
+    return 1;
+  v17[0] = 556;
+  v8 = sub_441DF0((void *)0x6AE69F02);
+  v9 = (int (__stdcall *)(int, int *))sub_441F10(v8, 0x267CF1A5);
+  if ( !v9(v6, v17) )
+    return 1;
+  v10 = sub_441DF0((void *)0x6AE69F02);
+  v15 = (int (__stdcall *)(int, int *))sub_441F10(v10, 0x28ED5C0);
+  v11 = sub_441DF0((void *)0x6AE69F02);
+  v12 = (void (__stdcall *)(int))sub_441F10(v11, 0x4F6CEA0C);
+  while ( !(unsigned __int8)sub_441860(v18) )
+  {
+    if ( !v15(v6, v17) )
+    {
+      v13 = 0;
+      goto LABEL_9;
+    }
+  }
+  v13 = 1;
+LABEL_9:
+  v14 = sub_442050(a1, v13, a3);
+  if ( *(int *)(a1 + 556) >= 256 )
+    *(_DWORD *)(a1 + 556) = 0;
+  if ( byte_44329F[++*(_DWORD *)(a1 + 556)] == (a2 ^ (unsigned __int8)v14) )
+  {
+    v12(v6);
+    return 1;
+  }
+  else
+  {
+    v12(v6);
+    return 0;
+  }
+}
 ```
+   + Case này sẽ resolve `CreateToolhelp32Snapshot`, `Process32First` và `Process32Last` bằng kĩ thuật `API Hashing` mà mình đã đề cập ở trên để kiếm chương trình đang chạy `anti3`, ban đầu mình nghĩ case này sẽ kiểm tra thêm cả parent process của nó rồi kiểm tra với tên các trình debugger với disassembler nữa nhưng có vẻ là không phải (cứ để flow chương trình chạy bình thường tại đây)
+
+  + Case 6
+```C
+bool __fastcall sub_441AA0(int a1, char a2, int a3)
+{
+  struct _LIST_ENTRY *v5; // eax
+  int (__stdcall *v6)(int); // esi
+  char v7; // bl
+  char v8; // al
+  char v9; // al
+
+  v5 = sub_441DF0((void *)0x2489AAB);
+  v6 = (int (__stdcall *)(int))sub_441F10(v5, 838910877);
+  v7 = v6(1);
+  v8 = v6(1);
+  if ( byte_4455B8 )
+  {
+    if ( v7 == v8 )
+      goto LABEL_3;
+  }
+  else if ( v7 != v8 )
+  {
+LABEL_3:
+    v9 = sub_442050(a1, 1, a3);
+    byte_4455B8 = 1;
+    goto LABEL_6;
+  }
+  v9 = sub_442050(a1, 0, a3);
+LABEL_6:
+  if ( *(int *)(a1 + 556) >= 256 )
+    *(_DWORD *)(a1 + 556) = 0;
+  ++*(_DWORD *)(a1 + 556);
+  return byte_44329F[*(_DWORD *)(a1 + 556)] == (char)(a2 ^ v9);
+}
+```
+   + Case này sử dụng một kĩ thuật khá là `lạ` và bản thân mình thấy rất hay đó chính là resolve `BlockInput` bằng kĩ thuật `API Hashing` mà mình đã đề cập ở trên. `BlockInput` sẽ có nhiệm vụ block mouse cũng như là keyboard input của user (không dùng được chuột với phím thì sao mà debug :v), sau đó kiểm tra giá trị trả về thông qua 2 lần gọi hàm này để check xem hàm có bị tác động thêm vào hay không, từ đó phát hiện debugger. Cái điều mà mình thấy hay nó là ở đây, theo [MSDN](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-blockinput#return-value) nếu như hàm này đã block input thành công thì giá trị trả về sẽ khác 0 và nếu như đã bị block rồi thì giá trị trả về sẽ = 0, nếu như không có debugger attach vào thì giá trị trả về lần lượt của 2 hàm này sẽ là 1 và 0 tương ứng. Nhưng nếu ta patch lại argument của hàm này để cho `BlockInput` không block thì giá trị trả về sẽ đểu là 0 hoặc là đều là 1, và từ đó có nghĩa là chương trình bị debug, nên ta sẽ phải patch đoạn kiểm tra `v7!=v8` sao cho nó luôn đúng
+
+  + Case 7
+```C
+      case 7:
+        v22 = (void (__stdcall *)(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD))dword_443360[v3];
+        v12 = this[dword_4433F8[v3]];
+        v13 = sub_441DF0((void *)0x7B3FA1C0);
+        v21 = (void (__stdcall *)(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD))sub_441F10(v13, 0x5A3BB3B0);
+        v23 = 0;
+        v20 = v21;
+        v21(-1, 31, &v20, 4, 0);
+        v23 = v20;
+        v14 = v20 == 0;
+        v20 = v22;
+        v15 = !v14;
+        v16 = sub_442050((int)v25, v15, (int)v20);
+        v17 = v26;
+        if ( v26 >= 256 )
+          v17 = 0;
+        v26 = v17 + 1;
+        if ( byte_44329F[v17 + 1] != ((unsigned __int8)v16 ^ (unsigned __int8)v12) )
+          goto LABEL_23;
+        v2 = 1;
+        goto LABEL_10;
+```
+  + Cách kiểm tra debugger của hàm này giống hàm `TLSCallBack_0` nên mình sẽ không phân tích
+
+- Vậy để viết script giải ta có 2 cách. Cách đầu tiên là chạy lần lượt qua các case và nhặt các giá trị được return bởi `sub_442050` (giá trị trả về của hàm này chỉ có 2 trường hợp phụ thuộc vào việc flag check debugger trong từng case ra sao) và xor với từng phần tử trong `byte_44329F`. Cách thứ hai sẽ là tự build lại hàm `sub_442050`. Vì bài này là để học các kĩ thuật anti debug nên mình sẽ làm theo cách 1
 ## Script and Flag
 ```python
 #manually picking out flag from the binary :skull:

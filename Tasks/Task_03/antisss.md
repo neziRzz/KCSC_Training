@@ -76,7 +76,74 @@ for i in range(len(cyphertext)):
 
 ![image](https://github.com/user-attachments/assets/c993a1af-2772-419a-9190-ca47e7027192)
 ## Detailed Analysis
+- IDA's Pseudocode
+- Hàm `main`
+```C
+__int64 __fastcall main(int a1, char **a2, char **a3)
+{
+  void (__noreturn *v4)(); // [rsp+0h] [rbp-8h] BYREF
 
+  v4 = sub_9100;
+  return sub_1EAA0(&v4, &off_52F18, a1, a2, 0LL);
+}
+```
+- Hàm xử lí chính của chúng ta sẽ là `sub_9100` nên mình sẽ đi vào phân tích hàm đó
+
+- Hàm `sub_9100` (mình sẽ chỉ nhặt ra những phần đáng chú ý để phân tích)
+```C
+  v0 = 0;
+  v1 = 0LL;
+  v2 = 0xF3LL;
+  v3 = 0x158LL;
+  do
+  {
+    --v3;
+    --v2;
+  }
+  while ( v2 > 0 );
+  __asm { syscall; LINUX - }
+  v4 = 291LL;
+  if ( v3 )
+  {
+    ((void (__fastcall *)(int *, __int64, _QWORD))sub_9610)(v25, 291LL, 0LL);
+    v5 = (v26 >> 13) - 1;
+    if ( v26 <= 0x1FFF )
+    {
+      v6 = (1 - (v26 >> 13)) / 0x190u + 1;
+      v5 += 400 * v6;
+      v0 = -146097 * v6;
+    }
+    v4 = (unsigned int)v25[0]
+       + 86400LL
+       * (int)(((unsigned int)((__int64 (*)(void))sub_94D0)() >> 4)
+             + ((v5 / 100) >> 2)
+             + ((1461 * v5) >> 2)
+             + v0
+             - v5 / 100)
+       - 0xE77934880LL;
+  }
+ ////////////////////
+    v12 = (*(_BYTE *)(v7 + v9) ^ (unsigned __int8)v11) == *((_BYTE *)v23 + v9);
+    ++v9;
+    if ( !v12 )
+    {
+      v14 = &off_52FA8;
+      v15 = 1LL;
+      v13[0] = 0LL;
+      v16 = "Enter something:\nFailed to read linesrc/main.rsNopeSeems good";
+      v17 = 0LL;
+      sub_210A0(v13);
+      goto LABEL_18;
+    }
+  }
+  v14 = &off_52FB8;
+  v15 = 1LL;
+  v13[0] = 0LL;
+  v16 = "Enter something:\nFailed to read linesrc/main.rsNopeSeems good";
+  v17 = 0LL;
+  sub_210A0(v13);
+```
+- Đầu tiên sẽ khởi tạo init code cho syscall bằng cách lấy `v3 - v2`(kết quả là 0x65) tương ứng với việc gọi `ptrace` bằng syscall để check debugger. Một chút về kĩ thuật này, nếu như syscall đến `ptrace` thành công (không có chương trình nào đang trace chương trình gọi `ptrace`) thì giá trị trả về là 0 và tương ứng với việc không có debugger (giống như việc ta chỉ có thể attach 1 debugger per process), ngược lại nếu như giá trị trả về là -1 (đang có process trace) thì có nghĩa là đang có debugger attached. Tùy thuộc vào việc có debugger hay không thì chương trình sẽ gen ra cypher phù hợp. Trong trường hợp có debugger thì `sub_9610` sẽ có nhiệm vụ lấy time hiện tại làm seed cho cypher, điều này lí giải cho việc tại sao mỗi lần debug chương trình thì cypher thay đổi liên tục. Cuối cùng chương trình sẽ đem input của chúng ta XOR với cypher để kiểm tra với một array constant. Vậy để viết script thì ta chỉ cần thay đổi giá trị trả về sau syscall từ -1 về 0 rồi đặt bp tại phần kiểm tra rồi nhặt ra data để viết script
 ## Script and Flag
 ```python
 test = [0xE8, 0x49, 0x12, 0x6E, 0x4E, 0x47, 0xD8, 0x7A, 0x1B, 0x2E, 

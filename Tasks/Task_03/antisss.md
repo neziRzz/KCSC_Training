@@ -176,7 +176,7 @@ char *__stdcall TlsCallback_0(int a1, int a2, int a3)
   return result;
 }
 ```
-- Trong hàm này, 2 hàm `sub_401DF0` và `sub_401F10` thực chất là custom implementation của `LoadLibrary` và `GetProcAddress` sử dụng kĩ thuật `API Hashing` để resolve các DLLs và functions dựa trên giá trị hash của chúng, và trong trường hợp này sẽ resolve `ntdll32.dll` và `NtQueryInformationProcess`. Sau đó gọi `NtQueryInformationProcess` với argument thứ 2 là `ProcessDebugPort`(0x7) để check debugger. Các bạn có thể bypass đoạn check này bằng cách chỉnh cờ ZF khi step đến instruction dưới đây
+- Trong hàm này, 2 hàm `sub_401DF0` và `sub_401F10` thực chất là custom implementation của `LoadLibrary` và `GetProcAddress` sử dụng kĩ thuật `API Hashing` để resolve các DLLs và functions dựa trên giá trị hash của chúng, và trong trường hợp này sẽ resolve `ntdll32.dll` và `NtQueryInformationProcess`(để kiểm chứng có thể debug sau đó xem giá trị trả về của thanh ghi `eax`). Sau đó gọi `NtQueryInformationProcess` với argument thứ 2 là `ProcessDebugPort`(0x7) để check debugger. Các bạn có thể bypass đoạn check này bằng cách chỉnh cờ ZF khi step đến instruction dưới đây
 
 ![image](https://github.com/user-attachments/assets/361df950-1fc5-4d9d-abf4-58ca2bfadf11)
 
@@ -288,7 +288,116 @@ LABEL_10:
   }
 }
 ```
+- Hàm này sẽ kiểm tra input của chúng ta bằng cách sử dụng một map để access một case bất kì trong các case của switch case trên, mỗi một case sẽ chứa một kĩ thuật anti debug. Sau đây mình sẽ phân tích từng case
+  + Case 1
+    + Case này sẽ check debug bằng cách kiểm tra flag `NtGlobalFlag` trong `PEB`, nếu chương trình bị debug thì sẽ tiến hành set flag đồng thời phụ thuộc vào flag này thì `sub_AB2050` sẽ gen ra giá trị tương ứng (may thay `sub_AB2050` chỉ có thể gen ra 2 trường hợp giá trị phụ thuộc vào việc chương trình có bị debug hay không nên mình sẽ không phân tích kĩ hàm đó) sau đó input của chúng ta sẽ được XOR với giá trị mà `sub_AB2050` trả về và kiểm tra với phần tử tương ứng tại `byte_AB329F`
+  + Case 2:
+    + `sub_AB1600`
+```C
+bool __fastcall sub_AB1600(int a1, char a2, int a3)
+{
+  struct _LIST_ENTRY *v4; // eax
+  unsigned __int8 (*v5)(void); // eax
+  char v6; // bl
+  struct _LIST_ENTRY *v7; // eax
+  void (__stdcall *v8)(_DWORD); // eax
+  int v9; // eax
+  unsigned int v11; // [esp+8h] [ebp-8h]
 
+  v4 = sub_AB1DF0((void *)0x6AE69F02);
+  v5 = (unsigned __int8 (*)(void))sub_AB1F10(v4, 0x4CCF1A0F);
+  v11 = *(_DWORD *)((_BYTE *)NtCurrentPeb()->ProcessHeap + (v5() >= 6u ? 0x34 : 0) + 12) & 0xEFFEFFFF;
+  v6 = sub_AB2050(a1, v11 != 0x40000062, a3);
+  if ( *(int *)(a1 + 556) >= 256 )
+    *(_DWORD *)(a1 + 556) = 0;
+  ++*(_DWORD *)(a1 + 556);
+  v7 = sub_AB1DF0((void *)0x2489AAB);
+  v8 = (void (__stdcall *)(_DWORD))sub_AB1F10(v7, 0x3200C39D);
+  v8(0);
+  v9 = *(_DWORD *)(a1 + 556);
+  byte_AB55B8 = 0;
+  return byte_AB329F[v9] == (char)(a2 ^ v6);
+}
+```
+   + Hàm này sẽ resolve `HeapWalk` bằng kĩ thuật `API Hashing` như mình vừa đề cập và sau đó kiểm tra các `Heap Flags` các bạn có thể tìm hiểu kĩ hơn tại [đây](https://anti-debug.checkpoint.com/techniques/debug-flags.html#manual-checks-heap-flags)
+
+  + Case 3:
+```C
+bool __fastcall sub_AB16C0(int a1, char a2, int a3)
+{
+  struct _LIST_ENTRY *v4; // eax
+  unsigned __int8 (*v5)(void); // eax
+  bool v6; // dl
+  char v7; // cl
+
+  v4 = sub_AB1DF0((void *)0x6AE69F02);
+  v5 = (unsigned __int8 (*)(void))sub_AB1F10(v4, 1288641039);
+  v6 = (*(_DWORD *)((_BYTE *)NtCurrentPeb()->ProcessHeap + (v5() >= 6u ? 0x34 : 0) + 16) & 0xEFFEFFFF) != 1073741920;
+  v7 = sub_AB2050(a1, v6, a3);
+  if ( *(int *)(a1 + 556) >= 256 )
+    *(_DWORD *)(a1 + 556) = 0;
+  ++*(_DWORD *)(a1 + 556);
+  return byte_AB329F[*(_DWORD *)(a1 + 556)] == (char)(a2 ^ v7);
+}
+```
+   + Tương tự case 2 nhưng sẽ là kiểm tra `Force Flags`
+
+  + Case 4
+```C
+bool __fastcall sub_AB1760(int a1, char a2, int a3)
+{
+  struct _LIST_ENTRY *v4; // eax
+  int (*v5)(void); // eax
+  int v6; // edi
+  struct _LIST_ENTRY *v7; // eax
+  void (__cdecl *v8)(int *, _DWORD, int); // eax
+  struct _LIST_ENTRY *v9; // eax
+  void (__stdcall *v10)(int, int *); // ebx
+  char *v11; // edx
+  int v12; // eax
+  char v13; // cl
+  char v14; // dl
+  char v15; // cl
+  int v18[2]; // [esp+10h] [ebp-20h] BYREF
+  __int16 v19; // [esp+1Ah] [ebp-16h]
+
+  v4 = sub_AB1DF0((void *)0x6AE69F02);
+  v5 = (int (*)(void))sub_AB1F10(v4, 0x40F6426D);
+  v6 = v5();
+  v7 = sub_AB1DF0((void *)0x7B3FA1C0);
+  v8 = (void (__cdecl *)(int *, _DWORD, int))sub_AB1F10(v7, 0x7B9C69F6);
+  v8(v18, 0, 28);
+  v9 = sub_AB1DF0((void *)0x6AE69F02);
+  v10 = (void (__stdcall *)(int, int *))sub_AB1F10(v9, 0x70495334);
+  while ( v19 != 4 )
+    v10(v6, v18);
+  v11 = (char *)(v18[0] + v18[1]);
+  v12 = 0;
+  while ( 1 )
+  {
+    v13 = *v11++;
+    if ( v13 != (char)0xAB )
+      break;
+    if ( ++v12 >= 8 )
+    {
+      v14 = 1;
+      goto LABEL_8;
+    }
+  }
+  v14 = 0;
+LABEL_8:
+  v15 = sub_AB2050(a1, v14, a3);
+  if ( *(int *)(a1 + 556) >= 256 )
+    *(_DWORD *)(a1 + 556) = 0;
+  ++*(_DWORD *)(a1 + 556);
+  return byte_AB329F[*(_DWORD *)(a1 + 556)] == (char)(a2 ^ v15);
+}
+```
+  + Case này sẽ kiểm tra chuỗi `0xABABABAB` có được append trong heap block hay không (check debug), các bạn có thể tìm hiểu thêm về kĩ thuật này tại [đây](https://anti-debug.checkpoint.com/techniques/debug-flags.html#manual-checks-heap-protection)
+
+  + Case 5
+```C
+```
 ## Script and Flag
 ```python
 #manually picking out flag from the binary :skull:

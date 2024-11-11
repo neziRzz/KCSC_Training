@@ -32,6 +32,75 @@ int main() {
 - Function `IsDebuggerPresent()` sẽ xác định tiến trình đang chạy có đang bị debug bởi 1 debugger user-mode hay không. Thông thường thì function này sẽ kiểm tra flag `BeingDebugged` trong `PEB`
 
 ### NtQueryInformationProcess()
+- Function `ntdll!NtQueryInformationProcess()` có thể lấy ra một số các thông tin về process hiện hành. Nó nhận 1 parameter là `ProcessInformationClass` và parameter đó sẽ chỉ định thông tin muốn lấy và define output type của `ProcessInformation` parameter
+#### ProcessDebugPort
+- Ta có thể lấy số port của debugger đang được attached trên process hiện hành bằng cách sử dụng `ntdll!NtQueryInformationProcess()`. Có một class được documented là `ProcessDebugPort`, class này chứa 1 `DWORD` có giá trị là `0xFFFFFFFF` (-1) nếu như process bị debug
 ```C
-
+#include <Windows.h>
+#include <winternl.h>
+#include <stdio.h>
+typedef NTSTATUS(NTAPI* TNtQueryInformationProcess)(
+    IN HANDLE           ProcessHandle,
+    IN PROCESSINFOCLASS ProcessInformationClass,
+    OUT PVOID           ProcessInformation,
+    IN ULONG            ProcessInformationLength,
+    OUT PULONG          ReturnLength
+    );
+int main() {
+    HMODULE hNTDLL = LoadLibraryA("ntdll.dll");
+    if (hNTDLL) {
+        TNtQueryInformationProcess pfnNtQueryInformationProcess = GetProcAddress(hNTDLL, "NtQueryInformationProcess");
+        if (pfnNtQueryInformationProcess) {
+            DWORD dwProcessDebugPort, dwReturned;
+            NTSTATUS status = pfnNtQueryInformationProcess(
+                GetCurrentProcess(),
+                ProcessDebugPort,
+                &dwProcessDebugPort,
+                sizeof(DWORD),
+                &dwReturned);
+            if (status == 0 && dwProcessDebugPort == -1) {
+                printf("Cu't");
+                ExitProcess(-1);
+            }
+        }
+    }
+    printf("Hello there!");
+	return 0;
+}
+```
+#### ProcessDebugFlags
+- 1 Struct trong kernel gọi là `EPROCESS`, 1 process object. Chứa field `NoDebugInherit`. Giá trị đảo lại của field này có thể được lấy dựa trên một undocumented class `ProcessDebugFlags`(0x1F). Vậy, nếu như giá trị được return là 0 thì có nghĩa là process bị debug
+```C
+#include <Windows.h>
+#include <winternl.h>
+#include <stdio.h>
+typedef NTSTATUS(NTAPI* TNtQueryInformationProcess)(
+    IN HANDLE           ProcessHandle,
+    IN PROCESSINFOCLASS ProcessInformationClass,
+    OUT PVOID           ProcessInformation,
+    IN ULONG            ProcessInformationLength,
+    OUT PULONG          ReturnLength
+    );
+int main() {
+    HMODULE hNTDLL = LoadLibraryA("ntdll.dll");
+    if (hNTDLL) {
+        TNtQueryInformationProcess pfnNtQueryInformationProcess = GetProcAddress(hNTDLL, "NtQueryInformationProcess");
+        if (pfnNtQueryInformationProcess) {
+            DWORD dwProcessDebugFlags, dwReturned;
+            DWORD ProcessDebugFlags = 0x1F;
+            NTSTATUS status = pfnNtQueryInformationProcess(
+                GetCurrentProcess(),
+                ProcessDebugFlags,
+                &dwProcessDebugFlags,
+                sizeof(DWORD),
+                &dwReturned);
+            if (status == 0 && dwProcessDebugFlags == 0) {
+                printf("Cu't");
+                ExitProcess(-1);
+            }
+        }
+    }
+    printf("Hello there!");
+	return 0;
+}
 ```

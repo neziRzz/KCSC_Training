@@ -30,7 +30,28 @@ int main() {
 }
 ```
 - Function `IsDebuggerPresent()` sẽ xác định tiến trình đang chạy có đang bị debug bởi 1 debugger user-mode hay không. Thông thường thì function này sẽ kiểm tra flag `BeingDebugged` trong `PEB`
-
+### CheckRemoteDebuggerPresent()
+- Function `kernel32!CheckRemoteDebuggerPresent()` kiểm tra nếu có debugger (được attached trên một process khác nhưng cùng trong cùng một machine) được attached vào process hiện hành
+```C
+#include <Windows.h>
+#include <stdio.h>
+BOOL debugger_check() {
+	BOOL bDebuggerOrNot;
+	if (CheckRemoteDebuggerPresent(GetCurrentProcess(), &bDebuggerOrNot) == TRUE && bDebuggerOrNot == TRUE) {
+		return TRUE;
+	}
+	return FALSE;
+}
+int main() {
+	if (debugger_check() == TRUE) {
+		printf("Cu't");
+	}
+	else {
+		printf("Hello there!");
+	}
+	return 0;
+}
+```
 ### NtQueryInformationProcess()
 - Function `ntdll!NtQueryInformationProcess()` có thể lấy ra một số các thông tin về process hiện hành. Nó nhận 1 parameter là `ProcessInformationClass` và parameter đó sẽ chỉ định thông tin muốn lấy và define output type của `ProcessInformation` parameter
 #### ProcessDebugPort

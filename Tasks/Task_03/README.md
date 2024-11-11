@@ -381,6 +381,199 @@ int main() {
 	return 0;
 }
 ```
+### Assembly instructions
+- Các kĩ thuật dưới đây được dùng với mục đích phát hiện debugger bằng cách kiểm tra cách debugger hoạt động khi CPU thực thi một số các instructions nhất định
+#### INT 3
+- Instruction `INT 3` (0xCC) là một ngắt được sử dụng như là một `Software Breakpoint`. Khi mà không có debugger, sau khi chạy qua instruction `INT 3`, exception `EXCEPTION_BREAKPOINT` (0x80000003) được gen và sẽ exception handler sẽ được call. Nếu như có sự hiện diện của debugger, luồng control sẽ không được đưa cho execption handler
+```C
+#include <Windows.h>
+#include <stdio.h>
+
+BOOL debugger_check()
+{
+    __try
+    {
+        __asm int 3;
+        return TRUE;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return FALSE;
+    }
+}
+int main() {
+	if (debugger_check() == TRUE) {
+		printf("Cu't");
+	}
+	else {
+		printf("Hello there!");
+	}
+	return 0;
+}
+```
+- Ngoài dạng ngắn của instruction này (0xCC), còn có một dạng dài hơn là : `CD 03` opcode
+- Khi exception `EXCEPTION_BREAKPOINT` xảy ra, hệ điều hành sẽ giảm `EIP` tới vị trí mà được coi là cùa opcode `0xCC` và pass control cho exception handler. Đối với phiên bản dài hơn của `INT 3`, EIP sẽ trỏ vào giữa instruction này (0x03). Nên vì vậy `EIP` phải được chỉnh trong exception handler nếu như ta muốn tiếp tục execution flow sau instruction `INT 3`(nếu không khả năng cao chúng ta sẽ nhận được exception `EXCEPTION_ACCESS_VIOLATION `).
+```C
+#include <Windows.h>
+#include <stdio.h>
+BOOL g_bDebugged = FALSE;
+int filter(unsigned int code, struct _EXCEPTION_POINTERS* ep)
+{
+    g_bDebugged = code != EXCEPTION_BREAKPOINT;
+    return EXCEPTION_EXECUTE_HANDLER;
+}
+BOOL debugger_check()
+{
+    __try
+    {
+        __asm __emit(0xCD);
+        __asm __emit(0x03);
+    }
+    __except (filter(GetExceptionCode(), GetExceptionInformation()))
+    {
+        return g_bDebugged;
+    }
+}
+int main() {
+	if (debugger_check() == TRUE) {
+		printf("Cu't");
+	}
+	else {
+		printf("Hello there!");
+	}
+	return 0;
+}
+```
+#### INT 2D
+- Cũng giống như instruction `INT 3`, khi mà instruction `INT 2D` được execute, sẽ raise exception `EXCEPTION_BREAKPOINT`. Nhưng với `INT 2D`, hệ điều hành sẽ sử dụng ``EIP`` register làm địa chỉ xảy ra exception rồi increase `EIP` lên. Hệ điều hành cũng kiểm tra giá trị của `EAX` trong khi `INT 2D` được thực thi. Nếu như giá trị của `EAX` là 1 trong 3 giá trị sau 1, 3 hoặc 4 trên mọi phiên bản của Windows hoặc là 5 trong Vista+ thì địa chỉ xảy ra exception sẽ được tăng lên 1
+- Instruction này có thể gây ra một số vấn đề cho một số debugger bởi sau khi tăng `EIP` thì byte ở sau instruction `INT 2D` sẽ bị bỏ qua và luồn thực thi có thể sẽ bị lỗi
+```C
+#include <Windows.h>
+#include <stdio.h>
+BOOL debugger_check()
+{
+    __try
+    {
+        __asm xor eax, eax;
+        __asm int 0x2d;
+        __asm nop;
+        return TRUE;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return FALSE;
+    }
+}
+int main() {
+	if (debugger_check() == TRUE) {
+		printf("Cu't");
+	}
+	else {
+		printf("Hello there!");
+	}
+	return 0;
+}
+```
+#### DebugBreak()
+- Được chỉ rõ trong [document về DebugBreak](https://docs.microsoft.com/en-us/windows/win32/api/debugapi/nf-debugapi-debugbreak), "DebugBreak sẽ gây ra breakpoint exception trong process hiện hành. Điều này sẽ khiến cho thread đã gọi hàm này đưa ra tín hiệu cho debugger để xử lí exception này"
+- Nếu như chương trình không bị attached bởi debugger, luồng control sẽ được pass cho exception handler. Ngược lại, luồng thực thi sẽ được xử lí bởi debugger
+```C
+#include <Windows.h>
+#include <stdio.h>
+BOOL debugger_check()
+{
+    __try
+    {
+        DebugBreak();
+    }
+    __except (EXCEPTION_BREAKPOINT)
+    {
+        return FALSE;
+    }
+
+    return TRUE;
+}
+int main() {
+	if (debugger_check() == TRUE) {
+		printf("Cu't");
+	}
+	else {
+		printf("Hello there!");
+	}
+	return 0;
+}
+```
+#### ICE
+- Là một trong những instruction không được document của Intel, có opcode là `0xF1`. Được sử dụng để kiểm tra xem chương trình có bị trace hay không
+- Nếu instruction `ICE` được thực thi, exception `EXCEPTION_SINGLE_STEP` (0x80000004) sẽ được raised
+- Nếu như chương trình đã bị traced trước đó, debugger sẽ coi exception này như là một exception bình thường được tạo ra bởi việc thực thi instruction này với bit `SingleStep` được set trong `Flags registers`. Vì vậy, khi được chạy trong debugger, exception handler sẽ không được gọi và luồng thực thi sẽ tiếp tục như thường sau `ICE` instruction
+```C
+#include <Windows.h>
+#include <stdio.h>
+BOOL debugger_check()
+{
+    __try
+    {
+        __asm __emit 0xF1;
+        return TRUE;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return FALSE;
+    }
+}
+int main() {
+	if (debugger_check() == TRUE) {
+		printf("Cu't");
+	}
+	else {
+		printf("Hello there!");
+	}
+	return 0;
+}
+```
+#### Stack Segment Register
+- Đây là một kĩ thuật được sử dụng để kiểm tra xem chương trình có bị trace hay không bằng cách sử dụng các instruction sau
+```asm
+push ss 
+pop ss 
+pushf
+```
+- Sau khi single-stepping trong debugger có chứa đoạn code này, `Trap Flags` sẽ được set. Thông thường ta sẽ không thể thấy được `Trap Flags` bởi debugger sẽ clear flag này sau mỗi một event mà debugger đã qua. Tuy nhiên, nếu ta lưu `EFLAGS` vào stack, thì ta có thể check được `Trap Flags` có được set hay không
+```C
+#include <Windows.h>
+#include <stdio.h>
+BOOL debugger_check()
+{
+    BOOL bTraced = FALSE;
+
+    __asm
+    {
+        push ss
+        pop ss
+        pushf
+        test byte ptr[esp + 1], 1
+        jz movss_not_being_debugged
+    }
+
+    bTraced = TRUE;
+
+movss_not_being_debugged:
+    // restore stack
+    __asm popf;
+
+    return bTraced;
+}
+int main() {
+	if (debugger_check() == TRUE) {
+		printf("Cu't");
+	}
+	else {
+		printf("Hello there!");
+	}
+	return 0;
+}
+```
 ### BlockInput()
 - Đây là một kĩ thuật khá hay mà mình gặp trong bài `anti3`. Theo [MSDN](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-blockinput), hàm này sẽ có chức năng block hoặc unblock input từ mouse và keyboard dựa trên arguments được truyền vào nó (Cụ thể là 0 nếu như muốn unblock và 1 nếu như muốn block). Ý tưởng cho việc sử dụng này sẽ là block hoặc unblock hoàn toàn các keyboard và mouse khi chạy qua hàm này, điều này đồng nghĩa với việc ta sẽ không thể nhấn F9,F8 hay di chuột để sử dụng debugger.Bên dưới là một implementation của mình, đoạn code này đơn thuần chỉ là mã hóa XOR nhưng nếu ta áp dụng kĩ thuật này vào những hàm có cơ chế phức tạp hơn thì việc debug sẽ trở nên vô cùng khó khăn. **NOTE: Chương trình có sử dụng hàm này bắt buộc phải được chạy dưới quyền admin thì mới có thể hoạt động**. Các bạn có thể copy đoạn code của mình bên dưới, compile rồi load vào một trình debugger và thử debug :v 
 ```C

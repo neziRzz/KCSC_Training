@@ -381,3 +381,24 @@ int main() {
 	return 0;
 }
 ```
+### BlockInput()
+- Đây là một kĩ thuật khá hay mà mình gặp trong bài `anti3`. Theo [MSDN](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-blockinput), hàm này sẽ có chức năng block hoặc unblock input từ mouse và keyboard dựa trên arguments được truyền vào nó (Cụ thể là 0 nếu như muốn unblock và 1 nếu như muốn block). Ý tưởng cho việc sử dụng này sẽ là block hoặc unblock hoàn toàn các keyboard và mouse khi chạy qua hàm này, điều này đồng nghĩa với việc ta sẽ không thể nhấn F9,F8 hay di chuột để sử dụng debugger.Bên dưới là một implementation của mình, đoạn code này đơn thuần chỉ là mã hóa XOR nhưng nếu ta áp dụng kĩ thuật này vào những hàm có cơ chế phức tạp hơn thì việc debug sẽ trở nên vô cùng khó khăn. **NOTE: Chương trình có sử dụng hàm này bắt buộc phải được chạy dưới quyền admin thì mới có thể hoạt động**. Các bạn có thể copy đoạn code của mình bên dưới và thử debug :v 
+```C
+#include <Windows.h>
+#include <stdio.h>
+unsigned char cypher[] = { 0xa8, 0xb9, 0xa1, 0xae, 0x93, 0xad, 0xa4, 0xa4, 0x93, 0xa8, 0xa9, 0xae, 0xb9, 0xab, 0xab, 0xa9, 0xbe, 0x93, 0xaf, 0xad, 0xa2, 0xb8, 0x93, 0xaa, 0xa5, 0xab, 0xb9, 0xbe, 0xa9, 0x93, 0xa3, 0xb9, 0xb8, 0x93, 0xbb, 0xa4, 0xad, 0xb8, 0x93, 0xa5, 0xa1, 0x93, 0xad, 0xae, 0xa3, 0xb9, 0xb8, 0x93, 0xb8, 0xa3, 0x93, 0xa8, 0xa3, 0x93, 0x94, 0x88, 0x88, 0x88 };
+
+int main() {
+	BlockInput(1);
+	char* alloc_mem = VirtualAlloc(NULL, sizeof(cypher), (MEM_COMMIT | MEM_RESERVE), PAGE_EXECUTE_READWRITE);
+	for (int i = 0; i < sizeof(cypher); i++) {
+		alloc_mem[i] = cypher[i];
+	}
+	for (int i = 0; i < sizeof(cypher); i++) {
+		alloc_mem[i] ^= 0xCC;
+	}
+	VirtualFree(alloc_mem,0,MEM_RELEASE);
+	BlockInput(0);
+	return 0;
+}
+``` 

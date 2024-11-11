@@ -388,7 +388,26 @@ int main() {
 #include <stdio.h>
 unsigned char cypher[] = { 0xa8, 0xb9, 0xa1, 0xae, 0x93, 0xad, 0xa4, 0xa4, 0x93, 0xa8, 0xa9, 0xae, 0xb9, 0xab, 0xab, 0xa9, 0xbe, 0x93, 0xaf, 0xad, 0xa2, 0xb8, 0x93, 0xaa, 0xa5, 0xab, 0xb9, 0xbe, 0xa9, 0x93, 0xa3, 0xb9, 0xb8, 0x93, 0xbb, 0xa4, 0xad, 0xb8, 0x93, 0xa5, 0xa1, 0x93, 0xad, 0xae, 0xa3, 0xb9, 0xb8, 0x93, 0xb8, 0xa3, 0x93, 0xa8, 0xa3, 0x93, 0x94, 0x88, 0x88, 0x88 };
 
+BOOL IsElevated() {
+    BOOL fRet = FALSE;
+    HANDLE hToken = NULL;
+    if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken)) {
+        TOKEN_ELEVATION Elevation;
+        DWORD cbSize = sizeof(TOKEN_ELEVATION);
+        if (GetTokenInformation(hToken, TokenElevation, &Elevation, sizeof(Elevation), &cbSize)) {
+            fRet = Elevation.TokenIsElevated;
+        }
+    }
+    if (hToken) {
+        CloseHandle(hToken);
+    }
+    return fRet;
+}
 int main() {
+    if (IsElevated() == FALSE) {
+        MessageBox(NULL, L"Run me with administrative privilege or fuck off.", L"No lol", MB_OK);
+        exit(-1);
+    }
 	BlockInput(1);
 	char* alloc_mem = VirtualAlloc(NULL, sizeof(cypher), (MEM_COMMIT | MEM_RESERVE), PAGE_EXECUTE_READWRITE);
 	for (int i = 0; i < sizeof(cypher); i++) {
@@ -402,3 +421,5 @@ int main() {
 	return 0;
 }
 ``` 
+## Conclusion
+- Đây là một số các kĩ thuật anti debug mà mình có thể tổng hợp được. Một trong những kĩ năng cần thiết cho các Reverse Engineers là có thế phát hiện và đồng thời code được một số các kĩ thuật anti debug cơ bản.

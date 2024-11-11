@@ -125,4 +125,40 @@ int main() {
 	return 0;
 }
 ```
-- 
+### ProcessDebugObjectHandle
+- Khi bắt đầu debug, một kernel object gọi là `debug object` được tạo ra. Ta có thể duyệt các giá trị có trong handle này bằng cách sử dụng một undocumented class là `ProcessDebugObjectHandle`
+```C
+#include <Windows.h>
+#include <winternl.h>
+#include <stdio.h>
+typedef NTSTATUS(NTAPI* TNtQueryInformationProcess)(
+    IN HANDLE           ProcessHandle,
+    IN PROCESSINFOCLASS ProcessInformationClass,
+    OUT PVOID           ProcessInformation,
+    IN ULONG            ProcessInformationLength,
+    OUT PULONG          ReturnLength
+    );
+int main() {
+    HMODULE hNTDLL = LoadLibraryA("ntdll.dll");
+    if (hNTDLL) {
+        TNtQueryInformationProcess pfnNtQueryInformationProcess = GetProcAddress(hNTDLL, "NtQueryInformationProcess");
+        if (pfnNtQueryInformationProcess) {
+            DWORD dwReturned;
+            HANDLE hProcessDebugObject = 0;
+            DWORD ProcessDebugObjectHandle = 0x1E;
+            NTSTATUS status = pfnNtQueryInformationProcess(
+                GetCurrentProcess(),
+                ProcessDebugObjectHandle,
+                &hProcessDebugObject,
+                sizeof(DWORD),
+                &dwReturned);
+            if (status == 0 && hProcessDebugObject != 0) {
+                printf("Cu't");
+                ExitProcess(-1);
+            }
+        }
+    }
+    printf("Hello there!");
+    return 0;
+}
+```

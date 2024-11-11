@@ -232,3 +232,152 @@ debugged:
 	return -1;
 }
 ```
+### Timing Check
+- Khi mà một process bị trace bởi debugger, sẽ có một khoảng chênh lệch thời gian lớn giữa các instructions. Độ chênh lệch này có thể được so sánh với sự chênh lệch thực tế bằng một số các method dưới đây
+#### RDTSC
+- Để sử dụng instruction này, flag `PCE` phải set trong `CR4` register, đồng thời đây là 1 instruction user-mode
+```C
+#include <Windows.h>
+#include <stdio.h>
+BOOL debugger_check(DWORD64 qwNativeElapsed)
+{
+    ULARGE_INTEGER Start, End;
+    __asm
+    {
+        xor ecx, ecx
+        rdtsc
+        mov  Start.LowPart, eax
+        mov  Start.HighPart, edx
+    }
+    // things to do here
+    __asm
+    {
+        xor ecx, ecx
+        rdtsc
+        mov  End.LowPart, eax
+        mov  End.HighPart, edx
+    }
+    return (End.QuadPart - Start.QuadPart) > qwNativeElapsed;
+}
+int main() {
+	if (debugger_check(0xFF) == TRUE) {
+		printf("Cu't");
+	}
+	else {
+		printf("Hello there!");
+	}
+	return 0;
+}
+```
+#### GetLocalTime()
+```C
+#include <Windows.h>
+#include <stdio.h>
+BOOL debugger_check(DWORD64 qwNativeElapsed)
+{
+    SYSTEMTIME stStart, stEnd;
+    FILETIME ftStart, ftEnd;
+    ULARGE_INTEGER uiStart, uiEnd;
+
+    GetLocalTime(&stStart);
+    // things to do here
+    GetLocalTime(&stEnd);
+
+    if (!SystemTimeToFileTime(&stStart, &ftStart))
+        return FALSE;
+    if (!SystemTimeToFileTime(&stEnd, &ftEnd))
+        return FALSE;
+
+    uiStart.LowPart = ftStart.dwLowDateTime;
+    uiStart.HighPart = ftStart.dwHighDateTime;
+    uiEnd.LowPart = ftEnd.dwLowDateTime;
+    uiEnd.HighPart = ftEnd.dwHighDateTime;
+    return (uiEnd.QuadPart - uiStart.QuadPart) > qwNativeElapsed;
+}
+int main() {
+	if (debugger_check(0xFF) == TRUE) {
+		printf("Cu't");
+	}
+	else {
+		printf("Hello there!");
+	}
+	return 0;
+}
+```
+#### GetSystemTime()
+```C
+#include <Windows.h>
+#include <stdio.h>
+BOOL debugger_check(DWORD64 qwNativeElapsed)
+{
+    SYSTEMTIME stStart, stEnd;
+    FILETIME ftStart, ftEnd;
+    ULARGE_INTEGER uiStart, uiEnd;
+
+    GetSystemTime(&stStart);
+    // things to do here
+    GetSystemTime(&stEnd);
+
+    if (!SystemTimeToFileTime(&stStart, &ftStart))
+        return FALSE;
+    if (!SystemTimeToFileTime(&stEnd, &ftEnd))
+        return FALSE;
+
+    uiStart.LowPart = ftStart.dwLowDateTime;
+    uiStart.HighPart = ftStart.dwHighDateTime;
+    uiEnd.LowPart = ftEnd.dwLowDateTime;
+    uiEnd.HighPart = ftEnd.dwHighDateTime;
+    return (uiEnd.QuadPart - uiStart.QuadPart) > qwNativeElapsed;
+}
+int main() {
+	if (debugger_check(0xFF) == TRUE) {
+		printf("Cu't");
+	}
+	else {
+		printf("Hello there!");
+	}
+	return 0;
+}
+```
+#### GetTickCount()
+```C
+#include <Windows.h>
+#include <stdio.h>
+BOOL debugger_check(DWORD dwNativeElapsed)
+{
+	DWORD dwStart = GetTickCount();
+	// things to do here
+	return (GetTickCount() - dwStart) > dwNativeElapsed;
+}
+int main() {
+	if (debugger_check(0xFF) == TRUE) {
+		printf("Cu't");
+	}
+	else {
+		printf("Hello there!");
+	}
+	return 0;
+}
+```
+#### QueryPerformanceCounter()
+```C
+#include <Windows.h>
+#include <stdio.h>
+BOOL debugger_check(DWORD64 qwNativeElapsed)
+{
+	LARGE_INTEGER liStart, liEnd;
+	QueryPerformanceCounter(&liStart);
+	// things to do here
+	QueryPerformanceCounter(&liEnd);
+	return (liEnd.QuadPart - liStart.QuadPart) > qwNativeElapsed;
+}
+int main() {
+	if (debugger_check(0xFF) == TRUE) {
+		printf("Cu't");
+	}
+	else {
+		printf("Hello there!");
+	}
+	return 0;
+}
+```

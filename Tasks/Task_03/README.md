@@ -125,7 +125,7 @@ int main() {
 	return 0;
 }
 ```
-### ProcessDebugObjectHandle
+#### ProcessDebugObjectHandle
 - Khi bắt đầu debug, một kernel object gọi là `debug object` được tạo ra. Ta có thể duyệt các giá trị có trong handle này bằng cách sử dụng một undocumented class là `ProcessDebugObjectHandle`
 ```C
 #include <Windows.h>
@@ -160,5 +160,75 @@ int main() {
     }
     printf("Hello there!");
     return 0;
+}
+```
+### Heap Protection
+- Nếu như flag `HEAP_TAIL_CHECKING_ENABLED` được set trong `NtGlobalFlag`, chuỗi `0xABABABAB` sẽ được append (2 lần nếu là process 32-bit và 4 lần nếu như là process 64-bit) ở cuối heap block được allocate
+- Nếu như flag `HEAP_FREE_CHECKING_ENABLED` được set trong `NtGlobalFlag` chuỗi `0xFEEEFEEE` sẽ được append nếu như cần fill thêm bytes vào khoảng trống trong mem cho đến block tiếp theo
+```C
+#include <Windows.h>
+#include <stdio.h>
+BOOL debugger_check()
+{
+    PROCESS_HEAP_ENTRY HeapEntry = { 0 };
+    do
+    {
+        if (!HeapWalk(GetProcessHeap(), &HeapEntry))
+            return FALSE;
+    } while (HeapEntry.wFlags != PROCESS_HEAP_ENTRY_BUSY);
+
+    PVOID pOverlapped = (PBYTE)HeapEntry.lpData + HeapEntry.cbData;
+    return ((DWORD)(*(PDWORD)pOverlapped) == 0xABABABAB);
+}
+int main() {
+	if (debugger_check() == TRUE) {
+		printf("Cu't");
+	}
+	else {
+		printf("Hello there!");
+	}
+	return 0;
+}
+```
+### PEB!BeingDebugged Flag
+- Cách này giống với việc ta kiểm tra debugger bằng cách kiểm tra `BeingDebugged` flag trong `PEB` thay vì gọi `IsDebuggerPresent` bằng cách sử dụng inline asm
+```C
+#include <Windows.h>
+#include <stdio.h>
+int main() {
+	__asm {
+		mov eax, fs: [30h]
+		cmp byte ptr[eax + 2], 0
+		jne debugged
+	}
+	printf("Hello there!");
+	ExitProcess(0);
+debugged:
+	printf("Cu't");
+	return -1;
+}
+```
+### NtGlobalFlag
+- Trường `NtGlobalFlag` trong `PEB` (có offset 0x68 trong 32-bit và 0xBC trong 64-bit) mặc định là 0. Attach debugger sẽ không làm thay đổi giá trị của `NtGlobalFlag` nhưng process mà được **TẠO RA BỞI DEBUGGER** thì các flag sau sẽ được set
+	+ `FLG_HEAP_ENABLE_TAIL_CHECK ` (0x10)
+	+ `FLG_HEAP_ENABLE_FREE_CHECK ` (0x20)
+ 	+ `FLG_HEAP_VALIDATE_PARAMETERS ` (0x40)
+- Debugger sẽ được check bằng việc lấy sum của các flag trên  
+```C
+#include <Windows.h>
+#include <stdio.h>
+int main() {
+	__asm {
+		mov eax, fs: [30h]
+		mov al, [eax + 68h]
+		and al, 70h
+		cmp al, 70h
+		jz debugged
+	}
+	printf("Hello there!");
+	ExitProcess(0);
+debugged:
+	printf("Cu't");
+	return -1;
 }
 ```

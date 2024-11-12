@@ -395,7 +395,6 @@ bool __fastcall sub_AB1600(int a1, char a2, int a3)
        + HEAP_VALIDATE_PARAMETERS_ENABLED (0x40000000)
 
 
-
   + Case 3:
 ```C
 bool __fastcall sub_AB16C0(int a1, char a2, int a3)

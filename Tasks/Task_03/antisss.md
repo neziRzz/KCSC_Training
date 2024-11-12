@@ -388,7 +388,11 @@ bool __fastcall sub_AB1600(int a1, char a2, int a3)
   return byte_AB329F[v9] == (char)(a2 ^ v6);
 }
 ```
-   + Hàm này sẽ resolve `HeapWalk` bằng kĩ thuật `API Hashing` như mình vừa đề cập và sau đó kiểm tra các `Heap Flags` các bạn có thể tìm hiểu kĩ hơn tại [đây](https://anti-debug.checkpoint.com/techniques/debug-flags.html#manual-checks-heap-flags)
+   + Hàm này sẽ resolve `HeapWalk` bằng kĩ thuật `API Hashing` như mình vừa đề cập và sau đó kiểm tra các `Heap Flags` các bạn có thể tìm hiểu kĩ hơn tại [đây](https://anti-debug.checkpoint.com/techniques/debug-flags.html#manual-checks-heap-flags). Đối với hệ điều hành 64-bit, `Heap Flags` sẽ được set dựa trên sum của các sub flags sau
+       + HEAP_GROWABLE (2)
+       + HEAP_TAIL_CHECKING_ENABLED (0x20)
+       + HEAP_FREE_CHECKING_ENABLED (0x40)
+       + HEAP_VALIDATE_PARAMETERS_ENABLED (0x40000000)
 
 
 
@@ -411,9 +415,10 @@ bool __fastcall sub_AB16C0(int a1, char a2, int a3)
   return byte_AB329F[*(_DWORD *)(a1 + 556)] == (char)(a2 ^ v7);
 }
 ```
-   + Tương tự case 2 nhưng sẽ là kiểm tra `Force Flags`
-
-
+   + Tương tự case 2 nhưng sẽ là kiểm tra `Force Flags`. Flag này được set dựa theo sum của các flags sau
+     + HEAP_TAIL_CHECKING_ENABLED (0x20)
+     + HEAP_FREE_CHECKING_ENABLED (0x40)
+     + HEAP_VALIDATE_PARAMETERS_ENABLED (0x40000000) 
 
   + Case 4
 ```C

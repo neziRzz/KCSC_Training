@@ -394,7 +394,7 @@ bool __fastcall sub_AB1600(int a1, char a2, int a3)
        + HEAP_FREE_CHECKING_ENABLED (0x40)
        + HEAP_VALIDATE_PARAMETERS_ENABLED (0x40000000)
 
-
+  + Nếu như tất cả các flag này đều được set thì sẽ đồng nghĩa với việc co debugger
   + Case 3:
 ```C
 bool __fastcall sub_AB16C0(int a1, char a2, int a3)
@@ -418,7 +418,7 @@ bool __fastcall sub_AB16C0(int a1, char a2, int a3)
      + HEAP_TAIL_CHECKING_ENABLED (0x20)
      + HEAP_FREE_CHECKING_ENABLED (0x40)
      + HEAP_VALIDATE_PARAMETERS_ENABLED (0x40000000) 
-
+  
   + Case 4
 ```C
 bool __fastcall sub_AB1760(int a1, char a2, int a3)
@@ -453,9 +453,9 @@ bool __fastcall sub_AB1760(int a1, char a2, int a3)
   while ( 1 )
   {
     v13 = *v11++;
-    if ( v13 != (char)0xAB )
+    if ( v13 != (char)0xAB ) // check for 8 AB sequence here 
       break;
-    if ( ++v12 >= 8 )
+    if ( ++v12 >= 8 ) // loophole here since in 32-bit arch only have 4 AB sequence
     {
       v14 = 1;
       goto LABEL_8;
@@ -470,7 +470,7 @@ LABEL_8:
   return byte_AB329F[*(_DWORD *)(a1 + 556)] == (char)(a2 ^ v15);
 }
 ```
-  + Case này sẽ kiểm tra chuỗi `0xABABABAB` có được append trong heap block hay không (check debug), các bạn có thể tìm hiểu thêm về kĩ thuật này tại [đây](https://anti-debug.checkpoint.com/techniques/debug-flags.html#manual-checks-heap-protection)
+  + Case này sẽ kiểm tra chuỗi `0xABABABAB` có được append trong heap block hay không (check debug), các bạn có thể tìm hiểu thêm về kĩ thuật này tại [đây](https://anti-debug.checkpoint.com/techniques/debug-flags.html#manual-checks-heap-protection). Nhưng có vẻ trong case này không tính đến trường hợp cho các hệ 32-bit bởi đối với hệ 32-bit thì chỉ có 4 sequence AB trong khi trong case này kiểm tra 8 sequence AB (nói cách khác là ta cũng có thể bypass case này bằng việc cho chạy chương trình trên hệ 32-bit)
 
 
 

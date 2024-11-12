@@ -375,8 +375,8 @@ bool __fastcall sub_AB1600(int a1, char a2, int a3)
 
   v4 = sub_AB1DF0((void *)0x6AE69F02);
   v5 = (unsigned __int8 (*)(void))sub_AB1F10(v4, 0x4CCF1A0F);
-  v11 = *(_DWORD *)((_BYTE *)NtCurrentPeb()->ProcessHeap + (v5() >= 6u ? 0x34 : 0) + 12) & 0xEFFEFFFF;
-  v6 = sub_AB2050(a1, v11 != 0x40000062, a3);
+  v11 = *(_DWORD *)((_BYTE *)NtCurrentPeb()->ProcessHeap + (v5() >= 6u ? 0x34 : 0) + 12) & 0xEFFEFFFF; // get heap flags sum
+  v6 = sub_AB2050(a1, v11 != 0x40000062, a3); // check the sum of heap flags with this value for debugger
   if ( *(int *)(a1 + 556) >= 256 )
     *(_DWORD *)(a1 + 556) = 0;
   ++*(_DWORD *)(a1 + 556);
@@ -406,7 +406,7 @@ bool __fastcall sub_AB16C0(int a1, char a2, int a3)
 
   v4 = sub_AB1DF0((void *)0x6AE69F02);
   v5 = (unsigned __int8 (*)(void))sub_AB1F10(v4, 1288641039);
-  v6 = (*(_DWORD *)((_BYTE *)NtCurrentPeb()->ProcessHeap + (v5() >= 6u ? 0x34 : 0) + 16) & 0xEFFEFFFF) != 1073741920;
+  v6 = (*(_DWORD *)((_BYTE *)NtCurrentPeb()->ProcessHeap + (v5() >= 6u ? 0x34 : 0) + 16) & 0xEFFEFFFF) != 0x40000060; // check the sum of force flags with this value for debugger
   v7 = sub_AB2050(a1, v6, a3);
   if ( *(int *)(a1 + 556) >= 256 )
     *(_DWORD *)(a1 + 556) = 0;

@@ -30,6 +30,16 @@ int main() {
 }
 ```
 - Function `IsDebuggerPresent()` sẽ xác định tiến trình đang chạy có đang bị debug bởi 1 debugger user-mode hay không. Thông thường thì function này sẽ kiểm tra flag `BeingDebugged` trong `PEB`
+- Chạy đoạn code trên khi không có debugger, ta có kết quả như sau
+
+![image](https://github.com/user-attachments/assets/45d98b30-61c7-4ec9-a867-668fa7105ef9)
+
+- Và ngược lại khi có debugger
+
+  ![Uploading image.png…]()
+
+
+  
 ### CheckRemoteDebuggerPresent()
 - Function `kernel32!CheckRemoteDebuggerPresent()` kiểm tra nếu có debugger (được attached trên một process khác nhưng cùng trong cùng một machine) được attached vào process hiện hành
 ```C

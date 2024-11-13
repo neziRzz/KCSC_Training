@@ -440,6 +440,14 @@ int main() {
 	return 0;
 }
 ```
+- Như ta có thể thấy, khi step qua instruction `INT 3`, chương trình sẽ raise exception
+
+![image](https://github.com/user-attachments/assets/dd45feb0-0e81-4491-9057-0620ffb48f31)
+
+- Và nếu như ta bỏ qua exception và tiếp tục step tiếp thì chương trình sẽ crash
+
+![image](https://github.com/user-attachments/assets/28c00f35-ed7d-4ceb-b950-36e88ac5323e)
+
 - Ngoài dạng ngắn của instruction này (0xCC), còn có một dạng dài hơn là : `CD 03` opcode
 - Khi exception `EXCEPTION_BREAKPOINT` xảy ra, hệ điều hành sẽ giảm `EIP` tới vị trí mà được coi là cùa opcode `0xCC` và pass control cho exception handler. Đối với phiên bản dài hơn của `INT 3`, EIP sẽ trỏ vào giữa instruction này (0x03). Nên vì vậy `EIP` phải được chỉnh trong exception handler nếu như ta muốn tiếp tục execution flow sau instruction `INT 3`(nếu không khả năng cao chúng ta sẽ nhận được exception `EXCEPTION_ACCESS_VIOLATION `).
 ```C

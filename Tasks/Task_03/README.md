@@ -36,7 +36,8 @@ int main() {
 
 - Và ngược lại khi có debugger
 
-  ![Uploading image.png…]()
+![image](https://github.com/user-attachments/assets/072f3251-47f7-4a7c-be8f-aa57aaa07341)
+
 
 
   

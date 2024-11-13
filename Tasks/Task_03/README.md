@@ -204,6 +204,10 @@ int main() {
 	return 0;
 }
 ```
+- Như bên dưới ta có thể thấy, chuỗi `0xABABABAB` sẽ được append 2 lần (64-bit) nếu như process có attached debugger
+
+![image](https://github.com/user-attachments/assets/0769afcc-addd-4d72-b8b5-089c5bb465c2)
+
 ### PEB!BeingDebugged Flag
 - Cách này giống với việc ta kiểm tra debugger bằng cách kiểm tra `BeingDebugged` flag trong `PEB` thay vì gọi `IsDebuggerPresent` bằng cách sử dụng inline asm
 ```C
@@ -247,7 +251,7 @@ debugged:
 }
 ```
 ### Timing Check
-- Khi mà một process bị trace bởi debugger, sẽ có một khoảng chênh lệch thời gian lớn giữa các instructions. Độ chênh lệch này có thể được so sánh với sự chênh lệch thực tế bằng một số các method dưới đây
+- Khi mà một process bị trace bởi debugger, sẽ có một khoảng chênh lệch thời gian lớn giữa các instructions. Độ chênh lệch này có thể được so sánh với sự chênh lệch thực tế bằng một số các method dưới đây. Cách thức hoạt động của các method này là tương đồng nhau, chỉ khác ở việc sử dụng các instruction hay các hàm
 #### RDTSC
 - Để sử dụng instruction này, flag `PCE` phải set trong `CR4` register, đồng thời đây là 1 instruction user-mode
 ```C
@@ -283,6 +287,17 @@ int main() {
 	return 0;
 }
 ```
+- Khi ta gọi `rdtsc`, instruction trên sẽ lấy time hiện tại (số giây đã trôi qua tính từ UNIX Epoch) và lưu phần high vào `edx`, phần low vào `eax` giả sử khi ta thực hiện gọi instruction này và giá trị trả về là như sau
+
+![image](https://github.com/user-attachments/assets/d1050dee-fb8b-480e-b89b-d6c501b9d36e)
+
+- TimeStart = 0x87655569ABEC
+
+![image](https://github.com/user-attachments/assets/950aafca-a569-4807-a818-a1487ca4f61b)
+
+- TimeEnd = 0x8772B3A3C317
+
+- Và khi lấy 2 giá trị trên trừ đi cho nhau để tìm ra độ chênh lệch thì kết quả sẽ lớn hơn 0xFF, bởi thời gian để CPU thực hiện các câu lệnh là rất nhanh nên khi độ chênh lệch thời gian lớn như này thì chắc chắn có sự hiện diện của debugger
 #### GetLocalTime()
 ```C
 #include <Windows.h>

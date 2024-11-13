@@ -40,7 +40,6 @@ int main() {
 
 
 
-  
 ### CheckRemoteDebuggerPresent()
 - Function `kernel32!CheckRemoteDebuggerPresent()` kiểm tra nếu có debugger (được attached trên một process khác nhưng cùng trong cùng một machine) được attached vào process hiện hành
 ```C
@@ -100,6 +99,10 @@ int main() {
 	return 0;
 }
 ```
+- Ta có thể thấy rằng nếu chạy tiến trình bằng debugger, giá trị của `dwProcessDebugPort` sau khi gọi `NtQueryInformationProcess` sẽ là `0xFFFFFFFF` (-1)
+
+![image](https://github.com/user-attachments/assets/709448f1-0ef5-41be-ac9a-2f8fcf454f3c)
+
 #### ProcessDebugFlags
 - 1 Struct trong kernel gọi là `EPROCESS`, 1 process object. Chứa field `NoDebugInherit`. Giá trị đảo lại của field này có thể được lấy dựa trên một undocumented class `ProcessDebugFlags`(0x1F). Vậy, nếu như giá trị được return là 0 thì có nghĩa là process bị debug
 ```C

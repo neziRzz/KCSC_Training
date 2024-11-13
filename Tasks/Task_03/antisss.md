@@ -394,7 +394,7 @@ bool __fastcall sub_AB1600(int a1, char a2, int a3)
        + HEAP_FREE_CHECKING_ENABLED (0x40)
        + HEAP_VALIDATE_PARAMETERS_ENABLED (0x40000000)
 
-  + Nếu như tất cả các flag này đều được set thì sẽ đồng nghĩa với việc co debugger
+  + Nếu như tất cả các flag này đều được set thì sẽ đồng nghĩa với việc có debugger
   + Case 3:
 ```C
 bool __fastcall sub_AB16C0(int a1, char a2, int a3)

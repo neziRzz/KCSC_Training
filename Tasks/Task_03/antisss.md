@@ -650,7 +650,7 @@ for i in flag:
     continue
   print(i,end='')
 ```
-# Anti 4
+# Anti_4
 ## Misc
 ## Detailed Analysis
 ## Script and Flag
@@ -698,4 +698,60 @@ for i in range(len(flag)):
   s.add(flag[i] == cyphertext[i])
 if(s.check() == sat):
   print(s.model())
+```
+# Anti_5
+## Mics
+## Detailed Analysis
+## Script and Flag
+```python
+def tea_decrypt(ciphertext_block, key):
+    delta = 0x9E3779B9
+    n = 32
+    v0, v1 = ciphertext_block
+    k0, k1, k2, k3 = key
+    sum_value = delta * n
+
+    for _ in range(n):
+        v1 -= ((v0 << 4) + k2) ^ (v0 + sum_value) ^ ((v0 >> 5) + k3)
+        v1 &= 0xFFFFFFFF  
+        v0 -= ((v1 << 4) + k0) ^ (v1 + sum_value) ^ ((v1 >> 5) + k1)
+        v0 &= 0xFFFFFFFF  
+        sum_value -= delta
+        sum_value &= 0xFFFFFFFF  
+
+    return v0, v1
+  
+def reverse_endian(block):
+    return tuple(int.from_bytes(part.to_bytes(4, byteorder='big'), byteorder='little') for part in block)
+
+def decrypt_all(ciphertext, key):
+    plaintext = []
+    for i in range(0, len(ciphertext), 2):
+        block = (ciphertext[i], ciphertext[i+1])
+        decrypted_block = tea_decrypt(block, key)
+        reversed_block = reverse_endian(decrypted_block)
+        plaintext.append(reversed_block)
+    return plaintext
+
+def blocks_to_ascii(blocks):
+    ascii_text = ""
+    for block in blocks:
+        for part in block:
+            ascii_text += part.to_bytes(4, byteorder='big').decode('ascii', errors='ignore')
+    return ascii_text
+
+ciphertext = [
+    0x2A302C19, 0x0254F979, 0xD66CA9B3, 0x04958091,
+    0xA3E85929, 0x86BD790F, 0x6C1305AF, 0x2BDB75FE,
+    0x5DF0E0AE, 0x89864B88, 0x45AC6633, 0xA6786C9A
+]
+
+key = [0x4B6C6456, 0x70753965, 0x6B464266, 0x4C304F6B]
+
+plaintext = decrypt_all(ciphertext, key)
+
+ascii_text = blocks_to_ascii(plaintext)
+
+print(ascii_text)
+
 ```

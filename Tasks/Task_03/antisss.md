@@ -755,3 +755,94 @@ ascii_text = blocks_to_ascii(plaintext)
 print(ascii_text)
 
 ```
+# Anti_6
+## Misc
+## Detailed Analysis
+## Script and Flag
+```C
+#include <stdio.h>
+#include <string.h>
+#include <stdint.h>
+
+
+void ksa(const uint8_t* key, int key_length, uint8_t* S) {
+    int i, j = 0;
+    uint8_t temp;
+
+ 
+    for (i = 0; i < 256; i++) {
+        S[i] = i;
+    }
+
+  
+    for (i = 0; i < 256; i++) {
+        j = (j + S[i] + key[i % key_length]) % 256;
+        temp = S[i];
+        S[i] = S[j];
+        S[j] = temp;
+    }
+}
+
+void prga(const uint8_t* input, uint8_t* output, int length, uint8_t* S) {
+    int i = 0, j = 0, k, t;
+    uint8_t temp;
+
+    for (k = 0; k < length; k++) {
+    
+        i = (i + 1) % 256;
+        j = (j + S[i]) % 256;
+
+       
+        temp = S[i];
+        S[i] = S[j];
+        S[j] = temp;
+
+       
+        t = (S[i] + S[j]) % 256;
+        uint8_t keystream_byte = S[t];
+
+   
+        output[k] = input[k] ^ keystream_byte;
+    }
+}
+void rc4_decrypt(const unsigned char* key, const uint8_t* ciphertext, uint8_t* plaintext, int length) {
+    uint8_t S[256];
+    int key_length = strlen((const char*)key);
+
+
+    ksa(key, key_length, S);
+
+ 
+    prga(ciphertext, plaintext, length, S);
+}
+
+int main() {
+    unsigned char key[] = { 0x33, 0xBF, 0xAD,0xDE};
+    uint8_t ciphertext[14]; 
+    ciphertext[0] = 0x7D;
+    ciphertext[1] = 8;
+    ciphertext[2] = 0xED;
+    ciphertext[3] = 0x47;
+    ciphertext[4] = 0xE5;
+    ciphertext[5] = 0;
+    ciphertext[6] = 0x88;
+    ciphertext[7] = 0x3A;
+    ciphertext[8] = 0x7A;
+    ciphertext[9] = 0x36;
+    ciphertext[10] = 2;
+    ciphertext[11] = 0x29;
+    ciphertext[12] = 0xE4;
+    ciphertext[13] = 0;
+    int ciphertext_length = sizeof(ciphertext) / sizeof(ciphertext[0]);
+
+    uint8_t plaintext[256] = { 0 }; 
+
+
+    rc4_decrypt(key, ciphertext, plaintext, ciphertext_length);
+
+    printf("%s\n", plaintext);
+
+    return 0;
+}
+
+```

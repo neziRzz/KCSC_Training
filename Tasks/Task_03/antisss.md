@@ -807,7 +807,7 @@ int __cdecl sub_4011D0(int a1)
   + Đầu tiên chương trình xử lí 5 kí tự của flag với pattern như sau `(*(_BYTE *)(i + a1) << (8 - i) | (*(char *)(i + a1) >> (i))`
   + Tiếp đến 5 kí tự tiếp theo sẽ được xor lần lượt với 0x37, 0x13, 0xFE và 0xC0
 
-- Trong hàm `sub_401190` sẽ xử lí nốt 30 kí tự cuối cùng bằng cách XOR từng kí tự 1 với kí tự trược nó, cuối cùng sẽ kiểm tra input với `byte_404118`. Với các dữ kiện trên ta có thể viết script như bên dưới
+- Trong hàm `sub_401190` sẽ xử lí nốt 30 kí tự cuối cùng bằng cách XOR từng kí tự 1 với kí tự trước nó, cuối cùng sẽ kiểm tra input với `byte_404118`. Với các dữ kiện trên ta có thể viết script như bên dưới
 ## Script and Flag
 ```python
 from z3 import *

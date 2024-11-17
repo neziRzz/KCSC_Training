@@ -749,7 +749,26 @@ int __cdecl sub_401460(int a1)
 ![image](https://github.com/user-attachments/assets/ca017424-7cfe-4c3f-8318-64b2d33cce5d)
 ![image](https://github.com/user-attachments/assets/29002737-8f63-445d-a853-e05d554e7349)
 
+- Nhấn F5 để gen ra pseudocode
+```C
+_DWORD *__cdecl sub_401330(_DWORD *a1)
+{
+  _DWORD *result; // eax
+  int i; // [esp+Ch] [ebp-8h]
+  int j; // [esp+10h] [ebp-4h]
 
+  for ( i = 0; i < 8; ++i )
+    *(_BYTE *)(*a1 + i) ^= byte_404082;
+  *a1 += 9;
+  for ( j = 0; j < 12; ++j )
+    *(_BYTE *)(*a1 + j) = ((2 * *(_BYTE *)(*a1 + j)) | 1) ^ (j + byte_404083);
+  result = a1;
+  *a1 += 13;
+  return result;
+}
+```
+- Hàm này sẽ thực hiện XOR 8 kí tự tiếp theo với `byte_404082`. Tiếp đến, 12 kí tự tiếp đó sẽ được sẽ được biến đổi thông qua một số phép toán dựa trên `byte_404083`
+- Quay lại hàm `sub_401460`, 
 ## Script and Flag
 ```python
 from z3 import *

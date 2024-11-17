@@ -712,6 +712,7 @@ LONG __stdcall TopLevelExceptionFilter(struct _EXCEPTION_POINTERS *ExceptionInfo
 ```
 - Hàm này đầu tiên sẽ có nhiệm vụ khởi tạo `byte_404082` tùy thuộc vào flag `BeingDebugged` trong `PEB` có được set hay không
 - Tiếp đến khởi tạo `dword_404114` tùy theo giá trị trả về của `sub_401400()`
+
 - Hàm `sub_401400()`
 ```C
 int sub_401400()
@@ -744,7 +745,7 @@ int __cdecl sub_401460(int a1)
 
 ![image](https://github.com/user-attachments/assets/70ef21db-5884-4c41-9df2-8592a67d8b15)
 
-- Lí do thì khá giống với những gì mình đã đề cập, nhưng thay vì trèn 1 byte rác thì là trèn 3, cụ thể là 0xE8, 0x66 và 0xB8, ta sẽ phải `NOP` 3 byte này và redefine lại function
+- Lí do thì khá giống với những gì mình đã đề cập, nhưng thay vì chèn 1 byte rác thì là chèn 3, cụ thể là 0xE8, 0x66 và 0xB8, ta sẽ phải `NOP` 3 byte này và redefine lại function
 
 ![image](https://github.com/user-attachments/assets/ca017424-7cfe-4c3f-8318-64b2d33cce5d)
 ![image](https://github.com/user-attachments/assets/29002737-8f63-445d-a853-e05d554e7349)
@@ -768,7 +769,45 @@ _DWORD *__cdecl sub_401330(_DWORD *a1)
 }
 ```
 - Hàm này sẽ thực hiện XOR 8 kí tự tiếp theo với `byte_404082`. Tiếp đến, 12 kí tự tiếp đó sẽ được sẽ được biến đổi thông qua một số phép toán dựa trên `byte_404083`
-- Quay lại hàm `sub_401460`, 
+- Quay lại hàm `sub_401460`, 18 kí tự kế tiếp (2 kí tự 1) sẽ được XOR với `dword_404114`. Và các kí tự còn lại sẽ được xử lí thông qua hàm `sub_4011D0`
+
+- Hàm `sub_4011D0`
+```C
+int __cdecl sub_4011D0(int a1)
+{
+  int i; // [esp+14h] [ebp-1Ch]
+
+  __asm { int     2Dh; Windows NT - debugging services: eax = type }
+  for ( i = 0; i < 5; ++i )
+    *(_BYTE *)(i + a1) = (*(_BYTE *)(i + a1) << (8 - i + 1)) | (*(char *)(i + a1) >> (i - 1));
+  __debugbreak();
+  dword_404658 ^= 0xEFC00CFE;
+  sub_401190(a1 + 11);
+  return sub_401100();
+}
+```
+- Hàm này có sử dụng 2 kĩ thuật anti-debug là `INT 2D` và `INT 3`. 2 Kĩ thuật này đều có điểm chung là nếu như dưới sự hiện diện của debugger thì sau khi step qua thì exception sẽ không được đưa cho exception handler. Có nghĩa là ta có thể sử dụng kĩ thuật này để giấu luồng thực thi đúng của chương trình ở bên trong các exception handler, kĩ thuật trên không những có thể chống được debugger mà đồng thời cũng có thể khiến cho các trình disassembler decompile sai. Để bypass được kĩ thuật này ta sẽ làm như sau
+
+- Có thể thấy rằng khi step qua instruction này, chương trình lập tức raise exception
+
+![image](https://github.com/user-attachments/assets/dcf3df4f-015b-47ca-b626-6019c6071449)
+
+- Khi ta tiếp tục step thì IDA hiện lên của sổ thông báo như sau
+
+![image](https://github.com/user-attachments/assets/042870fd-93bb-4102-91b0-bc28837181ea)
+
+- Bởi trong kĩ thuật này, nếu như có sự hiện diện của debugger thì exception sẽ không được đưa cho exception handler nên ta sẽ ép chương trình phải xử lí exception này bằng cách nhấn `Yes` và đặt BP tại exception handler để không bị pass mất luồng thực thi
+
+![image](https://github.com/user-attachments/assets/f02a533b-0c06-4429-96ce-92936f607291)
+
+- Khi có luồng đúng, sau khi ta debug thì sẽ có thể thấy rõ là pseudocode đã cho kết quả sai
+
+- Với `INT 3`, hướng tiếp cận của chúng ta tương tự
+- Sau khi bypass được hết các anti debug trong hàm này, ta có thể suy ra được luồng chuẩn như sau
+  + Đầu tiên chương trình xử lí 5 kí tự của flag với pattern như sau `(*(_BYTE *)(i + a1) << (8 - i) | (*(char *)(i + a1) >> (i))`
+  + Tiếp đến 5 kí tự tiếp theo sẽ được xor lần lượt với 0x37, 0x13, 0xFE và 0xC0
+
+- Trong hàm `sub_401190` sẽ xử lí nốt 30 kí tự cuối cùng bằng cách XOR từng kí tự 1 với kí tự trược nó, cuối cùng sẽ kiểm tra input với `byte_404118`. Với các dữ kiện trên ta có thể viết script như bên dưới
 ## Script and Flag
 ```python
 from z3 import *

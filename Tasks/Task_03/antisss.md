@@ -710,7 +710,46 @@ LONG __stdcall TopLevelExceptionFilter(struct _EXCEPTION_POINTERS *ExceptionInfo
   return 0;
 }
 ```
-- 
+- Hàm này đầu tiên sẽ có nhiệm vụ khởi tạo `byte_404082` tùy thuộc vào flag `BeingDebugged` trong `PEB` có được set hay không
+- Tiếp đến khởi tạo `dword_404114` tùy theo giá trị trả về của `sub_401400()`
+- Hàm `sub_401400()`
+```C
+int sub_401400()
+{
+  unsigned int v1; // [esp+4h] [ebp-8h]
+  unsigned int i; // [esp+8h] [ebp-4h]
+
+  v1 = (char *)sub_4013F0 - (char *)&loc_401330 - 16;
+  for ( i = 0; i < v1 && (*((unsigned __int8 *)&loc_401330 + i) ^ 0x55) != 0x99; ++i )
+    ;
+  return v1 - i + 0xBEEF;
+}
+```
+- Hàm này sẽ kiểm tra `Software Breakpoint` (Opcode 0xCC) bên trong `loc_401330` bằng cách lấy các byte bên trong hàm `loc_401330` XOR với 0x55 (0x55 ^ 0x99 = 0xCC)
+- Quay lại phân tích `TopLevelExceptionFilter`, ta có thể thấy 17 kí tự đầu tiên của input sẽ được XOR với 1. Các kí tự tiếp theo sẽ được xử lí tại `sub_401460`
+
+- Hàm `sub_401460`
+```C
+int __cdecl sub_401460(int a1)
+{
+  int i; // [esp+0h] [ebp-4h]
+
+  ((void (__stdcall *)(int *))loc_401330)(&a1);
+  for ( i = 0; i < 9; ++i )
+    *(_WORD *)(a1 + 2 * i) ^= dword_404114;
+  return sub_4011D0(a1 + 19);
+}
+```
+- Ta có thể thấy input cũng được xử lí tại `loc_401330` nhưng khi phân tích hàm này, ta sẽ gặp trường hợp giống với hàm `TopLevelExceptionFilter`
+
+![image](https://github.com/user-attachments/assets/70ef21db-5884-4c41-9df2-8592a67d8b15)
+
+- Lí do thì khá giống với những gì mình đã đề cập, nhưng thay vì trèn 1 byte rác thì là trèn 3, cụ thể là 0xE8, 0x66 và 0xB8, ta sẽ phải `NOP` 3 byte này và redefine lại function
+
+![image](https://github.com/user-attachments/assets/ca017424-7cfe-4c3f-8318-64b2d33cce5d)
+![image](https://github.com/user-attachments/assets/29002737-8f63-445d-a853-e05d554e7349)
+
+
 ## Script and Flag
 ```python
 from z3 import *

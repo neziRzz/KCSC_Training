@@ -687,6 +687,30 @@ int __cdecl main(int argc, const char **argv, const char **envp)
 ![image](https://github.com/user-attachments/assets/560d6860-588f-403f-b1ae-6ea2d28da821)
 ![image](https://github.com/user-attachments/assets/9d96134c-122e-4260-93ab-f279a98a2673)
 
+- Nhấn F5 để gen ra pseudocode
+```C
+LONG __stdcall TopLevelExceptionFilter(struct _EXCEPTION_POINTERS *ExceptionInfo)
+{
+  char v2; // [esp+0h] [ebp-1Ch]
+  struct _PEB *v3; // [esp+Ch] [ebp-10h]
+  bool v4; // [esp+10h] [ebp-Ch]
+  int i; // [esp+18h] [ebp-4h]
+
+  v3 = NtCurrentPeb();
+  v4 = v3 != (struct _PEB *)-49088 && ((int)v3[84].AtlThunkSListPtr & 0x70) != 0;
+  byte_404083 = v4 ^ 0xCD;
+  byte_404082 = v3->BeingDebugged ^ 0xAB;
+  sub_401050(aEnterFlag, v2);
+  sub_4010C0(aS, (char)byte_404640);
+  memcpy(&unk_404560, byte_404640, 0x64u);
+  dword_404114 = sub_401400();
+  for ( i = 0; i < 17; ++i )
+    byte_404640[i] ^= 1u;
+  sub_401460(&unk_404652);
+  return 0;
+}
+```
+- 
 ## Script and Flag
 ```python
 from z3 import *

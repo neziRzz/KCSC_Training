@@ -656,7 +656,37 @@ for i in flag:
 ```
 # Anti_4
 ## Misc
+- Đề cho 1 file PE32
+
+![image](https://github.com/user-attachments/assets/2aeac110-0424-434c-875f-46c5099a225a)
+
 ## Detailed Analysis
+- Hàm `main()`
+```C
+int __cdecl main(int argc, const char **argv, const char **envp)
+{
+  LPTOP_LEVEL_EXCEPTION_FILTER lpTopLevelExceptionFilter; // [esp+0h] [ebp-8h]
+
+  lpTopLevelExceptionFilter = SetUnhandledExceptionFilter(TopLevelExceptionFilter);
+  SetUnhandledExceptionFilter(lpTopLevelExceptionFilter);
+  return 0;
+}
+```
+- Hàm này sẽ thực hiện gọi `SetUnhandledExceptionFilter()` để xử lí exception. Theo [MSDN](https://learn.microsoft.com/en-us/windows/win32/api/errhandlingapi/nf-errhandlingapi-setunhandledexceptionfilter) thì sau khi hàm này được gọi, nếu có exception xảy ra trong một process **KHÔNG BỊ DEBUG** thì exception này sẽ được chuyển đến một hàm được chỉ định trong parameter `TopLevelExceptionFilter` để xủ lí, trong hàm `main()` sẽ xảy ra một exception `Divide by zero` (ta không thể thấy exception này trong pseudocode của hàm `main()`)
+
+![image](https://github.com/user-attachments/assets/a95efc6f-df60-4f10-b9c1-dad72df3b2a6)
+![image](https://github.com/user-attachments/assets/c7ee6861-61fe-42da-8d59-504bb430298d)
+
+- Vậy để bypass được exception này, ta có thể đặt entry point (set IP) vào thẳng bên trong hàm được chỉ định trong `TopLevelExceptionFilter`. Tuy nhiên khi ta step vào bên trong thì có vẻ như IDA đã không thể decompile được hàm này
+
+![image](https://github.com/user-attachments/assets/bf60537b-d95c-4ad4-897c-30590c3aed9b)
+
+- Lí do cho điều này là bởi tác giả đã đặt byte rác `0xE8`(Call Opcode) vào sau 2 instruction `JNZ` và `JZ` nhằm làm khó việc phân tích. Để xử lí, ta chỉ cần biến instruction `CALL` ở hình trên thành data và `NOP` lại byte rác đó, sau khi `NOP` xong thì ta convert lại về code và redefine lại function
+
+![image](https://github.com/user-attachments/assets/510aaa51-8d59-4649-94aa-51d41f60ea9b)
+![image](https://github.com/user-attachments/assets/560d6860-588f-403f-b1ae-6ea2d28da821)
+![image](https://github.com/user-attachments/assets/9d96134c-122e-4260-93ab-f279a98a2673)
+
 ## Script and Flag
 ```python
 from z3 import *
@@ -705,6 +735,9 @@ if(s.check() == sat):
 ```
 # Anti_5
 ## Mics
+- Đề cho 1 file PE32
+
+
 ## Detailed Analysis
 ## Script and Flag
 ```python

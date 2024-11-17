@@ -805,7 +805,7 @@ void prga(const uint8_t* input, uint8_t* output, int length, uint8_t* S) {
         output[k] = input[k] ^ keystream_byte;
     }
 }
-void rc4_decrypt(const unsigned char* key, const uint8_t* ciphertext, uint8_t* plaintext, int length) {
+void rc4_decrypt(const unsigned char* key, const uint8_t* cyphertext, uint8_t* plaintext, int length) {
     uint8_t S[256];
     int key_length = strlen((const char*)key);
 
@@ -813,36 +813,37 @@ void rc4_decrypt(const unsigned char* key, const uint8_t* ciphertext, uint8_t* p
     ksa(key, key_length, S);
 
  
-    prga(ciphertext, plaintext, length, S);
+    prga(cyphertext, plaintext, length, S);
 }
 
 int main() {
     unsigned char key[] = { 0x33, 0xBF, 0xAD,0xDE};
-    uint8_t ciphertext[14]; 
-    ciphertext[0] = 0x7D;
-    ciphertext[1] = 8;
-    ciphertext[2] = 0xED;
-    ciphertext[3] = 0x47;
-    ciphertext[4] = 0xE5;
-    ciphertext[5] = 0;
-    ciphertext[6] = 0x88;
-    ciphertext[7] = 0x3A;
-    ciphertext[8] = 0x7A;
-    ciphertext[9] = 0x36;
-    ciphertext[10] = 2;
-    ciphertext[11] = 0x29;
-    ciphertext[12] = 0xE4;
-    ciphertext[13] = 0;
-    int ciphertext_length = sizeof(ciphertext) / sizeof(ciphertext[0]);
+    uint8_t cyphertext[14]; 
+    cyphertext[0] = 0x7D;
+    cyphertext[1] = 8;
+    cyphertext[2] = 0xED;
+    cyphertext[3] = 0x47;
+    cyphertext[4] = 0xE5;
+    cyphertext[5] = 0;
+    cyphertext[6] = 0x88;
+    cyphertext[7] = 0x3A;
+    cyphertext[8] = 0x7A;
+    cyphertext[9] = 0x36;
+    cyphertext[10] = 2;
+    cyphertext[11] = 0x29;
+    cyphertext[12] = 0xE4;
+    cyphertext[13] = 0;
+    int cyphertext_length = sizeof(cyphertext) / sizeof(cyphertext[0]);
 
     uint8_t plaintext[256] = { 0 }; 
 
 
-    rc4_decrypt(key, ciphertext, plaintext, ciphertext_length);
+    rc4_decrypt(key, cyphertext, plaintext, cyphertext_length);
 
     printf("%s\n", plaintext);
 
     return 0;
 }
+
 
 ```

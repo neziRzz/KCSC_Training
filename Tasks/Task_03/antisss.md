@@ -858,8 +858,105 @@ if(s.check() == sat):
 ## Mics
 - Đề cho 1 file PE32
 
+![image](https://github.com/user-attachments/assets/a588618b-e0b2-439d-9404-bef49ac682fe)
 
 ## Detailed Analysis
+- Bài này sử dụng kĩ thuật anti debug bằng cách gọi `TlsCallBack` trước hàm `main`
+
+- Hàm `TlsCallback_0`
+```C
+BOOL __stdcall TlsCallback_0(int a1, int a2, int a3)
+{
+  BOOL result; // eax
+  HANDLE hProcess; // [esp+4h] [ebp-10h]
+  DWORD dwProcessId; // [esp+8h] [ebp-Ch]
+  SIZE_T NumberOfBytesWritten; // [esp+Ch] [ebp-8h] BYREF
+
+  result = IsDebuggerPresent();
+  if ( !result )
+  {
+    dwProcessId = GetCurrentProcessId();
+    hProcess = OpenProcess(0x1FFFFFu, 0, dwProcessId);
+    return WriteProcessMemory(hProcess, (char *)&loc_4013A2 + 1, &unk_403140, 4u, &NumberOfBytesWritten);
+  }
+  return result;
+}
+```
+- Hàm này sẽ kiểm tra debugger bằng cách gọi hàm `IsDebuggerPresent`. Nếu như không có debugger thì hàm này sẽ thực hiện replace instruction `call sub_401180` ở hàm `main` thành `call sub_401070` (khi debug ta sẽ thấy rõ)
+
+- Hàm `main`
+```C
+int __cdecl main(int argc, const char **argv, const char **envp)
+{
+  FILE *v3; // eax
+  int v4; // ecx
+  char v6; // [esp+0h] [ebp-30h]
+  int j; // [esp+0h] [ebp-30h]
+  unsigned int i; // [esp+8h] [ebp-28h]
+  char *Buf2; // [esp+Ch] [ebp-24h]
+  signed int v10; // [esp+10h] [ebp-20h]
+  char *Buffer; // [esp+14h] [ebp-1Ch]
+  _DWORD v12[5]; // [esp+18h] [ebp-18h] BYREF
+
+  strcpy((char *)v12, "VdlKe9upfBFkkO0L");
+  Buf2 = (char *)malloc(0x100u);
+  Buffer = (char *)malloc(0x100u);
+  memset(Buffer, 0, 0x100u);
+  memset(Buf2, 0, 0x100u);
+  memcpy(Buf2, &unk_40315C, 0x30u);
+  sub_401410("FLAG : ", v6);
+  v3 = __acrt_iob_func(0);
+  fgets(Buffer, 256, v3);
+  v10 = strlen(Buffer);
+  v4 = v10 % 8;
+  if ( v10 % 8 )
+  {
+    for ( i = 0; i < 8 - v4; ++i )
+      Buffer[v10 - 1 + i] = 10;
+    v10 += 8 - v4;
+  }
+  for ( j = 0; j < v10 / 8; ++j )
+  {
+    sub_401180(Buffer, v12);
+    if ( memcmp(Buffer, Buf2, 8u) )
+    {
+      puts("Incorrect");
+      exit(0);
+    }
+    Buffer += 8;
+    Buf2 += 8;
+  }
+  puts("Correct");
+  return 1;
+}
+```
+- Hàm `main` đơn thuần chỉ lấy input của chúng ta, sau đó `sub_401180` sẽ có nhiệm vụ encrypt input với key là `VdlKe9upfBFkkO0L`. Cuối cùng thì sẽ thực hiện kiểm tra input sau khi đã được mã hóa với `unk_40315C`
+- Như mình đã đề cập bên trên, khi không có debugger thì hàm thực thi đúng của chúng ta sẽ là `sub_401070` nên giờ chúng ta sẽ phân tích hàm đó
+```C
+int __fastcall sub_401070(unsigned int *a1, _DWORD *a2)
+{
+  int result; // eax
+  unsigned int i; // [esp+14h] [ebp-18h]
+  int v4; // [esp+1Ch] [ebp-10h]
+  unsigned int v5; // [esp+24h] [ebp-8h]
+  unsigned int v6; // [esp+28h] [ebp-4h]
+
+  v6 = *a1;
+  v5 = a1[1];
+  v4 = 0;
+  for ( i = 0; i < 0x20; ++i )
+  {
+    v4 -= 0x61C88647;
+    v6 += (a2[1] + (v5 >> 5)) ^ (v4 + v5) ^ (*a2 + 16 * v5);
+    v5 += (a2[3] + (v6 >> 5)) ^ (v4 + v6) ^ (a2[2] + 16 * v6);
+  }
+  *a1 = v6;
+  result = 4;
+  a1[1] = v5;
+  return result;
+}
+```
+- Hàm này sử dụng thuật toán `TEA` để mã hóa input. Vậy để tìm ra flag ta chỉ cần kiếm thuật toán decrypt trên mạng và viết script. Tuy nhiên bởi thuật toán này hoạt động trên các block 32 bits nên ta sẽ phải chia cyphertext và key ra thành các khối 32 bit theo kiểu little endian. Sau khi decrypt xong thì chỉ cần đảo lại endianess là được
 ## Script and Flag
 ```python
 def tea_decrypt(cyphertext_block, key):

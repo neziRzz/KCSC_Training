@@ -1082,7 +1082,22 @@ int __cdecl sub_4010C0(int a1, unsigned int a2)
 
 ![image](https://github.com/user-attachments/assets/3c736197-3b97-45e7-99a8-0b4848e85723)
 
+- Nhưng không phải cứ có byte `0xCC` là có nghĩa là instruction tại đó được đặt BP, bởi trong hàm `main` có rất nhiều byte `0xCC`
 
+![image](https://github.com/user-attachments/assets/f3b1f42d-5fa5-4110-8b20-836ae91d1ca7)
+![image](https://github.com/user-attachments/assets/030d6b0d-3bc9-4d2f-a127-26153cae2201)
+![image](https://github.com/user-attachments/assets/3b9db86e-78ab-4de8-8121-06d8a75ba734)
+
+- Từ đây ta có thể thấy rằng cho dù có đặt BP tại hàm `main` hay không thì cũng không làm ảnh hường đến luồng thực thi
+- Khi kiểm tra xem hàm anti debug này có được gọi tại hàm nào khác nữa không thì ta có thể thấy rằng hàm này cũng được gọi bên trong hàm `sub_401120`(RC4 encrypt)
+
+![image](https://github.com/user-attachments/assets/81a2f65b-8e35-4ae1-826b-c3749dcaa007)
+
+- Tuy nhiên trong hàm này không hề có byte `0xCC`, vì vậy nếu như ta đặt bất kì một BP nào ở bên trong hàm này thì sẽ làm ảnh hưởng đến qua trình mã hóa bởi giá trị trả về bởi key dùng để mã hóa sẽ phụ thuộc vào giá trị trả về của `sub_4010C0`
+
+![image](https://github.com/user-attachments/assets/dbe201bf-09a8-4e30-b98a-c3ed9ec9fa43)
+
+- Vậy để giải ta chỉ cần không đặt BP bên trong hàm mã hõa RC4, sau đó nhặt ra key chuẩn và viết script
 ## Script and Flag
 ```C
 #include <stdio.h>

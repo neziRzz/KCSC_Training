@@ -1012,7 +1012,77 @@ print(ascii_text)
 ```
 # Anti_6
 ## Misc
+- Đề cho 1 file PE32
+
+![image](https://github.com/user-attachments/assets/ef4a7261-f4c0-4552-9719-f1a76db7298a)
+
 ## Detailed Analysis
+- Hàm `main`
+```C
+int __cdecl main(int argc, const char **argv, const char **envp)
+{
+  FILE *v3; // eax
+  int v4; // eax
+  int i; // [esp+0h] [ebp-3Ch]
+  unsigned int v7; // [esp+4h] [ebp-38h] BYREF
+  char Buffer[16]; // [esp+8h] [ebp-34h] BYREF
+  int v9[3]; // [esp+18h] [ebp-24h] BYREF
+  __int16 v10; // [esp+24h] [ebp-18h]
+  char v11[16]; // [esp+28h] [ebp-14h]
+
+  puts("Enter Flag :");
+  v3 = _acrt_iob_func(0);
+  fgets(Buffer, 14, v3);
+  v11[0] = 125;
+  v11[1] = 8;
+  v11[2] = -19;
+  v11[3] = 71;
+  v11[4] = -27;
+  v11[5] = 0;
+  v11[6] = -120;
+  v11[7] = 58;
+  v11[8] = 122;
+  v11[9] = 54;
+  v11[10] = 2;
+  v11[11] = 41;
+  v11[12] = -28;
+  v11[13] = 0;
+  memset(v9, 0, sizeof(v9));
+  v10 = 0;
+  v4 = sub_401080(main);
+  v7 = sub_4010C0(main, v4) ^ 0xDEADBEEF;
+  sub_401120(Buffer, 13, &v7, 4, v9);
+  for ( i = 0; i < 13; ++i )
+  {
+    if ( v11[i] != *((_BYTE *)v9 + i) )
+    {
+      sub_401040("Failed", i);
+      return 1;
+    }
+  }
+  sub_401040("Success!! Here is your Flag : Flag{%s}", (char)Buffer);
+  return 0;
+}
+```
+- Nhìn chung thì có vẻ hàm sẽ có nhiệm vụ nhận input từ user, tiếp đến sẽ tiến hành encrypt input thông qua hàm `sub_401120`(Hàm này sử dụng custom RC4) với key được khởi tạo từ `v7`. Cuối cùng kiểm tra input sau khi đã được encrypt với `v11`. Vậy thì anti debug của bài này là ở chỗ nào? Thực chất hàm `sub_4010C0` sẽ sử dụng 1 kĩ thuật anti debug
+```C
+int __cdecl sub_4010C0(int a1, unsigned int a2)
+{
+  unsigned int i; // [esp+4h] [ebp-8h]
+
+  for ( i = 0; i < a2; ++i )
+  {
+    if ( (*(unsigned __int8 *)(i + a1) ^ 0x55) == 0x99 )
+      return 0x13;
+  }
+  return 0x37;
+}
+```
+- Hàm này sẽ tiến hành kiểm tra các byte có trong 1 hàm được chỉ địng trong parameter `a1`. Nếu trong hàm đó có byte `0xCC` (Software Breakpoint) thì sẽ đồng nghĩa với việc đang có debugger attach vào trong process. Một chút về cách debugger đặt `Software Breakpoint`, mỗi khi ta đặt breakpoint trong debugger thì khi đó debugger sẽ thay byte đầu của instruction đó bằng `0xCC`(ta sẽ vẫn thấy byte nguyên bản khi kiểm tra bằng hex view bởi debugger đã lưu lại byte gốc của instruction đó). Ta có thể kiểm chứng bằng cách thử debug hàm này. Giả sử ta trước đó đã đặt BP tại ngay instruction đầu của hàm `main` là `push ebp` (Opcode 0x55), thì khi hàm `sub_4010C0` đọc byte đầu tiên của hàm này thì nó đã bị thay đổi từ `0x55` sang `0xCC`
+
+![image](https://github.com/user-attachments/assets/3c736197-3b97-45e7-99a8-0b4848e85723)
+
+
 ## Script and Flag
 ```C
 #include <stdio.h>

@@ -5,7 +5,148 @@
 ![image](https://github.com/user-attachments/assets/9a803d8c-4c4f-44d3-92cb-569c6460819c)
 
 ## Detailed Analysis
-- 
+- Bài này có rất nhiều hàm rác nhằm làm rối việc phân tích, sau một hồi debug thì mình cũng tìm ra hàm `main` chuẩn
+```C
+_BOOL8 sub_4010CF()
+{
+  sub_40281D("Sadly you won't see this message!\n", 1LL, 34LL);
+  return (unsigned __int8)sub_401077() != 0;
+}
+```
+
+- Hàm `sub_401077`
+```C
+__int64 sub_401077()
+{
+  int v1; // [rsp+Ch] [rbp-4h]
+
+  v1 = sub_40229A();
+  if ( v1 >= 0 )
+  {
+    if ( v1 )
+      sub_4020FF((unsigned int)v1);
+    else
+      sub_40101F();
+    return 0LL;
+  }
+  else
+  {
+    sub_40281D((__int64)"Fork failed.\n", 2u, 13LL);
+    return 1LL;
+  }
+}
+```
+- Hàm này sử dụng một kĩ thuật anti debug khá mới đó chính là bằng cách sử dụng hàm `fork` hoặc syscall `fork`, nếu các bạn muốn tìm hiểu kĩ về kĩ thuật này thì nhấn vào [đây](https://malwareandstuff.com/nanomites-on-linux/). Để giải thích ngắn gọn thì kĩ thuật này sẽ sử dụng hàm `fork` để spawn ra child process (rep 1:1) của process hiện hành, sau đó process hiện hành sẽ rơi vào trạng thái `wait` và luồng thực thi sẽ tiếp tục ở child process. Bởi vì processs hiện hành ở trạng thái `wait`, ta sẽ không thể tiếp tục thực thi cho đến khi child process gửi `kill` hoặc các signal bất kì nào khác. Vậy để một phần nào đó giải quyết được kĩ thuật này, ta có thể bỏ qua bước `fork` và đi thẳng vào trong luồng thực thi chuẩn tuy nhiên cách này sẽ rất dễ gây ra lỗi bởi trong kĩ thuật này 2 process child và parent phải liên tục communicate với nhau
+- Trong trường hợp này, để bỏ qua bước `fork`, ta sẽ step vào `sub_40101F` và `sub_401D3F`
+
+- Hàm `sub_401D3F`
+```C
+__int64 sub_401D3F()
+{
+  __int64 v0; // rax
+  __int64 v1; // rbx
+  __int64 v2; // rax
+  __int64 v3; // rax
+  __int64 v4; // rax
+  __int64 v5; // rax
+  __int64 v6; // rbx
+  __int64 v7; // rdi
+  __int64 v8; // rax
+  __int64 v9; // rbx
+  __int64 v10; // rax
+  __int64 result; // rax
+  unsigned int v12; // [rsp+4h] [rbp-43Ch]
+  unsigned int v13; // [rsp+8h] [rbp-438h]
+  __int64 v14; // [rsp+18h] [rbp-428h]
+  char v15[1032]; // [rsp+20h] [rbp-420h] BYREF
+  unsigned __int64 v16; // [rsp+428h] [rbp-18h]
+
+  v16 = __readfsqword(0x28u);
+  sub_40230E(0LL, 0LL, 0LL, 0LL);
+  sub_402733(18LL);
+  v0 = sub_4016CD();
+  v1 = sub_402BE9(v0);
+  v2 = sub_4016CD();
+  sub_40281D(v2, 1LL, v1);
+  sub_402759(42LL);
+  v12 = sub_402749();
+  if ( !sub_4022D5(v15, 1024LL) )
+  {
+    sub_40269C("getcwd");
+    goto LABEL_15;
+  }
+  v3 = sub_401883();
+  if ( (unsigned int)sub_40228C(v3) == -1 )
+    goto LABEL_4;
+  v4 = sub_4018CF();
+  v13 = sub_4022A8(v4, 577LL, 384LL);
+  if ( v13 == -1 )
+  {
+    sub_40269C("open");
+  }
+  else
+  {
+    v5 = sub_401744();
+    v6 = sub_402BE9(v5);
+    v7 = sub_401744();
+    if ( sub_40281D(v7, v13, v6) == -1 )
+    {
+      sub_40269C("write");
+      sub_402293(v13);
+    }
+    else
+    {
+      v14 = sub_401923();
+      if ( v14 )
+      {
+        if ( (unsigned int)sub_401CA4(v14, v12) == 1 )
+        {
+          v8 = sub_401825();
+          v9 = sub_402BE9(v8);
+          v10 = sub_401825();
+          sub_40281D(v10, 1LL, v9);
+        }
+        if ( (int)sub_402293(v13) == -1LL )
+        {
+          sub_40269C("close");
+        }
+        else if ( (unsigned int)sub_40228C(v15) == -1 )
+        {
+LABEL_4:
+          sub_40269C("chdir");
+        }
+      }
+    }
+  }
+LABEL_15:
+  result = v16 - __readfsqword(0x28u);
+  if ( result )
+    return sub_402917();
+  return result;
+}
+```
+- Đến đây nếu như ta chịu khó nhấn vào từng hàm để xem qua chúng có chức năng gì thì sẽ có thể thấy được hàm `sub_401CA4` có vẻ là hàm kiểm tra flag (debug không bao giờ nhảy được vào đây, mà kể cả có setIP vào thì cũng SEGFAULT thôi 🗿)
+```C
+__int64 __fastcall sub_401CA4(__int64 a1, unsigned int a2)
+{
+  __int64 result; // rax
+  int i; // [rsp+1Ch] [rbp-24h]
+  int v4[6]; // [rsp+20h] [rbp-20h] BYREF
+  unsigned __int64 v5; // [rsp+38h] [rbp-8h]
+
+  v5 = __readfsqword(0x28u);
+  for ( i = 0; i <= 3; ++i )
+  {
+    v4[i] = sub_401BFE(4 * i + a1);
+    v4[i] = sub_401B0A((unsigned int)v4[i], a2);
+  }
+  result = sub_401C4A(v4);
+  if ( v5 != __readfsqword(0x28u) )
+    return sub_402917();
+  return result;
+}
+```
+- Hàm này sẽ gộp input?(Thực sự mình vẫn không biết rằng là bài này check input kiểu gì bởi đầu vào đâu nhận input) thành các block 32 bit (cụ thể là 4 blocks), sau đó `sub_401B0A` sẽ có nhiệm vụ XOR các block này với `rol()` của chính nó (muốn biết là `rol` bao nhiêu ta sẽ phải bruteforce) và cuối cùng `sub_401C4A` sẽ kiểm tra các block sau khi đã biến đổi có thỏa mãn điều kiện hay không. Vậy để giải bài này thì mình sẽ tiến hành bruteforce các block 32 bits này (bước bruteforce số bit để `rol` mình xin phép bỏ qua bởi riêng bước đó thôi cũng tốn hơn 20' chạy script)
 ## Script and Flag
 ```python
 def rol(val, bits, bit_size):
@@ -13,7 +154,7 @@ def rol(val, bits, bit_size):
            ((val & (2 ** bit_size - 1)) >> (bit_size - (bits % bit_size)))
 dest =[0x1EE04D9B,0xF77CAAAC,0x44F4ECA3,0x82E5EFFA]
 for i in range(0,4):
-    for j in range(0x20202020,0x7F7F7F7F):
+    for j in range(0x20202020,0x7F7F7F7F): 
         if((j ^ rol(j,22,32))==dest[i]):
             print(i,end='')
             print(hex(j),end=' ')

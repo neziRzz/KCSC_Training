@@ -7,6 +7,17 @@
 ## Detailed Analysis
 - 
 ## Script and Flag
+```python
+def rol(val, bits, bit_size):
+    return (val << bits % bit_size) & (2 ** bit_size - 1) | \
+           ((val & (2 ** bit_size - 1)) >> (bit_size - (bits % bit_size)))
+dest =[0x1EE04D9B,0xF77CAAAC,0x44F4ECA3,0x82E5EFFA]
+for i in range(0,4):
+    for j in range(0x20202020,0x7F7F7F7F):
+        if((j ^ rol(j,22,32))==dest[i]):
+            print(i,end='')
+            print(hex(j),end=' ')
+```
 # Anti_1
 ## Misc
 - Đề cho 1 file PE32

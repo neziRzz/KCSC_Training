@@ -1,6 +1,11 @@
 # Anti
 ## Misc
+- Đề cho 1 file ELF64
+
+![image](https://github.com/user-attachments/assets/9a803d8c-4c4f-44d3-92cb-569c6460819c)
+
 ## Detailed Analysis
+- 
 ## Script and Flag
 # Anti_1
 ## Misc

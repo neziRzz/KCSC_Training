@@ -57,8 +57,8 @@ for i in range(0,len(cyphertext),8):
   v11 = ord("d")
   v12 = 100
   while(v12):
-    v1 = 0xFF&(ror(v1&0xFF, 1, 8)) - map[(v11 + result)&0xFF] 
-    result = 0xFF&ror(result&0xFF, 1, 8) - map[(v9 + v8)&0xFF] 
+    v1 = 0xFF&(ror(v1, 1, 8)) - map[(v11 + result)&0xFF] 
+    result = 0xFF&ror(result, 1, 8) - map[(v9 + v8)&0xFF] 
     v8 = 0xFF&ror(v8, 1, 8) - map[(v6 + v7)&0xFF] 
     v6 = 0xFF&ror(v6, 1, 8) - map[(v5 + v14)&0xFF] 
     v5 = 0xFF&ror(v5, 1, 8) - map[(v4 + v15)&0xFF] 
@@ -76,4 +76,6 @@ for i in range(0,len(cyphertext),8):
   dest[i+7]=result
 for i in dest:
   print(chr(i),end='')
+
+
 ```

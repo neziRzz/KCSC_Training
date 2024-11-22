@@ -1,5 +1,5 @@
 # Math
-## Mics
+## Misc
 ## Detailed Analysis
 ## Script and Flag
 ```python
@@ -77,5 +77,58 @@ for i in range(0,len(cyphertext),8):
 for i in dest:
   print(chr(i),end='')
 
+
+```
+# Math 3
+## Detailed Analysis
+## Script and Flag
+```python
+# z3 my beloved <3 
+from z3 import *
+SHUFFLE = [  0x02, 0x06, 0x07, 0x01, 0x05, 0x0B, 0x09, 0x0E, 0x03, 0x0F, 0x04, 0x08, 0x0A, 0x0C, 0x0D, 0x00]
+ADD32 = [0xDEADBEEF, 0xFEE1DEAD, 0x13371337, 0x67637466]
+XOR = [0x76, 0x58, 0xB4, 0x49, 0x8D, 0x1A, 0x5F, 0x38, 0xD4, 0x23, 0xF8, 0x34, 0xEB, 0x86, 0xF9, 0xAA]
+TEST = [0x46 ,0x61 ,0x61 ,0x54 ,0x61 ,0x61 ,0x61 ,0x7D ,0x7B ,0x00 ,0x61 ,0x61 ,0x61 ,0x61 ,0x61 ,0x43]
+flag = [BitVec('x[%d]'%i,8) for i in range(16)]
+s = Solver()
+temp = [0]*len(flag)
+for i in range(len(flag)):
+    temp[i] = flag[SHUFFLE[i]]
+cond = Concat(temp[3],temp[2],temp[1],temp[0])
+cond1 = Concat(temp[7],temp[6],temp[5],temp[4])
+cond2= Concat(temp[11],temp[10],temp[9],temp[8])
+cond3 = Concat(temp[15],temp[14],temp[13],temp[12])
+    
+sum= (cond+ADD32[0])&0xFFFFFFFF
+sum1= (cond1+ADD32[1])&0xFFFFFFFF
+sum2= (cond2+ADD32[2])&0xFFFFFFFF
+sum3= (cond3+ADD32[3])&0xFFFFFFFF
+
+temp[0] = Extract(7, 0, sum)
+temp[1] = Extract(15, 8, sum)
+temp[2] = Extract(23, 16, sum)
+temp[3] = Extract(31, 24, sum)
+temp[4] = Extract(7, 0, sum1)
+temp[5] = Extract(15, 8, sum1)
+temp[6] = Extract(23, 16, sum1)
+temp[7] = Extract(31, 24, sum1)
+temp[8] = Extract(7, 0, sum2)
+temp[9] = Extract(15, 8, sum2)
+temp[10] = Extract(23, 16, sum2)
+temp[11] = Extract(31, 24, sum2)
+temp[12] = Extract(7, 0, sum3)
+temp[13] = Extract(15, 8, sum3)
+temp[14] = Extract(23, 16, sum3)
+temp[15] = Extract(31, 24, sum3)
+
+for i in range(len(temp)):
+    temp[i] ^= XOR[i]
+for i in range(len(flag)):
+    s.add(flag[i] == temp[i])
+if(s.check()==sat):
+    m = s.model()
+    result = [m[flag[i]].as_long() for i in range(16)]
+for i in result:
+    print(chr(i),end='')
 
 ```

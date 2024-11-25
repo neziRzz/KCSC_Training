@@ -1,4 +1,4 @@
-# Math
+![image](https://github.com/user-attachments/assets/c6d20486-d904-4548-8fed-e462c9e68cf1)# Math
 ## Misc
 - Đề cho 1 file PE64
 
@@ -480,7 +480,136 @@ for i in range(0,44,4):
     v12 = v55
 ```
 # Math 2
+## Mics
+- Đề cho 1 file ELF64
+
+![image](https://github.com/user-attachments/assets/f58adeb7-c4f8-4031-af22-e862df77dec0)
+
 ## Detailed Analysis
+- Hàm `main`
+```C
+int __fastcall main(int argc, const char **argv, const char **envp)
+{
+  int v3; // ebx
+  char v5; // [rsp+13h] [rbp-107Dh]
+  unsigned __int16 v6; // [rsp+14h] [rbp-107Ch]
+  unsigned __int16 v7; // [rsp+16h] [rbp-107Ah]
+  unsigned __int16 v8; // [rsp+18h] [rbp-1078h]
+  int v9; // [rsp+1Ch] [rbp-1074h] BYREF
+  unsigned int v10; // [rsp+20h] [rbp-1070h] BYREF
+  unsigned int v11; // [rsp+24h] [rbp-106Ch] BYREF
+  int i; // [rsp+28h] [rbp-1068h]
+  int j; // [rsp+2Ch] [rbp-1064h]
+  int v14; // [rsp+30h] [rbp-1060h]
+  unsigned int k; // [rsp+34h] [rbp-105Ch]
+  int m; // [rsp+38h] [rbp-1058h]
+  int n; // [rsp+3Ch] [rbp-1054h]
+  int ii; // [rsp+40h] [rbp-1050h]
+  unsigned int v19; // [rsp+44h] [rbp-104Ch]
+  int v20; // [rsp+48h] [rbp-1048h]
+  unsigned int v21; // [rsp+4Ch] [rbp-1044h]
+  __int64 v22; // [rsp+50h] [rbp-1040h]
+  __int64 v23; // [rsp+58h] [rbp-1038h]
+  __int64 v24; // [rsp+60h] [rbp-1030h]
+  unsigned __int64 v25; // [rsp+68h] [rbp-1028h]
+  char v26[24]; // [rsp+70h] [rbp-1020h]
+  unsigned __int64 v27; // [rsp+1078h] [rbp-18h]
+  __int64 savedregs; // [rsp+1090h] [rbp+0h] BYREF
+
+  v27 = __readfsqword(0x28u);
+  setvbuf(stdout, 0LL, 2, 0LL);
+  setvbuf(stdin, 0LL, 2, 0LL);
+  for ( i = 0; i <= 511; ++i )
+  {
+    for ( j = 0; j <= 7; ++j )
+      *((_BYTE *)&savedregs + 8 * j + i - 4128) = 0;
+  }
+  puts("*****************");
+  puts("* PWNYMAPS v0.1 *");
+  puts("*****************");
+  puts("The developer has only tested non-earth planetary systems. Please proceed with caution.");
+  printf("%s", "Indicate your directional complexity level: ");
+  __isoc99_scanf("%u", &v9);
+  getchar();
+  if ( (unsigned int)v9 > 0x200 )
+    goto LABEL_26;
+  v14 = 1;
+  for ( k = 0; (int)k < v9; ++k )
+  {
+    printf("Indicate your 'Earth'-type coordinate %x {{hintText.toUpperCase()}}: ", k);
+    __isoc99_scanf("%u%u", &v10, &v11);
+    getchar();
+    if ( v11 > 0xFFFFFFF )
+      goto LABEL_26;
+    v19 = v10 >> 8;
+    v6 = (16 * v10) & 0xFF0 | (v11 >> 28);
+    v7 = HIWORD(v11) & 0xFFF;
+    v8 = EncodeMorton_12bit((unsigned __int16)v11 >> 10, (v11 >> 4) & 0x3F);
+    v20 = EncodeMorton_24bit(v8, v7);
+    v24 = EncodeMorton_48bit(v19, v7);
+    v25 = (v24 << 12) | v6;
+    v26[8 * k] = Unpad64Bit_8Bit(v25);
+    v26[8 * k + 1] = Unpad64Bit_8Bit(v25 >> 1);
+    v26[8 * k + 2] = Unpad64Bit_8Bit(v25 >> 2);
+    v26[8 * k + 3] = Unpad64Bit_8Bit(v25 >> 3);
+    v26[8 * k + 4] = Unpad64Bit_8Bit(v25 >> 4);
+    v26[8 * k + 5] = Unpad64Bit_8Bit(v25 >> 5);
+    v26[8 * k + 6] = Unpad64Bit_8Bit(v25 >> 6);
+    v26[8 * k + 7] = Unpad64Bit_8Bit(v25 >> 7);
+    v5 = v26[8 * k + 1];
+    v26[8 * k + 1] = v26[8 * k + 5];
+    v26[8 * k + 5] = v5;
+    v21 = numberOfSetBits((unsigned __int16)((((unsigned __int8)v26[8 * k + 4] << 8) | (unsigned __int8)v26[8 * k + 5]) ^ (((unsigned __int8)v26[8 * k + 2] << 8) | (unsigned __int8)v26[8 * k + 3]) ^ ((unsigned __int8)v26[8 * k + 1] | ((unsigned __int8)v26[8 * k] << 8)) ^ (((unsigned __int8)v26[8 * k + 6] << 8) | (unsigned __int8)v26[8 * k + 7])));
+    v3 = correct_checksums[k];
+    if ( v3 != (unsigned int)hash(v21) )
+      v14 = 0;
+  }
+  if ( v14 )
+  {
+    for ( m = 1; m < v9; ++m )
+    {
+      for ( n = 0; n <= 7; ++n )
+      {
+        numberOfSetBits(*((unsigned __int8 *)&savedregs + 8 * m + n - 4136));
+        *((_BYTE *)&savedregs + 8 * m + n - 4128) = *((_BYTE *)&savedregs + 8 * m + n - 4128);
+      }
+    }
+    for ( ii = 0; ii < v9; ++ii )
+    {
+      v22 = EncodeMorton_9x7bit(
+              v26[8 * ii] & 0x7F,
+              v26[8 * (ii % v9) + 1] & 0x7F,
+              v26[8 * (ii % v9) + 2] & 0x7F,
+              v26[8 * (ii % v9) + 3] & 0x7F,
+              v26[8 * (ii % v9) + 4] & 0x7F,
+              v26[8 * (ii % v9) + 5] & 0x7F,
+              v26[8 * (ii % v9) + 6] & 0x7F,
+              v26[8 * (ii % v9) + 7] & 0x7F,
+              ((int)(unsigned __int8)v26[8 * ii + 6] >> 6) & 2 | ((int)(unsigned __int8)v26[8 * ii + 5] >> 5) & 4 | ((int)(unsigned __int8)v26[8 * ii + 4] >> 4) & 8 | ((int)(unsigned __int8)v26[8 * ii + 3] >> 3) & 0x10 | ((int)(unsigned __int8)v26[8 * ii + 2] >> 2) & 0x20 | ((int)(unsigned __int8)v26[8 * ii + 1] >> 1) & 0x40u | ((unsigned __int8)v26[8 * ii + 7] >> 7));
+      v23 = (unsigned __int8)v26[8 * ii] >> 7;
+      v22 |= v23 << 63;
+      if ( v22 != correct[ii] )
+        goto LABEL_26;
+    }
+    puts("You have reached your destination. PWNYMAPS does not support route plotting yet.");
+    return 0;
+  }
+  else
+  {
+LABEL_26:
+    puts("Continue straight for 500 meter(s) into Lake Michigan.");
+    return 1;
+  }
+}
+```
+- Nhìn qua thì có vẻ đây là một bài bắt nhập tọa độ để gen ra một map phụ thuộc vào độ phức tạp của map muốn tạo. Tùy thuộc vào độ phức tạp ta nhập vào bao nhiêu thì ta sẽ phải nhập bấy nhiêu cái tọa độ (tọa độ có dạng x,y). Sau đó tọa độ mà ta nhập vào sẽ được biến đổi thông qua các hàm như `EncodeMorton_12bit`, `Unpad64Bit_8Bit`,... và cuối cùng kiểm tra với `correct`
+- Với điều kiện cuối cùng là kiểm tra với `correct` ta có thể trace ngược lại những variables có liên quan là `v22` -> `v23` -> `v26` -> `v25`
+- Vậy để giải ta chỉ cần viết script cho những biến để tìm các biến liên quan và build lại các hàm nếu cần thiết. May thay các hàm này không quá phức tạp nên ta chỉ cần chép chúng ra, sửa lại data type và ném vào script. Bởi số lượng data cũng như là các hàm cần phải build lại khá là lớn nên mình sẽ phân script ra làm 3 phase để tiện hơn
+
+![image](https://github.com/user-attachments/assets/336087a3-34de-4721-b65d-cbb5c23a22de)
+
+![image](https://github.com/user-attachments/assets/ac438d6e-f564-4513-b20d-959c794a0748)
+
 ## Script and Flag
 ```python
 # find v26 phase

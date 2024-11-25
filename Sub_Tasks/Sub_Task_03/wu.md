@@ -1,6 +1,90 @@
 # Math
 ## Misc
+- Đề cho 1 file PE64
+
+![image](https://github.com/user-attachments/assets/5ce33fcd-ede6-4c8a-8e70-d1aade41a722)
+
 ## Detailed Analysis
+- Hàm `main`
+```C
+int __fastcall main(int argc, const char **argv, const char **envp)
+{
+  char v3; // al
+  const char *v4; // rcx
+  __int128 *v6; // [rsp+28h] [rbp-60h] BYREF
+  __int128 v7[4]; // [rsp+30h] [rbp-58h] BYREF
+
+  memset(v7, 0, sizeof(v7));
+  sub_140002480("Enter flag: ", argv, envp);
+  sub_140002500(v7);
+  sub_1400035B0(v7);
+  v6 = v7;
+  v3 = sub_140004680(&v6);
+  v4 = "Wrong!";
+  if ( v3 )
+    v4 = "Correct!";
+  puts(v4);
+  return 0;
+}
+```
+- Hàm `main` không quá phức tạp, hàm chỉ đơn thuần nhận input từ user, sau đó kiểm tra đúng sai. Nhưng khi phân tích các hàm còn lại ta sẽ thấy có điều đặc biệt
+
+![image](https://github.com/user-attachments/assets/1ba59b3e-c123-44d4-acab-64a78eed7116)
+
+- Các hàm `sub_140002500`, `sub_1400035B0` và `sub_140004680` đều có pattern như này, có thể thấy rõ là các hàm này đã bị obfuscated, tuy nhiên ở cuối các hàm này ta có thể thấy một đoạn call đến một giá trị nào đó
+
+![image](https://github.com/user-attachments/assets/160f82f3-2de3-4601-9a91-652642b4347a)
+
+- Từ đó có thể suy ra rằng các đoạn code bị obfuscated trên chỉ đơn thuần tính toán địa chỉ để thực thi lệnh call kia. Vậy để tiếp tục phân tích, ta sẽ phải debug và set BP vào các lệnh call này. Ta được các kết quả như sau
+
+- Hàm `sub_140002500` chỉ là 1 obfuscated call đến `fgets`
+```C
+__int64 __fastcall sub_7FF755C323C0(__int64 a1)
+{
+  FILE *v2; // rax
+
+  v2 = _acrt_iob_func(0);
+  common_fgets<char>(a1, 64i64, v2);
+  return 0i64;
+}
+```
+
+- Hàm `sub_1400035B0` là 1 obfuscated call đến check flag routine
+```C
+__int64 __fastcall sub_7FF755C31170(const char *a1)
+{
+  int v2; // eax
+  int v3; // ebx
+  signed int v4; // ebx
+  __int64 result; // rax
+  __int64 v6; // rbx
+  __int64 v7; // rdi
+  __int64 v8[3]; // [rsp+28h] [rbp-40h] BYREF
+
+  v2 = strlen(a1);
+  v3 = v2 + 7;
+  if ( v2 >= 0 )
+    v3 = v2;
+  v4 = (v3 & 0xFFFFFFF8) + 8;
+  result = 'desufnoc';
+  *(__int64 *)((char *)&v8[1] + 1) = 'desufnoc';
+  if ( v4 >= 8 )
+  {
+    v6 = (unsigned int)v4 >> 3;
+    v7 = 0i64;
+    do
+    {
+      v8[0] = *(_QWORD *)&a1[8 * v7];
+      sub_7FF755C31200(v8);
+      result = v8[0];
+      *(_QWORD *)&a1[8 * v7++] = v8[0];
+    }
+    while ( v6 != v7 );
+  }
+  return result;
+}
+```
+- Hàm này sẽ có nhiệm vụ tách 8 kí tự 1 của user. String `desufnoc` (confused but reversed bởi little endian)
 ## Script and Flag
 ```python
 def ror(val, bits, bit_size):

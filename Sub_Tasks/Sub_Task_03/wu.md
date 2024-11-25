@@ -237,7 +237,146 @@ for i in dest:
   print(chr(i),end='')
 ```
 # Math 1
+- Đề cho 1 file ELF64
+
+![image](https://github.com/user-attachments/assets/4fb719cf-cbd2-493f-b02f-9722643172e4)
+
 ## Detailed Analysis
+- Bởi bài này có rất nhiều những đoạn code không liên quan nên mình sẽ chỉ nhặt một số những đoạn đáng chú ý. Bởi để rev được các bài code bằng Rust thì mã giả sẽ không đáng tin cậy và để thực sự rõ được chương trình đang làm gì thì debug là giải pháp duy nhất  (Its all fun and game until you have to reverse a Rust sample)
+
+```C
+  LOWORD(v0) = 0x1110;
+  LOWORD(v12) = 0x1918;
+  v55 = (unsigned int)v12;
+  v13 = v65;
+  do
+  {
+    v16 = 4LL;
+    if ( v11 < 4 )
+      v16 = v11;
+    v72 = v11;
+    v61 = v0;
+    if ( v11 == 1 )
+    {
+      v53 = 0;
+      v17 = 0;
+      v18 = 0;
+    }
+    else
+    {
+      v18 = v13[1];
+      if ( v11 == 2 )
+      {
+        v53 = 0;
+        v17 = 0;
+      }
+      else
+      {
+        v17 = v13[2];
+        if ( v11 == 3 )
+          v53 = 0;
+        else
+          v53 = v13[3];
+      }
+    }
+```
+- Đoạn code bên trên đầu tiên sẽ khởi tạo 2 seed `v0` và `v12`. Sau đó chia input của user ra làm 4 kí tự 1 (2 block 16 bits)
+
+```C
+   if ( (void **)v23 == v57 )
+      {
+        alloc::raw_vec::RawVec$LT$T$C$A$GT$::grow_one::hcb77b4cc7fe90c59(&v57, 2LL);
+        v27 = (__int64)v58;
+      }
+      v30 = (v29 + __ROL2__(v28, 9)) ^ v25;
+      *(_WORD *)(v27 + 2 * v23) = v30;
+      v59 = v23 + 1;
+      v31 = v64;
+      if ( v64 == v62 )
+        alloc::raw_vec::RawVec$LT$T$C$A$GT$::grow_one::hcb77b4cc7fe90c59(&v62, 2LL);
+      v63[v31] = v30 ^ __ROL2__(v29, 2);
+      v24 = v31 + 1;
+      v64 = v31 + 1;
+      if ( v25 == 20 )
+        break;
+      v23 = v59;
+      ++v25;
+      v26 = v59 - 1;
+      if ( !v59 )
+        goto LABEL_87;
+    }
+```
+- Đoạn code này sẽ có nhiệm vụ khởi tạo 2 array dựa trên hai seed `v0` và `v12` mà mình đã đề cập ở trên bằng các phép `ROL` và `XOR`
+
+```C
+       do
+        {
+          LOWORD(v22) = __ROL2__(v22, 9);
+          v22 += v36;
+          LOWORD(v22) = *v34++ ^ v22;
+          LOWORD(v36) = __ROL2__(v36, 2);
+          v36 ^= v22;
+          --v35;
+        }
+        while ( v35 );
+      }
+      else
+      {
+        v36 = v54;
+      }
+      if ( (v31 & 0x7FFFFFFFFFFFFFFFuLL) >= 3 )
+      {
+        do
+        {
+          LOWORD(v22) = __ROL2__(v22, 9);
+          v37 = v36 + v22;
+          LOWORD(v37) = *v34 ^ v37;
+          LOWORD(v36) = __ROL2__(v36, 2);
+          v38 = v37 ^ v36;
+          LOWORD(v37) = __ROL2__(v37, 9);
+          v39 = v38 + v37;
+          LOWORD(v39) = v34[1] ^ v39;
+          LOWORD(v38) = __ROL2__(v38, 2);
+          v40 = v39 ^ v38;
+          LOWORD(v39) = __ROL2__(v39, 9);
+          v41 = v40 + v39;
+          LOWORD(v41) = v34[2] ^ v41;
+          LOWORD(v40) = __ROL2__(v40, 2);
+          v42 = v41 ^ v40;
+          LOWORD(v41) = __ROL2__(v41, 9);
+          v22 = v42 + v41;
+          LOWORD(v22) = v34[3] ^ v22;
+          LOWORD(v42) = __ROL2__(v42, 2);
+          v36 = v22 ^ v42;
+          v34 += 4;
+        }
+        while ( v34 != (_WORD *)(v33 + 2 * v24) );
+      }
+    }
+    if ( v32 )
+      _rust_dealloc();
+    v43 = _byteswap_ulong((v55 << 16) | (unsigned __int16)v61);
+    v44 = dword_483D0[(unsigned __int8)~(_BYTE)v43] ^ 0xFFFFFF;
+    v45 = dword_483D0[(unsigned __int8)(BYTE2(v43) ^ LOBYTE(dword_483D0[(unsigned __int8)(BYTE1(v43) ^ v44)]) ^ BYTE1(v44))] ^ ((dword_483D0[(unsigned __int8)(BYTE1(v43) ^ v44)] ^ (v44 >> 8)) >> 8);
+    v46 = dword_483D0[HIBYTE(v43) ^ (unsigned __int8)v45] ^ (v45 >> 8);
+    v47 = v68;
+    v13 = v73;
+    if ( v68 == v66 )
+      alloc::raw_vec::RawVec$LT$T$C$A$GT$::grow_one::h15e92b46b579b29e(&v66);
+    v0 = ~v46;
+    v14 = (__int64)v67;
+    v67[2 * v47] = v22;
+    *(_WORD *)(v14 + 4 * v47 + 2) = v36;
+    v15 = v47 + 1;
+    v68 = v15;
+    v55 = HIWORD(v0);
+    v11 = v72;
+  }
+  while ( v72 );
+```
+- Đoạn code này sẽ tiến hành biến đổi 2 block 16 bits input của user bằng các phép `ROR`, `XOR` và `+`, cụ thể thì vòng `do while` đẩu tiên sẽ lặp 2 lần còn vòng `do while` tiếp theo sẽ lặp trong khoảng `length của array được khởi tạo bởi seed - 2 (20 lần)`. Cuối cùng thì khởi tạo seed mới thông qua 1 map `dword_483D0` và tiếp tục vòng lặp cho đến khi duyệt hết input. Sau khi biến đổi xong thì sẽ kiểm tra lần lượt các khối 16 bit một của input với các khối 16 bit được khởi tạo từ `xmmword_48000`, `xmmword_48010`. `0x8FE70E707F8D8AA3` và `0x8F5EE71E`
+- Bài này tuy không khó nhưng bởi số lượng các phép biến đổi rất nhiều và đồng thời các datatype được gắn cho các biến cũng khá loằng ngoằng nên ta phải lưu ý. Bên dưới là script bruteforce 2 block 16 bits flag của mình(chạy sẽ khá lâu đó :v)
+
 ## Script and Flag
 ```python
 import struct

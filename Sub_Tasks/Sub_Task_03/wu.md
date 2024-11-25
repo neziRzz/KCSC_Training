@@ -77,6 +77,110 @@ for i in range(0,len(cyphertext),8):
 for i in dest:
   print(chr(i),end='')
 ```
+# Math 1
+## Detailed Analysis
+## Script and Flag
+```python
+import struct
+def swap32(i):
+    return struct.unpack("<I", struct.pack(">I", i))[0]
+def rol(val, bits, bit_size):
+    return (val << bits % bit_size) & (2 ** bit_size - 1) | \
+           ((val & (2 ** bit_size - 1)) >> (bit_size - (bits % bit_size)))
+
+cyphertext = [0xF34A, 0x3AA8, 0xFC90, 0x415D, 0xC87B, 0xC88A, 0x234C, 0xB629, 0xFE48, 0x8D12,
+0xD395, 0x2437, 0x2544, 0x19C2, 0xF1FA, 0x7A41, 0x8AA3, 0x7F8D, 0x0E70, 0x8FE7,
+0xE71E, 0x8F5E]
+v0 = 0x1110
+v12 = 0x1918
+
+map = [0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706aF48F, 0xe963a535, 0x9e6495a3, 0x0edb8832, 0x79dcb8a4,
+0xe0d5e91e, 0x97d2d988, 0x09b64c2b, 0x7eb17cbd, 0xe7b82d07, 0x90bF1d91, 0x1db71064, 0x6ab020F2, 0xF3b97148, 0x84be41de,
+0x1adad47d, 0x6ddde4eb, 0xF4d4b551, 0x83d385c7, 0x136c9856, 0x646ba8c0, 0xFd62F97a, 0x8a65c9ec, 0x14015c4F, 0x63066cd9,
+0xFa0F3d63, 0x8d080dF5, 0x3b6e20c8, 0x4c69105e, 0xd56041e4, 0xa2677172, 0x3c03e4d1, 0x4b04d447, 0xd20d85Fd, 0xa50ab56b,
+0x35b5a8Fa, 0x42b2986c, 0xdbbbc9d6, 0xacbcF940, 0x32d86ce3, 0x45dF5c75, 0xdcd60dcF, 0xabd13d59, 0x26d930ac, 0x51de003a,
+0xc8d75180, 0xbFd06116, 0x21b4F4b5, 0x56b3c423, 0xcFba9599, 0xb8bda50F, 0x2802b89e, 0x5F058808, 0xc60cd9b2, 0xb10be924,
+0x2F6F7c87, 0x58684c11, 0xc1611dab, 0xb6662d3d, 0x76dc4190, 0x01db7106, 0x98d220bc, 0xeFd5102a, 0x71b18589, 0x06b6b51F,
+0x9FbFe4a5, 0xe8b8d433, 0x7807c9a2, 0x0F00F934, 0x9609a88e, 0xe10e9818, 0x7F6a0dbb, 0x086d3d2d, 0x91646c97, 0xe6635c01,
+0x6b6b51F4, 0x1c6c6162, 0x856530d8, 0xF262004e, 0x6c0695ed, 0x1b01a57b, 0x8208F4c1, 0xF50Fc457, 0x65b0d9c6, 0x12b7e950,
+0x8bbeb8ea, 0xFcb9887c, 0x62dd1ddF, 0x15da2d49, 0x8cd37cF3, 0xFbd44c65, 0x4db26158, 0x3ab551ce, 0xa3bc0074, 0xd4bb30e2,
+0x4adFa541, 0x3dd895d7, 0xa4d1c46d, 0xd3d6F4Fb, 0x4369e96a, 0x346ed9Fc, 0xad678846, 0xda60b8d0, 0x44042d73, 0x33031de5,
+0xaa0a4c5F, 0xdd0d7cc9, 0x5005713c, 0x270241aa, 0xbe0b1010, 0xc90c2086, 0x5768b525, 0x206F85b3, 0xb966d409, 0xce61e49F,
+0x5edeF90e, 0x29d9c998, 0xb0d09822, 0xc7d7a8b4, 0x59b33d17, 0x2eb40d81, 0xb7bd5c3b, 0xc0ba6cad, 0xedb88320, 0x9abFb3b6,
+0x03b6e20c, 0x74b1d29a, 0xead54739, 0x9dd277aF, 0x04db2615, 0x73dc1683, 0xe3630b12, 0x94643b84, 0x0d6d6a3e, 0x7a6a5aa8,
+0xe40ecF0b, 0x9309FF9d, 0x0a00ae27, 0x7d079eb1, 0xF00F9344, 0x8708a3d2, 0x1e01F268, 0x6906c2Fe, 0xF762575d, 0x806567cb,
+0x196c3671, 0x6e6b06e7, 0xFed41b76, 0x89d32be0, 0x10da7a5a, 0x67dd4acc, 0xF9b9dF6F, 0x8ebeeFF9, 0x17b7be43, 0x60b08ed5,
+0xd6d6a3e8, 0xa1d1937e, 0x38d8c2c4, 0x4FdFF252, 0xd1bb67F1, 0xa6bc5767, 0x3Fb506dd, 0x48b2364b, 0xd80d2bda, 0xaF0a1b4c,
+0x36034aF6, 0x41047a60, 0xdF60eFc3, 0xa867dF55, 0x316e8eeF, 0x4669be79, 0xcb61b38c, 0xbc66831a, 0x256Fd2a0, 0x5268e236,
+0xcc0c7795, 0xbb0b4703, 0x220216b9, 0x5505262F, 0xc5ba3bbe, 0xb2bd0b28, 0x2bb45a92, 0x5cb36a04, 0xc2d7FFa7, 0xb5d0cF31,
+0x2cd99e8b, 0x5bdeae1d, 0x9b64c2b0, 0xec63F226, 0x756aa39c, 0x026d930a, 0x9c0906a9, 0xeb0e363F, 0x72076785, 0x05005713,
+0x95bF4a82, 0xe2b87a14, 0x7bb12bae, 0x0cb61b38, 0x92d28e9b, 0xe5d5be0d, 0x7cdceFb7, 0x0bdbdF21, 0x86d3d2d4, 0xF1d4e242,
+0x68ddb3F8, 0x1Fda836e, 0x81be16cd, 0xF6b9265b, 0x6Fb077e1, 0x18b74777, 0x88085ae6, 0xFF0F6a70, 0x66063bca, 0x11010b5c,
+0x8F659eFF, 0xF862ae69, 0x616bFFd3, 0x166ccF45, 0xa00ae278, 0xd70dd2ee, 0x4e048354, 0x3903b3c2, 0xa7672661, 0xd06016F7,
+0x4969474d, 0x3e6e77db, 0xaed16a4a, 0xd9d65adc, 0x40dF0b66, 0x37d83bF0, 0xa9bcae53, 0xdebb9ec5, 0x47b2cF7F, 0x30b5FFe9,
+0xbdbdF21c, 0xcabac28a, 0x53b39330, 0x24b4a3a6, 0xbad03605, 0xcdd70693, 0x54de5729, 0x23d967bF, 0xb3667a2e, 0xc4614ab8,
+0x5d681b02, 0x2a6F2b94, 0xb40bbe37, 0xc30c8ea1, 0x5a05dF1b, 0x2d02eF8d]
+
+
+for i in range(0,44,4):
+    hex_1 = [v12]
+    hex_2 = [v0]
+    for j in range(21):
+        v30 = (hex_1[j]+((hex_2[j]&0xFFFF0000)| rol(hex_2[j]&0xFFFF,9,16))) ^ j
+        hex_2.append(v30&0xFFFF)
+        vv = v30 ^ ((hex_1[j]&0xFFFF0000)| rol(hex_1[j]&0xFFFF,2,16))
+        hex_1.append(vv&0xFFFF)
+    for k in range(0x20,0x7F):
+        for m in range(0x20,0x7F):
+            for n in range(0x20,0x7F):
+                for o in range(0x20,0x7F):
+                
+                    count = 0
+                    v22 = (n<<8) | o   
+
+                    v36 = (k<<8) | m   
+
+                    for j in range(2):
+                        v22 =(v22&0xFFFF0000)| rol(v22&0xFFFF,9,16)
+                        v22 = (v36 + v22)
+                        v22 = (v22&0xFFFF0000)|(hex_1[count]^(v22&0xFFFF))
+                        v36 =(v36&0xFFFF0000)| rol(v36,2,16) 
+                        v36 ^= v22
+                        count +=1
+                    while(count < len(hex_1)):
+                        v22 =(v22&0xFFFF0000)| rol(v22&0xFFFF,9,16)
+                        v37 = v36 + v22
+                        v37 =(v37&0xFFFF0000)| (hex_1[count]^(v37&0xFFFF))
+                        v36 =(v36&0xFFFF0000)| rol(v36,2,16)
+                        v38 = v37 ^ v36 
+                        v37 = (v37&0xFFFF0000)| rol(v37&0xFFFF,9,16)
+                        v39 = v38 + v37
+                        v39 = (v39&0xFFFF0000)| (hex_1[count+1]^(v39&0xFFFF))
+                        v38 = (v38&0xFFFF0000)| rol(v38,2,16)
+                        v40 = v39 ^ v38
+                        v39 = (v39&0xFFFF0000)| rol(v39&0xFFFF,9,16)
+                        v41 = v40 + v39
+                        v41 = (v41&0xFFFF0000)| (hex_1[count+2]^(v41&0xFFFF))
+                        v40 = (v40&0xFFFF0000)| rol(v40,2,16)
+                        v42 = v41 ^ v40 
+                        v41 = (v41&0xFFFF0000)| rol(v41&0xFFFF,9,16)
+                        v22 = v42 + v41
+                        v22 = (v22&0xFFFF0000)| (hex_1[count+3]^(v22&0xFFFF))
+                        v42 = (v42&0xFFFF0000)| rol(v42,2,16)
+                        v36 = v22 ^ v42
+                        count += 4
+
+                    v43 = swap32((v12<<16)|(v0&0xFFFF))
+                    v44 = map[(~v43)&0xFFFFFFFF&0xFF] ^ 0xFFFFFF
+                    v45 = (((map[((v43>>8)^v44)&0xFF])^(v44>>8))>>8) ^ map[(((map[((v43>>8)^v44)&0xFF])^(v44>>8))^(v43>>16))&0xFF]
+                    v46 = map[(v43>>24)^(v45&0xFF)] ^ (v45>>8)
+                    v0 = ((~v46)&0xFFFFFFFF)
+                            
+                    if(((v22)&0xFFFF == cyphertext[0]) and ((v36)&0xFFFF == cyphertext[1])): #for each cyphertext replace cyphertext's indices accordingly (22 in total btw) 
+                        print(hex(((n<<8) | o)),hex((k<<8) | m))
+    v55 = v0 >> 0x10
+    v12 = v55
+```
 # Math 2
 ## Detailed Analysis
 ## Script and Flag

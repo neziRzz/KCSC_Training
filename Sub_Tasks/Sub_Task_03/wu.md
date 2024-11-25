@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/c6d20486-d904-4548-8fed-e462c9e68cf1)# Math
+# Math
 ## Misc
 - Đề cho 1 file PE64
 

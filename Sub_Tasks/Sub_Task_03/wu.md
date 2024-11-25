@@ -773,7 +773,38 @@ for i in range(len(result)):
     print(result1[i])
 ````
 # Math 3
+- Đề cho 1 file ELF64
+
+![image](https://github.com/user-attachments/assets/2f781d3f-858b-4544-99b6-10f99ae2c52b)
+
 ## Detailed Analysis
+- Hàm `main`
+```C
+int __fastcall main(int argc, const char **argv, const char **envp)
+{
+  int v3; // r12d
+  __m128i v5; // [rsp+0h] [rbp-38h] BYREF
+  __m128i s2[2]; // [rsp+10h] [rbp-28h] BYREF
+
+  printf("Flag: ");
+  __isoc99_scanf("%15s", &v5);
+  s2[0] = _mm_xor_si128(
+            _mm_add_epi32(_mm_shuffle_epi8(_mm_load_si128(&v5), (__m128i)SHUFFLE), (__m128i)ADD32),
+            (__m128i)XOR);
+  if ( !strncmp(v5.m128i_i8, s2[0].m128i_i8, 0x10uLL) && (v3 = strncmp(s2[0].m128i_i8, EXPECTED_PREFIX, 4uLL)) == 0 )
+  {
+    puts("SUCCESS");
+  }
+  else
+  {
+    v3 = 1;
+    puts("FAILURE");
+  }
+  return v3;
+}
+```
+- Hàm `main` sẽ có nhiệm vụ nhận input từ user, sau đó biến đổi như sau. Đầu tiên tiến hành `shuffle` các phần tử có trong input với shuffle mask `SHUFFLE`, tiếp đến là tiến hành cộng 4 byte 1 của input (theo kiểu little endian) với các dword có trong `ADD32`, và cuối cùng xor các phần tử có trong inout với `XOR`, nếu input sau khi được biến đổi vẫn giống như trước biến đổi thì đúng
+- Với các dữ kiện bên trên thì việc viết script sẽ không quá khó khăn (thậm chí không cần phải debug). Có 1 tips cho bài này nếu như các bạn muốn debug xem input được biến đổi cụ thể như nào thì ta có thể sử dụng cửa sổ `XMM registers` của IDA
 ## Script and Flag
 ```python
 # z3 my beloved <3 

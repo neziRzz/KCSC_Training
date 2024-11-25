@@ -603,8 +603,8 @@ LABEL_26:
 }
 ```
 - Nhìn qua thì có vẻ đây là một bài bắt nhập tọa độ để gen ra một map phụ thuộc vào độ phức tạp của map muốn tạo. Tùy thuộc vào độ phức tạp ta nhập vào bao nhiêu thì ta sẽ phải nhập bấy nhiêu cái tọa độ (tọa độ có dạng x,y). Sau đó tọa độ mà ta nhập vào sẽ được biến đổi thông qua các hàm như `EncodeMorton_12bit`, `Unpad64Bit_8Bit`,... và cuối cùng kiểm tra với `correct`
-- Với điều kiện cuối cùng là kiểm tra với `correct` ta có thể trace ngược lại những variables có liên quan là `v22` -> `v23` -> `v26` -> `v25`
-- Vậy để giải ta chỉ cần viết script cho những biến để tìm các biến liên quan và build lại các hàm nếu cần thiết. May thay các hàm này không quá phức tạp nên ta chỉ cần chép chúng ra, sửa lại data type và ném vào script. Bởi số lượng data cũng như là các hàm cần phải build lại khá là lớn nên mình sẽ phân script ra làm 3 phase để tiện hơn
+- Với điều kiện cuối cùng là kiểm tra với `correct` ta có thể trace ngược lại những variables có liên quan là `v22` -> `v23` -> `v26` -> `v25` -> v11 & v6(x&y)
+- Vậy để giải ta chỉ cần viết script cho những biến để tìm các biến liên quan và build lại các hàm nếu cần thiết. May thay các hàm này không quá phức tạp nên ta chỉ cần chép chúng ra, sửa lại data type và ném vào script(z3). Bởi số lượng data cũng như là các hàm cần phải build lại khá là lớn nên mình sẽ phân script ra làm 3 phase để tiện hơn
 
 ![image](https://github.com/user-attachments/assets/336087a3-34de-4721-b65d-cbb5c23a22de)
 

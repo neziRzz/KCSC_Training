@@ -84,7 +84,82 @@ __int64 __fastcall sub_7FF755C31170(const char *a1)
   return result;
 }
 ```
-- Hàm này sẽ có nhiệm vụ tách 8 kí tự 1 của user. String `desufnoc` (confused but reversed bởi little endian)
+- Hàm này sẽ có nhiệm vụ tách 8 kí tự 1 của user để xử lí, sau đó cùng với string `confused`(Little endian nên bị đảo) sẽ được đưa vào hàm `sub_7FF755C31200` để tiếp tục tính toán
+
+- Hàm `sub_7FF755C31200` cũng sử dụng kĩ thuật obfuscate như trên nên cũng sẽ sử dụng cách làm tương tự để tìm hàm chuẩn
+```C
+char __fastcall sub_7FF7EDF11000(char *a1)
+{
+  char v1; // r8
+  char v2; // r10
+  char v3; // r15
+  char v4; // dl
+  char v5; // si
+  char v6; // di
+  char v7; // r13
+  char v8; // bl
+  char v9; // r9
+  char result; // al
+  char v11; // cl
+  int v12; // r11d
+  char v14; // [rsp+8h] [rbp-68h]
+  char v15; // [rsp+10h] [rbp-60h]
+  char v16; // [rsp+18h] [rbp-58h]
+  char v17; // [rsp+20h] [rbp-50h]
+  char v18; // [rsp+28h] [rbp-48h]
+
+  v1 = *a1;                                     // a[0] -> a[7] = input
+                                                // a[9] -> a[15] = confused
+  v2 = a1[1];
+  v18 = a1[9];
+  v17 = a1[10];
+  v3 = a1[2];
+  v16 = a1[11];
+  v4 = a1[3];
+  v15 = a1[12];
+  v5 = a1[4];
+  v14 = a1[13];
+  v6 = a1[5];
+  v7 = a1[14];
+  v8 = a1[6];
+  v9 = a1[15];
+  result = a1[7];
+  v11 = a1[16];
+  v12 = 100;
+  do
+  {
+    v2 = __ROL1__(byte_7FF7EDF2B000[(unsigned __int8)(v1 + v18)] + v2, 1);
+    v3 = __ROL1__(byte_7FF7EDF2B000[(unsigned __int8)(v2 + v17)] + v3, 1);
+    v4 = __ROL1__(byte_7FF7EDF2B000[(unsigned __int8)(v3 + v16)] + v4, 1);
+    v5 = __ROL1__(byte_7FF7EDF2B000[(unsigned __int8)(v4 + v15)] + v5, 1);
+    v6 = __ROL1__(byte_7FF7EDF2B000[(unsigned __int8)(v5 + v14)] + v6, 1);
+    v8 = __ROL1__(byte_7FF7EDF2B000[(unsigned __int8)(v6 + v7)] + v8, 1);
+    result = __ROL1__(byte_7FF7EDF2B000[(unsigned __int8)(v9 + v8)] + result, 1);
+    v1 = __ROL1__(byte_7FF7EDF2B000[(unsigned __int8)(v11 + result)] + v1, 1);
+    --v12;
+  }
+  while ( v12 );
+  a1[1] = v2;
+  a1[2] = v3;
+  a1[3] = v4;
+  a1[4] = v5;
+  a1[5] = v6;
+  a1[6] = v8;
+  a1[7] = result;
+  *a1 = v1;
+  return result;
+}
+```
+- Tại đây ta có thể thấy rằng input được tính toán theo pattern như sau `_rol1_(map[index]+input,1)` nên ta có thể tìm lại được input ban đầu bằng cách đảo lại thứ tự của vòng `do while` trên (v1 -> v2), thay `_rol1_` thành `_ror_1` và cuối cùng lấy kết quả của cyphertext trừ đi cho `map[index]`, hoặc ta cũng có thể build lại hàm trên và bruteforce (ban đầu mình cũng nghĩ đến z3 nhưng vì một lí do nào đó mà không được)
+
+- Cuối cùng thì input sau khi được biến đổi sẽ được kiểm tra tại đây
+```C
+bool __fastcall sub_7FF7EDF11150(const void *a1)
+{
+  return memcmp(a1, &unk_7FF7EDF36000, 0x30ui64) == 0;
+}
+```
+- Input sau khi được biến đổi sẽ được kiểm tra với `unk_7FF7EDF36000`. Với những dữ kiện này, ta có thể dễ dàng viết script như bên dưới
 ## Script and Flag
 ```python
 def ror(val, bits, bit_size):

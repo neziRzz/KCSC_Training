@@ -46,3 +46,26 @@ if(s.check()==sat):
 # Datastruct2
 ## Detailed Analysis
 ## Script and Flag
+```python
+f = open("D:\\KCSC RE\\datastruct1\\rev_crushing\\message.txt.cz","rb")
+
+data = f.read()
+data_len = len(data)
+flag = [0]*(len(data))
+curr_index = 0
+for i in range(256):
+    if(curr_index>=data_len):
+        break
+    count = data[curr_index]
+    curr_ascii = i
+    curr_index += 8
+    if(count != 0):
+        iterate = curr_index
+        for j in range(count):
+            flag[int.from_bytes(data[iterate:iterate+2],"little")]=curr_ascii
+            iterate +=8
+            curr_index +=8
+    
+for i in flag:
+    print(chr(i),end='')
+```

@@ -47,7 +47,7 @@ if(s.check()==sat):
 ## Detailed Analysis
 ## Script and Flag
 ```python
-f = open("D:\\KCSC RE\\datastruct1\\rev_crushing\\message.txt.cz","rb")
+f = open("path\\to\\message.txt.cz","rb")
 
 data = f.read()
 data_len = len(data)

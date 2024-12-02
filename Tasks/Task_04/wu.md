@@ -236,7 +236,7 @@ __int64 __fastcall sub_1253(__int64 a1, unsigned int a2, unsigned __int8 a3)
   return result;
 }
 ```
-- Hàm này sẽ mô phỏng lại queue data structure bằng các opcode từ `unk_4060`, cụ thể các case sẽ có chức năng như sau
+- Hàm này sẽ mô phỏng lại queue data structure bằng các opcode (byte đầu) từ `unk_4060`, cụ thể các case sẽ có chức năng như sau
   + `Case 1`: Dequeue 2 phần tử ở đầu queue rồi sau đó nhân chúng lại với nhau rồi đẩy kết quả xuống cuối queue (chỉ lấy LOBYTE của kết quả)
   + `Case 2`: Đẩy phần tử thứ `a3` trong 16 byte input vào cuối queue
   + `Case 3`: Dequeue 2 phần tử ở đầu queue rồi sau đó cộng chúng lại với nhau rồi đẩy kết quả xuống cuối queue (chỉ lấy LOBYTE của kết quả)

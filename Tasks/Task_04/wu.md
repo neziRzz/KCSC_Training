@@ -1,5 +1,5 @@
 # Datastruct1
-![image](https://github.com/user-attachments/assets/799f10ab-46f8-4818-8c71-9b1e873d4c52)
+
 - Đề cho 1 file ELF64
 
 ![image](https://github.com/user-attachments/assets/dd62b04f-6795-49dd-a6c6-14c751344f2a)

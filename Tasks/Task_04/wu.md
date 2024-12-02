@@ -108,7 +108,8 @@ for i in range(256):
 for i in flag:
     print(chr(i),end='')
 ```
-```python
+- Kết quả thu được như sau
+```
 Organizer 1: Hey, did you finalize the password for the next... you know?
 
 Organizer 2: Yeah, I did. It's "HTB{4_v3ry_b4d_compr3ss1on_sch3m3}"
@@ -123,6 +124,7 @@ Organizer 2: Agreed. We can't afford any slip-ups, especially with the stakes so
 
 Organizer 1: Absolutely. The thrill of the unknown is what keeps them coming back for more. "HTB{4_v3ry_b4d_compr3ss1on_sch3m3}" it is then.
 ```
+**Flag:** `HTB{4_v3ry_b4d_compr3ss1on_sch3m3}`
 # Datastruct2
 - Đề cho 1 file ELF64
 
@@ -303,3 +305,5 @@ if(s.check()==sat):
 ```
 - Với 16 byte cyphertext đầu tiên thì kết quả như sau (với các byte còn lại cứ copy 16 byte 1 vào là được)
 ![image](https://github.com/user-attachments/assets/5a944c2f-7381-4365-b984-4ce718bd550d) 
+
+**Flag:** `ictf{S_d1dnt_5t4nd_f0r_5t4ck_b3c4u53_h3r3_I_us3d_4_L1nk3d_qu3u3}`

@@ -1,4 +1,4 @@
-# Datastruct1
+![image](https://github.com/user-attachments/assets/799f10ab-46f8-4818-8c71-9b1e873d4c52)# Datastruct1
 - Đề cho 1 file ELF64
 
 ![image](https://github.com/user-attachments/assets/dd62b04f-6795-49dd-a6c6-14c751344f2a)
@@ -114,12 +114,65 @@ for i in flag:
 ![image](https://github.com/user-attachments/assets/f088ac51-39a1-4ec0-adea-2240d596f07a)
 
 ## Detailed Analysis
+- Hàm `main()`
+```C
+__int64 __fastcall main(int a1, char **a2, char **a3)
+{
+  char s[72]; // [rsp+0h] [rbp-60h] BYREF
+  void *ptr; // [rsp+48h] [rbp-18h]
+  FILE *stream; // [rsp+50h] [rbp-10h]
+  int i; // [rsp+5Ch] [rbp-4h]
+
+  stream = fopen("flag.txt", "r");
+  fgets(s, 65, stream);
+  fclose(stream);
+  ptr = malloc(0x40uLL);
+  for ( i = 0; i <= 63; i += 16 )
+    sub_1403(&s[i], (char *)ptr + i);
+  stream = fopen("output.bin", "w");
+  fwrite(ptr, 1uLL, 0x40uLL, stream);
+  fclose(stream);
+  free(ptr);
+  return 0LL;
+}
+```
+- Hàm `main()` sẽ tiến hành mở file `flag.txt` (file này chứa flag ofc) và lấy 65 byte từ file này. Sau đó tiến hành xử lí 16 byte một thông qua hàm `sub_1403()`. Cuối cùng thì write hết các byte được xử lí vào file `output.bin`
+
+- Hàm `sub_1403()`
+```C
+_BYTE *__fastcall sub_1403(__int64 a1, __int64 a2)
+{
+  _BYTE *result; // rax
+  char v3; // cl
+  __int64 v4[4]; // [rsp+10h] [rbp-40h] BYREF
+  char v5; // [rsp+30h] [rbp-20h]
+  __int64 v6[2]; // [rsp+38h] [rbp-18h] BYREF
+  int j; // [rsp+48h] [rbp-8h]
+  int i; // [rsp+4Ch] [rbp-4h]
+
+  memset(v4, 0, sizeof(v4));
+  v5 = 0;
+  v6[0] = 0LL;
+  v6[1] = 0LL;
+  for ( i = 0; i <= 15; ++i )
+    sub_1189(v6, *(unsigned __int8 *)(i + a1));
+  result = (_BYTE *)sub_1396(v4, &unk_4060);
+  for ( j = 0; j <= 15; ++j )
+  {
+    v3 = sub_11F7(v6);
+    result = (_BYTE *)(j + a2);
+    *result = v3;
+  }
+  return result;
+}
+```
+- Hàm này tiến hành khởi tạo 1 linked list từ 16 byte của input sau đó đưa vào hàm `sub_1396()` để tiếp tục xử lí. Linked list sau khi được xử lí sẽ được free bằng hàm `sub_11F7()` và các phần tử trong list lần lượt được đưa vào `result` để viết vào `output.bin`
 ## Script and Flag
 ```python
 from z3 import *
 flag = [BitVec("x[%d]"%i,8)for i in range(16)]
 s = Solver()
-cyphertext = [0x69, 0x84, 0x94, 0xA4, 0x53, 0x0F, 0x39, 0x8A, 0xB4, 0x73, 0x37, 0xBC, 0x43, 0xD8, 0x72, 0x4C] # too lazy to write a solve script so i wrote a step by step solver instead (just use 16 bytes of cyphertext for each decrypt routine)
+cyphertext = [0x69, 0x84, 0x94, 0xA4, 0x53, 0x0F, 0x39, 0x8A, 0xB4, 0x73, 0x37, 0xBC, 0x43, 0xD8, 0x72, 0x4C] # too lazy to write a solve script so i wrote a step by step solver instead (just use 16 bytes of cyphertext for each decryption routine)
 bytecode = [0x02, 0x01, 0x05, 0xAA, 0x02, 0x02, 0x05, 0xED, # stripped 0x04 case at the beginning and 0x02 at the end
   0x02, 0x03, 0x05, 0xEC, 0x02, 0x04, 0x05, 0x5D, 0x02, 0x05, 
   0x05, 0x8E, 0x02, 0x06, 0x05, 0x87, 0x02, 0x07, 0x05, 0x41, 

@@ -1,4 +1,5 @@
-![image](https://github.com/user-attachments/assets/799f10ab-46f8-4818-8c71-9b1e873d4c52)# Datastruct1
+# Datastruct1
+![image](https://github.com/user-attachments/assets/799f10ab-46f8-4818-8c71-9b1e873d4c52)
 - Đề cho 1 file ELF64
 
 ![image](https://github.com/user-attachments/assets/dd62b04f-6795-49dd-a6c6-14c751344f2a)
@@ -167,6 +168,82 @@ _BYTE *__fastcall sub_1403(__int64 a1, __int64 a2)
 }
 ```
 - Hàm này tiến hành khởi tạo 1 linked list từ 16 byte của input sau đó đưa vào hàm `sub_1396()` để tiếp tục xử lí. Linked list sau khi được xử lí sẽ được free bằng hàm `sub_11F7()` và các phần tử trong list lần lượt được đưa vào `result` để viết vào `output.bin`
+
+- Hàm `sub_1396()`
+```C
+__int64 __fastcall sub_1396(__int64 a1, __int64 a2)
+{
+  int v2; // eax
+  __int64 result; // rax
+  unsigned int v4; // [rsp+18h] [rbp-8h]
+  int v5; // [rsp+1Ch] [rbp-4h]
+
+  v5 = 0;
+  while ( 1 )
+  {
+    v4 = *(unsigned __int8 *)(v5 + a2);
+    v2 = v5 + 1;
+    v5 += 2;
+    result = *(unsigned __int8 *)(v2 + a2);
+    if ( !v4 )
+      break;
+    sub_1253(a1, v4, (unsigned __int8)result);
+  }
+  return result;
+}
+```
+- Hàm này mô phỏng lại cách thức hoạt động của một VM (Virtual Machine) với `v5` là VIP (Virtual Instruction Pointer) với các bytecode được lấy từ `unk_4060`(lấy 2 byte một, với byte đầu tiên là opcode và byte thứ 2 là operand). Sau khi fetch được bytecode thì chương trình sẽ tăng VIP lên 2 byte và tùy thuộc vào opcode thì sẽ được xử lí ở bên trong hàm `sub_1253()`
+
+
+- Hàm `sub_1253()`
+```C
+__int64 __fastcall sub_1253(__int64 a1, unsigned int a2, unsigned __int8 a3)
+{
+  __int64 result; // rax
+  char v5; // [rsp+18h] [rbp-8h]
+  char v6; // [rsp+18h] [rbp-8h]
+  char v7; // [rsp+1Ch] [rbp-4h]
+  char v8; // [rsp+1Ch] [rbp-4h]
+  char v9; // [rsp+1Ch] [rbp-4h]
+
+  result = a2;
+  switch ( a2 )
+  {
+    case 1u:
+      v9 = sub_11F7(a1 + 40);
+      v6 = sub_11F7(a1 + 40);
+      result = sub_1189(a1 + 40, (unsigned __int8)(v6 * v9));
+      break;
+    case 2u:
+      result = sub_1189(a1 + 40, *(unsigned __int8 *)(a1 + a3));
+      break;
+    case 3u:
+      v8 = sub_11F7(a1 + 40);
+      v5 = sub_11F7(a1 + 40);
+      result = sub_1189(a1 + 40, (unsigned __int8)(v8 + v5));
+      break;
+    case 4u:
+      v7 = sub_11F7(a1 + 40);
+      result = a3;
+      *(_BYTE *)(a1 + a3) = v7;
+      break;
+    case 5u:
+      result = sub_1189(a1 + 40, a3);
+      break;
+    default:
+      return result;
+  }
+  return result;
+}
+```
+- Hàm này sẽ mô phỏng lại queue data structure bằng các opcode từ `unk_4060`, cụ thể các case sẽ có chức năng như sau
+  + `Case 1`: Dequeue 2 phần tử ở đầu queue rồi sau đó nhân chúng lại với nhau rồi đẩy kết quả xuống cuối queue (chỉ lấy LOBYTE của kết quả)
+  + `Case 2`: Đẩy phần tử thứ `a3` trong 16 byte input vào cuối queue
+  + `Case 3`: Dequeue 2 phần tử ở đầu queue rồi sau đó cộng chúng lại với nhau rồi đẩy kết quả xuống cuối queue (chỉ lấy LOBYTE của kết quả)
+  + `Case 4`: Dequeue phần tử ở đầu queue rồi lưu vào 1 buffer
+  + `Case 5`: Queue phần tử được chỉ định trong operand (ví dụ nếu như opcode là `0x05 0xDE` thì sẽ append `0xDE`)
+
+- Vậy để giải ta chỉ cần viết script mô phỏng lại và dùng z3 để tìm flag 
 ## Script and Flag
 ```python
 from z3 import *

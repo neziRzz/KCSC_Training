@@ -301,3 +301,5 @@ if(s.check()==sat):
   print(flag_string)
   
 ```
+- Với 16 byte cyphertext đầu tiên thì kết quả như sau 
+![image](https://github.com/user-attachments/assets/5a944c2f-7381-4365-b984-4ce718bd550d) 

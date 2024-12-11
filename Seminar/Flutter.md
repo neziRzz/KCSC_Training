@@ -1,6 +1,10 @@
 # Flutter
 ## Introduction
-- Được phát triển bởi Google, Flutter framework có thể giúp ta build các ứng dụng trên nhiều nền tảng khác nhau (iOS, Android,...etc) chỉ với một source code duy nhất. Source code của Flutter sẽ được viết bằng `Dart`
+- Được phát triển bởi Google, Flutter framework có thể giúp ta build các ứng dụng trên nhiều nền tảng khác nhau (iOS, Android,...etc) chỉ với một source code duy nhất. Source code của các app Flutter được viết bằng `Dart`
 ## Reversing Flutter
-### Requirements
+### Recon and Identification
+- Thông thường thì dấu hiệu nhận biết một app được build bằng Flutter sẽ như sau
+  + Nếu app được build bằng mode `debug` thì ta chỉ cần tìm source bên trong `./assets/flutter_assets/kernel_blob.bin`
+  + Nếu app được build bằng mode `release` thì lúc này ta sẽ phải tìm `libapp.so` ở bên trong thư mục `./lib/` của APK
+### Tools
 - 

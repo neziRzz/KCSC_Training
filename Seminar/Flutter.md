@@ -7,4 +7,5 @@
   + Nếu app được build bằng mode `debug` thì ta chỉ cần tìm source bên trong `./assets/flutter_assets/kernel_blob.bin`
   + Nếu app được build bằng mode `release` thì lúc này ta sẽ phải tìm `libapp.so` ở bên trong thư mục `./lib/` của APK
 ### Tools
-- 
+- Để reverse được các samples được build bằng Flutter, ta có thể sử dụng các tools sau
+  + [Blutter](https://github.com/worawit/blutter)

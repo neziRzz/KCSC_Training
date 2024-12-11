@@ -13,4 +13,8 @@
   + [Dolđrums](https://github.com/rscloura/Doldrums)
   + [reFlutter](https://github.com/Impact-I/reFlutter)
 ### Demo
+- Dưới đây mình sẽ demo 1 bài CTF có sử dụng Flutter ở `release mode`, về hướng tiếp cận thì ta sẽ có 2 cách
+  + Sử dụng tool `Blutter` để đọc file `main.dart`
+  + Patch trực tiếp trong file `libapp.so`
+#### Using Blutter
 - 

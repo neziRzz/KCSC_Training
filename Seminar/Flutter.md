@@ -118,3 +118,38 @@ _ _decryptMessage(/* No info */) {
     // 0x2242d8: b               #0x22421c
   }
 ```
+- Ta có thể thấy được một số từ khóa quan trọng trong hàm này như `AES`, `IV`, `Base64`, qua đó có thể suy ra được là chương trình sẽ thực hiện decrypt flag bằng thuật toán `AES` với mode `CBC` (do có IV), và có thể cyphertext hoặc key sẽ được encrypt bằng `Base64`, điều đó có nghĩa rằng ta có thể dễ dàng tìm chúng bằng cách tìm các string có trong `main.dart` (string được định nghĩa bằng các dấu `""`)
+
+![image](https://github.com/user-attachments/assets/59d3a29f-2660-4608-913f-048b66c8b03f)
+
+![image](https://github.com/user-attachments/assets/6fbd94f4-25ee-4327-87c6-6bc5f65a97ff)
+
+- Bên trên lần lượt là cyphertext, key và IV. Vậy việc viết script sẽ không quá khó khăn
+```python
+from base64 import b64decode
+from Crypto.Cipher import AES
+
+# Inputs
+encoded_ciphertext = "CXHoq5mV1jMA+63Sa7+IwhmhZWUXDL69B+wSB01uEQc63QWB0ZIeOiZtheLJpD0s2sC3s2+9FiWyRA+c1Y+vYw=="
+key = b"0h_g0d_sup3r_k3y_is_here_gsirjcu"  # 32 bytes key
+iv = b"16_bytes_key_len"  # 16 bytes IV
+
+# Decode the Base64-encoded ciphertext
+ciphertext = b64decode(encoded_ciphertext)
+
+# Create AES cipher object
+cipher = AES.new(key, AES.MODE_CBC, iv)
+
+# Decrypt the ciphertext
+plaintext_padded = cipher.decrypt(ciphertext)
+
+# Remove PKCS#7 padding
+padding_length = plaintext_padded[-1]
+plaintext = plaintext_padded[:-padding_length]
+
+# Print the plaintext
+print("Decrypted Plaintext:", plaintext.decode('utf-8'))
+
+```
+#### Patching libapp.so directly
+- 

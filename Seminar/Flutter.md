@@ -17,4 +17,6 @@
   + Sử dụng tool `Blutter` để đọc file `main.dart`
   + Patch trực tiếp trong file `libapp.so`
 #### Using Blutter
-- 
+- Cách này ta sẽ sử dụng tool `Blutter` để extract các file trong `lib/arm64-v8a`. Sau khi chạy xong, ta được output là file bên dưới
+
+![image](https://github.com/user-attachments/assets/3e19bd67-3884-4583-88ac-40a0681240d6)

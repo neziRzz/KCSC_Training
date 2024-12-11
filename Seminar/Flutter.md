@@ -152,4 +152,17 @@ print("Decrypted Plaintext:", plaintext.decode('utf-8'))
 
 ```
 #### Patching libapp.so directly
-- 
+- Cách này sẽ yêu cầu ta phải chạy thử chương trình để có cái nhìn khái quát về cách hoạt động, từ đó tìm ra được chỗ cần patch. Lưu ý rằng tùy vào architecture của giả lập chạy APK thì ta sẽ phải patch file tương ứng, ví dụ như nếu giả lập chạy trên architecture x86-64 thì ta patch file `libapp.so` thì ta patch ở bên trong `lib/x86_64`, còn nếu như giả lập chạy trên architecture `arm64` thì patch file ở bên trong `lib/arm64-v8a`,etc...
+- Về cơ bản thì chương trình sẽ bắt ta nhấn vào hình trái tim 10 triệu lần để in ra được flag
+
+![Screenshot_20241212-001407](https://github.com/user-attachments/assets/c2932c40-8994-46a6-8421-12348fc50e90)
+
+- Đưa file `libapp.so` vào IDA để tìm đoạn code kiểm tra
+
+![image](https://github.com/user-attachments/assets/2d3da146-554d-4571-b105-c9dd85b1fe80)
+
+- Đây chính là đoạn code kiểm tra số lần nhấn của user, giờ ta có thể patch nop lại đoạn này hoặc patch cho nó nhảy sang branch ngược lại là được. Sau khi patch xong thì build lại APK và thu được kết quả như sau
+
+![Screenshot_20241212-002427](https://github.com/user-attachments/assets/58686846-949a-4190-91cf-b9805f3c5ec1)
+
+

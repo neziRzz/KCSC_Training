@@ -10,7 +10,7 @@
 ### Tools
 - Để reverse được các samples được build bằng Flutter, ta có thể sử dụng một trong số tools sau
   + [Blutter](https://github.com/worawit/blutter) (Mình sẽ sử dụng tool này trong demo)
-  + [Dolđrums](https://github.com/rscloura/Doldrums)
+  + [Doldrums](https://github.com/rscloura/Doldrums)
   + [reFlutter](https://github.com/Impact-I/reFlutter)
 ### Demo
 - Dưới đây mình sẽ demo 1 bài CTF có sử dụng Flutter ở `release mode`, về hướng tiếp cận thì ta sẽ có 2 cách
